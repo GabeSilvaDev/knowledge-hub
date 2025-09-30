@@ -1,0 +1,27 @@
+services:
+  knowledge-hub:
+    build:
+      context: .
+    volumes:
+      - ./:/var/www
+    ports:
+      - "8004:8004"
+    environment:
+      APP_ENV: local
+      APP_DEBUG: "1"
+      DB_CONNECTION: mongodb
+      DB_HOST: mongo
+      DB_PORT: 27017
+      DB_DATABASE: knowledge_hub
+    depends_on:
+      - mongo
+
+  mongo:
+    image: mongo:6.0
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+volumes:
+  mongo-data:
