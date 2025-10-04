@@ -3,11 +3,11 @@
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 
-beforeEach(function () {
+beforeEach(function (): void {
     User::truncate();
 });
 
-test('user can be created with valid data', function () {
+it('user can be created with valid data', function (): void {
     $user = User::create([
         'name' => 'John Doe',
         'email' => 'john@example.com',
@@ -20,7 +20,7 @@ test('user can be created with valid data', function () {
         ->and($user->password)->not->toBe('password123');
 });
 
-test('user factory creates valid user', function () {
+it('user factory creates valid user', function (): void {
     $user = User::factory()->create();
 
     expect($user)->toBeInstanceOf(User::class)
@@ -29,27 +29,27 @@ test('user factory creates valid user', function () {
         ->and($user->password)->toBeString();
 });
 
-test('user email can have multiple users in mongodb', function () {
+it('user email can have multiple users in mongodb', function (): void {
     $user1 = User::factory()->create(['email' => 'test@example.com']);
-    
+
     expect($user1->email)->toBe('test@example.com');
-    
+
     $user2 = User::factory()->create(['email' => 'test2@example.com']);
     expect($user2->email)->toBe('test2@example.com');
 });
 
-test('user password is automatically hashed', function () {
+it('user password is automatically hashed', function (): void {
     $plainPassword = 'secret123';
-    
+
     $user = User::factory()->create([
-        'password' => $plainPassword
+        'password' => $plainPassword,
     ]);
 
     expect($user->password)->not->toBe($plainPassword)
         ->and(Hash::check($plainPassword, $user->password))->toBeTrue();
 });
 
-test('user hidden attributes are not visible in array', function () {
+it('user hidden attributes are not visible in array', function (): void {
     $user = User::factory()->create();
     $userArray = $user->toArray();
 
@@ -59,7 +59,7 @@ test('user hidden attributes are not visible in array', function () {
         ->and($userArray)->toHaveKey('email');
 });
 
-test('user fillable attributes can be mass assigned', function () {
+it('user fillable attributes can be mass assigned', function (): void {
     $userData = [
         'name' => 'Jane Doe',
         'email' => 'jane@example.com',
@@ -72,38 +72,38 @@ test('user fillable attributes can be mass assigned', function () {
         ->and($user->email)->toBe('jane@example.com');
 });
 
-test('user can be found by email', function () {
+it('user can be found by email', function (): void {
     $email = 'findme@example.com';
     $user = User::factory()->create(['email' => $email]);
-    
+
     $foundUser = User::where('email', $email)->first();
-    
+
     expect($foundUser)->not->toBeNull()
         ->and($foundUser->email)->toBe($email)
         ->and((string) $foundUser->_id)->toBe((string) $user->_id);
 });
 
-test('user count increases when user is created', function () {
+it('user count increases when user is created', function (): void {
     $initialCount = User::count();
-    
+
     User::factory()->create();
-    
+
     expect(User::count())->toBe($initialCount + 1);
 });
 
-test('user can be updated', function () {
+it('user can be updated', function (): void {
     $user = User::factory()->create(['name' => 'Old Name']);
-    
+
     $user->update(['name' => 'New Name']);
-    
+
     expect($user->fresh()->name)->toBe('New Name');
 });
 
-test('user can be deleted', function () {
+it('user can be deleted', function (): void {
     $user = User::factory()->create();
     $userId = $user->_id;
-    
+
     $user->delete();
-    
+
     expect(User::find($userId))->toBeNull();
 });
