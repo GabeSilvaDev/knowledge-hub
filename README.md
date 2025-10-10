@@ -14,9 +14,10 @@ Um sistema moderno de gerenciamento de conhecimento construído com Laravel 12 e
 - 🍃 **MongoDB** - Banco de dados NoSQL flexível e escalável
 - 🧪 **Pest 4** - Framework de testes moderno e expressivo
 - 🐳 **Docker** - Ambiente de desenvolvimento containerizado
-- 🔐 **Autenticação** - Sistema de usuários integrado
+- 🔐 **Autenticação Sanctum** - Sistema de autenticação via API tokens
 - 📝 **Documentação** - Estrutura flexível para diferentes tipos de conteúdo
 - ⚡ **Performance** - Otimizado para alta performance
+- 🔑 **API RESTful** - Endpoints seguros e bem documentados
 
 ## 🛠️ Tecnologias
 
@@ -24,6 +25,7 @@ Um sistema moderno de gerenciamento de conhecimento construído com Laravel 12 e
 |------------|--------|-----------|
 | PHP | 8.4 | Linguagem de programação |
 | Laravel | 12.0 | Framework web PHP |
+| Laravel Sanctum | 4.2 | Autenticação via API tokens |
 | MongoDB | 6.0 | Banco de dados NoSQL |
 | MongoDB Laravel | 5.5 | Driver oficial Laravel para MongoDB |
 | Pest | 4.1 | Framework de testes |
@@ -36,6 +38,7 @@ Um sistema moderno de gerenciamento de conhecimento construído com Laravel 12 e
 knowledge-hub/
 ├── app/
 │   ├── Http/Controllers/     # Controladores da aplicação
+│   │   └── AuthController.php  # Autenticação Sanctum
 │   ├── Models/              # Modelos Eloquent para MongoDB
 │   └── Providers/           # Service Providers
 ├── config/
@@ -43,7 +46,11 @@ knowledge-hub/
 │   └── app.php             # Configurações da aplicação
 ├── database/
 │   ├── factories/          # Factories para geração de dados
+│   ├── migrations/         # Migrations para MongoDB
 │   └── seeders/           # Seeders para população inicial
+├── routes/
+│   ├── web.php            # Rotas web
+│   └── api.php            # Rotas da API com Sanctum
 ├── tests/
 │   ├── Feature/           # Testes de integração
 │   ├── Unit/             # Testes unitários
@@ -88,7 +95,12 @@ knowledge-hub/
    docker exec -it knowledge-hub-knowledge-hub-1 php artisan key:generate
    ```
 
-6. **Execute os seeders (opcional)**
+6. **Execute as migrations**
+   ```bash
+   docker exec -it knowledge-hub-knowledge-hub-1 php artisan migrate
+   ```
+
+7. **Execute os seeders (opcional)**
    ```bash
    docker exec -it knowledge-hub-knowledge-hub-1 php artisan db:seed
    ```
@@ -96,6 +108,7 @@ knowledge-hub/
 ### 🎯 Acesso
 
 - **Aplicação**: http://localhost:8004
+- **API**: http://localhost:8004/api
 - **MongoDB**: localhost:27017
 
 ## 🧪 Testes
@@ -130,7 +143,326 @@ docker exec -it knowledge-hub-knowledge-hub-1 ./vendor/bin/pest tests/Feature/Us
 - **Feature Tests**: Testam fluxos completos da aplicação
 - **Database Testing**: Testes automaticamente limpam o banco MongoDB entre execuções
 
-## 🗄️ Banco de Dados
+## � Autenticação com Laravel Sanctum
+
+O Knowledge Hub utiliza **Laravel Sanctum** para autenticação via API tokens, proporcionando uma solução simples e segura para SPAs, aplicativos móveis e APIs simples baseadas em tokens.
+
+### Endpoints Disponíveis
+
+#### Registro de Usuário
+```bash
+POST /api/register
+Content-Type: application/json
+
+{
+  "name": "João Silva",
+  "email": "joao@example.com",
+  "username": "joaosilva",
+  "password": "senha_segura_123",
+  "password_confirmation": "senha_segura_123",
+  "bio": "Desenvolvedor Full Stack",
+  "avatar_url": "https://example.com/avatar.jpg"
+}
+```
+
+**Resposta de Sucesso (201):**
+```json
+{
+  "message": "User registered successfully",
+  "user": {
+    "_id": "507f1f77bcf86cd799439011",
+    "name": "João Silva",
+    "email": "joao@example.com",
+    "username": "joaosilva",
+    "bio": "Desenvolvedor Full Stack",
+    "avatar_url": "https://example.com/avatar.jpg",
+    "roles": ["user"],
+    "created_at": "2025-10-04T18:30:00.000000Z",
+    "updated_at": "2025-10-04T18:30:00.000000Z"
+  },
+  "access_token": "1|xxxxxxxxxxxxxxxxxxxxxxxxxxx",
+  "token_type": "Bearer"
+}
+```
+
+#### Login
+```bash
+POST /api/login
+Content-Type: application/json
+
+{
+  "email": "joao@example.com",
+  "password": "senha_segura_123"
+}
+```
+
+**Resposta de Sucesso (200):**
+```json
+{
+  "message": "Login successful",
+  "user": {
+    "_id": "507f1f77bcf86cd799439011",
+    "name": "João Silva",
+    "email": "joao@example.com",
+    "username": "joaosilva",
+    "last_login_at": "2025-10-04T18:35:00.000000Z"
+  },
+  "access_token": "2|xxxxxxxxxxxxxxxxxxxxxxxxxxx",
+  "token_type": "Bearer"
+}
+```
+
+#### Obter Usuário Autenticado
+```bash
+GET /api/me
+Authorization: Bearer {seu_token_aqui}
+```
+
+**Resposta de Sucesso (200):**
+```json
+{
+  "user": {
+    "_id": "507f1f77bcf86cd799439011",
+    "name": "João Silva",
+    "email": "joao@example.com",
+    "username": "joaosilva",
+    "roles": ["user"]
+  }
+}
+```
+
+#### Logout
+```bash
+POST /api/logout
+Authorization: Bearer {seu_token_aqui}
+```
+
+**Resposta de Sucesso (200):**
+```json
+{
+  "message": "Logged out successfully"
+}
+```
+
+#### Revogar Todos os Tokens
+```bash
+POST /api/tokens/revoke-all
+Authorization: Bearer {seu_token_aqui}
+```
+
+**Resposta de Sucesso (200):**
+```json
+{
+  "message": "All tokens revoked successfully"
+}
+```
+
+### Exemplos de Uso
+
+#### Com cURL
+```bash
+# Registro
+curl -X POST http://localhost:8004/api/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "João Silva",
+    "email": "joao@example.com",
+    "username": "joaosilva",
+    "password": "senha123",
+    "password_confirmation": "senha123"
+  }'
+
+# Login
+curl -X POST http://localhost:8004/api/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "joao@example.com",
+    "password": "senha123"
+  }'
+
+# Acessar rota protegida
+curl -X GET http://localhost:8004/api/me \
+  -H "Authorization: Bearer SEU_TOKEN_AQUI"
+
+# Logout
+curl -X POST http://localhost:8004/api/logout \
+  -H "Authorization: Bearer SEU_TOKEN_AQUI"
+```
+
+#### Com JavaScript (Fetch API)
+```javascript
+// Registro
+const register = async () => {
+  const response = await fetch('http://localhost:8004/api/register', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      name: 'João Silva',
+      email: 'joao@example.com',
+      username: 'joaosilva',
+      password: 'senha123',
+      password_confirmation: 'senha123'
+    })
+  });
+  
+  const data = await response.json();
+  localStorage.setItem('token', data.access_token);
+  return data;
+};
+
+// Login
+const login = async (email, password) => {
+  const response = await fetch('http://localhost:8004/api/login', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ email, password })
+  });
+  
+  const data = await response.json();
+  localStorage.setItem('token', data.access_token);
+  return data;
+};
+
+// Fazer requisição autenticada
+const getAuthenticatedUser = async () => {
+  const token = localStorage.getItem('token');
+  
+  const response = await fetch('http://localhost:8004/api/me', {
+    headers: {
+      'Authorization': `Bearer ${token}`
+    }
+  });
+  
+  return await response.json();
+};
+
+// Logout
+const logout = async () => {
+  const token = localStorage.getItem('token');
+  
+  await fetch('http://localhost:8004/api/logout', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}`
+    }
+  });
+  
+  localStorage.removeItem('token');
+};
+```
+
+#### Com Axios
+```javascript
+import axios from 'axios';
+
+// Configurar instância do Axios
+const api = axios.create({
+  baseURL: 'http://localhost:8004/api',
+  headers: {
+    'Content-Type': 'application/json'
+  }
+});
+
+// Interceptor para adicionar token automaticamente
+api.interceptors.request.use(config => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+// Usar a API
+const register = async (userData) => {
+  const { data } = await api.post('/register', userData);
+  localStorage.setItem('token', data.access_token);
+  return data;
+};
+
+const login = async (credentials) => {
+  const { data } = await api.post('/login', credentials);
+  localStorage.setItem('token', data.access_token);
+  return data;
+};
+
+const getMe = async () => {
+  const { data } = await api.get('/me');
+  return data;
+};
+
+const logout = async () => {
+  await api.post('/logout');
+  localStorage.removeItem('token');
+};
+```
+
+### Configuração do Sanctum
+
+O Sanctum está configurado em `config/sanctum.php`:
+
+```php
+return [
+    'stateful' => explode(',', env('SANCTUM_STATEFUL_DOMAINS', 
+        'localhost,localhost:3000,127.0.0.1,127.0.0.1:8000,::1'
+    )),
+    
+    'guard' => ['web'],
+    
+    'expiration' => null, // Tokens não expiram
+    
+    'token_prefix' => env('SANCTUM_TOKEN_PREFIX', ''),
+];
+```
+
+### Segurança
+
+- ✅ Senhas são automaticamente hasheadas com bcrypt
+- ✅ Tokens são gerados de forma segura e única
+- ✅ Email e username devem ser únicos no sistema
+- ✅ Validação de senha confirmada no registro
+- ✅ Timestamps de último login são atualizados automaticamente
+
+### Personalizações
+
+#### Adicionar campos customizados ao registro
+Edite `app/Http/Controllers/AuthController.php`:
+
+```php
+public function register(Request $request): JsonResponse
+{
+    $validated = $request->validate([
+        'name' => ['required', 'string', 'max:255'],
+        'email' => ['required', 'string', 'email', 'unique:users'],
+        // Adicione mais campos aqui
+        'company' => ['nullable', 'string', 'max:255'],
+    ]);
+    
+    $user = User::create([
+        'name' => $validated['name'],
+        'email' => $validated['email'],
+        'company' => $validated['company'] ?? null,
+        // ...
+    ]);
+}
+```
+
+#### Definir expiração de tokens
+Em `config/sanctum.php`:
+
+```php
+'expiration' => 60 * 24, // 24 horas
+```
+
+#### Adicionar abilities (permissões) aos tokens
+```php
+$token = $user->createToken('auth_token', ['read', 'write'])->plainTextToken;
+```
+
+## �🗄️ Banco de Dados
 
 ### MongoDB
 
@@ -176,26 +508,36 @@ A configuração do MongoDB está em:
 
 ### User Model
 
-O modelo User está configurado para trabalhar com MongoDB:
+O modelo User está configurado para trabalhar com MongoDB e Sanctum:
 
 ```php
 <?php
 
 namespace App\Models;
 
+use Laravel\Sanctum\HasApiTokens;
 use MongoDB\Laravel\Auth\User as Authenticatable;
 
 class User extends Authenticatable
 {
+    use HasApiTokens; // Trait do Sanctum para tokens
+    
     protected $connection = 'mongodb';
     protected $collection = 'users';
     
     protected $fillable = [
-        'name', 'email', 'password',
+        'name', 
+        'email', 
+        'username',
+        'password',
+        'bio',
+        'avatar_url',
+        'roles',
     ];
     
     protected $hidden = [
-        'password', 'remember_token',
+        'password', 
+        'remember_token',
     ];
     
     protected function casts(): array
@@ -203,10 +545,43 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'roles' => 'array',
+            'last_login_at' => 'datetime',
         ];
     }
 }
 ```
+
+### Collections MongoDB
+
+#### users
+Armazena informações dos usuários:
+- `_id`: ID único do MongoDB
+- `name`: Nome completo
+- `email`: Email único
+- `username`: Nome de usuário único
+- `password`: Senha hasheada
+- `bio`: Biografia (opcional)
+- `avatar_url`: URL do avatar (opcional)
+- `roles`: Array de roles/permissões
+- `email_verified_at`: Data de verificação do email
+- `last_login_at`: Data do último login
+- `remember_token`: Token de "lembrar-me"
+- `created_at`: Data de criação
+- `updated_at`: Data de atualização
+
+#### personal_access_tokens
+Armazena os tokens do Sanctum:
+- `_id`: ID único do MongoDB
+- `tokenable_type`: Tipo da entidade (User)
+- `tokenable_id`: ID do usuário
+- `name`: Nome do token
+- `token`: Hash do token
+- `abilities`: Permissões do token (JSON)
+- `last_used_at`: Última utilização
+- `expires_at`: Data de expiração
+- `created_at`: Data de criação
+- `updated_at`: Data de atualização
 
 ## 🛠️ Desenvolvimento
 
@@ -315,15 +690,19 @@ docker exec -it knowledge-hub-mongo-1 mongosh --eval "db.stats()"
 
 ## 📝 Changelog
 
-### [1.0.0] - 2025-09-30
+### [1.0.0] - 2025-10-04
 
 #### Adicionado
 - Configuração inicial do Laravel 12
 - Integração com MongoDB
-- Sistema de autenticação
+- **Sistema de autenticação com Laravel Sanctum**
+- **Endpoints de API RESTful**
 - Framework de testes Pest 4
 - Ambiente Docker
 - Documentação completa
+- Migrations para users e personal_access_tokens
+- AuthController com registro, login, logout e perfil
+- Rotas de API protegidas
 
 ## 📄 Licença
 
