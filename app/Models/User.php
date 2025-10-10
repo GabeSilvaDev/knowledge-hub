@@ -4,13 +4,16 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
+use Laravel\Sanctum\Sanctum;
 use MongoDB\Laravel\Auth\User as Authenticatable;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable;
 
     protected $connection = 'mongodb';
 
@@ -30,6 +33,7 @@ class User extends Authenticatable
         'avatar_url',
         'bio',
         'roles',
+        'last_login_at',
     ];
 
     /**
@@ -68,5 +72,21 @@ class User extends Authenticatable
     public function articles(): HasMany
     {
         return $this->hasMany(Article::class, 'author_id');
+    }
+
+    /**
+     * Override tokens relationship to use MongoDB connection.
+     *
+     * @return MorphMany<PersonalAccessToken>
+     */
+    public function tokens(): MorphMany
+    {
+        return $this->morphMany(
+            Sanctum::personalAccessTokenModel(),
+            'tokenable',
+            'tokenable_type',
+            'tokenable_id',
+            '_id' // local key
+        );
     }
 }

@@ -52,4 +52,19 @@ class UserRepository implements UserRepositoryInterface
             ->orWhere('email', 'like', "%{$term}%")
             ->get();
     }
+
+    public function updateLastLogin(User $user): void
+    {
+        $user->update(['last_login_at' => now()]);
+    }
+
+    public function revokeToken(User $user, string $tokenId): void
+    {
+        $user->tokens()->find($tokenId)?->delete();
+    }
+
+    public function revokeAllTokens(User $user): void
+    {
+        $user->tokens()->delete();
+    }
 }

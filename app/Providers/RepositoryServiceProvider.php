@@ -3,9 +3,11 @@
 namespace App\Providers;
 
 use App\Contracts\ArticleRepositoryInterface;
+use App\Contracts\AuthServiceInterface;
 use App\Contracts\UserRepositoryInterface;
 use App\Repositories\ArticleRepository;
 use App\Repositories\UserRepository;
+use App\Services\AuthService;
 use Illuminate\Support\ServiceProvider;
 
 class RepositoryServiceProvider extends ServiceProvider
@@ -24,6 +26,11 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(
             ArticleRepositoryInterface::class,
             ArticleRepository::class
+        );
+
+        $this->app->bind(
+            AuthServiceInterface::class,
+            AuthService::class
         );
     }
 
