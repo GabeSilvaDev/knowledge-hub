@@ -43,4 +43,19 @@ interface UserRepositoryInterface
      * Search users by name or username.
      */
     public function search(string $term): Collection;
+
+    /**
+     * Update last login timestamp.
+     */
+    public function updateLastLogin(User $user): void;
+
+    /**
+     * Revoke a specific token.
+     */
+    public function revokeToken(User $user, string $tokenId): void;
+
+    /**
+     * Revoke all tokens for a user.
+     */
+    public function revokeAllTokens(User $user): void;
 }
