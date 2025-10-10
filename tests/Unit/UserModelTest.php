@@ -8,8 +8,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Notifications\Notifiable;
 
-const TEST_USER_EMAIL = 'test@example.com';
-const TEST_USER_USERNAME = 'testuser';
 const TEST_USER_BIO = 'Test user biography';
 const TEST_AVATAR_URL = 'https://example.com/avatar.jpg';
 const TEST_PASSWORD = 'password123';
@@ -118,6 +116,7 @@ describe('User Model Configuration', function (): void {
             'avatar_url',
             'bio',
             'roles',
+            'last_login_at',
         ];
 
         expect($user->getFillable())->toBe($expectedFillable);

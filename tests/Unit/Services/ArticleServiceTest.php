@@ -10,24 +10,25 @@ use App\Services\ArticleService;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 
-function setupArticleService(): ArticleService
-{
-    $repository = new ArticleRepository(new Article);
+describe('ArticleService', function () {
+    beforeEach(function () {
+        $this->repository = new ArticleRepository(new Article);
+        $this->service = new ArticleService($this->repository);
+    });
 
-    return new ArticleService($repository);
-}
+    afterEach(function () {
+        Article::query()->delete();
+        User::query()->delete();
+    });
 
-function cleanupAfterArticleTest(): void
-{
-    Article::query()->delete();
-    User::query()->delete();
-}
+    describe('constructor', function () {
+        it('creates service with repository dependency', function () {
+            expect($this->service)->toBeInstanceOf(ArticleService::class);
+        });
+    });
 
-function testArticleCreationMethods(): void
-{
-    describe('createArticle method', function (): void {
-        it('creates article with minimal data', function (): void {
-            $service = setupArticleService();
+    describe('createArticle method', function () {
+        it('creates article with minimal data', function () {
             $user = User::factory()->create();
 
             $dto = CreateArticleDTO::fromArray([
@@ -38,7 +39,7 @@ function testArticleCreationMethods(): void
                 'type' => ArticleType::ARTICLE->value,
             ]);
 
-            $result = $service->createArticle($dto);
+            $result = $this->service->createArticle($dto);
 
             expect($result)->toBeInstanceOf(Article::class)
                 ->and($result->title)->toBe('Test Article')
@@ -48,8 +49,7 @@ function testArticleCreationMethods(): void
                 ->and($result->type)->toBe(ArticleType::ARTICLE->value);
         });
 
-        it('creates article with all data including SEO', function (): void {
-            $service = setupArticleService();
+        it('creates article with all data including SEO', function () {
             $user = User::factory()->create();
 
             $dto = CreateArticleDTO::fromArray([
@@ -71,7 +71,7 @@ function testArticleCreationMethods(): void
                 'seo_keywords' => 'seo,keywords',
             ]);
 
-            $result = $service->createArticle($dto);
+            $result = $this->service->createArticle($dto);
 
             expect($result)->toBeInstanceOf(Article::class)
                 ->and($result->title)->toBe('Complete Article')
@@ -84,8 +84,7 @@ function testArticleCreationMethods(): void
                 ->and($result->tags)->toContain('laravel');
         });
 
-        it('creates article with auto-generated slug when not provided', function (): void {
-            $service = setupArticleService();
+        it('creates article with auto-generated slug when not provided', function () {
             $user = User::factory()->create();
 
             $dto = CreateArticleDTO::fromArray([
@@ -96,15 +95,14 @@ function testArticleCreationMethods(): void
                 'type' => ArticleType::ARTICLE->value,
             ]);
 
-            $result = $service->createArticle($dto);
+            $result = $this->service->createArticle($dto);
 
             expect($result)->toBeInstanceOf(Article::class)
                 ->and($result->title)->toBe('Article Without Slug')
                 ->and($result->slug)->not->toBeEmpty();
         });
 
-        it('creates article with auto-generated excerpt when not provided', function (): void {
-            $service = setupArticleService();
+        it('creates article with auto-generated excerpt when not provided', function () {
             $user = User::factory()->create();
             $longContent = str_repeat('This is a long content. ', 50);
 
@@ -116,15 +114,14 @@ function testArticleCreationMethods(): void
                 'type' => ArticleType::ARTICLE->value,
             ]);
 
-            $result = $service->createArticle($dto);
+            $result = $this->service->createArticle($dto);
 
             expect($result)->toBeInstanceOf(Article::class)
                 ->and($result->excerpt)->not->toBeEmpty()
                 ->and($result->excerpt)->toEndWith('...');
         });
 
-        it('creates article with reading time calculation', function (): void {
-            $service = setupArticleService();
+        it('creates article with reading time calculation', function () {
             $user = User::factory()->create();
             $content = str_repeat('word ', 300);
 
@@ -136,14 +133,13 @@ function testArticleCreationMethods(): void
                 'type' => ArticleType::ARTICLE->value,
             ]);
 
-            $result = $service->createArticle($dto);
+            $result = $this->service->createArticle($dto);
 
             expect($result)->toBeInstanceOf(Article::class)
                 ->and($result->reading_time)->toBeGreaterThan(0);
         });
 
-        it('creates article with SEO data when provided', function (): void {
-            $service = setupArticleService();
+        it('creates article with SEO data when provided', function () {
             $user = User::factory()->create();
 
             $dto = CreateArticleDTO::fromArray([
@@ -157,14 +153,13 @@ function testArticleCreationMethods(): void
                 'seo_keywords' => 'seo,optimization',
             ]);
 
-            $result = $service->createArticle($dto);
+            $result = $this->service->createArticle($dto);
 
             expect($result)->toBeInstanceOf(Article::class)
                 ->and($result->title)->toBe('SEO Article');
         });
 
-        it('creates article with partial SEO data', function (): void {
-            $service = setupArticleService();
+        it('creates article with partial SEO data', function () {
             $user = User::factory()->create();
 
             $dto = CreateArticleDTO::fromArray([
@@ -176,205 +171,13 @@ function testArticleCreationMethods(): void
                 'seo_title' => 'Only SEO Title',
             ]);
 
-            $result = $service->createArticle($dto);
+            $result = $this->service->createArticle($dto);
 
             expect($result)->toBeInstanceOf(Article::class)
                 ->and($result->title)->toBe('Partial SEO Article');
         });
-    });
-}
 
-function testArticleFindMethods(): void
-{
-    describe('getArticleById method', function (): void {
-        it('returns article when found', function (): void {
-            $service = setupArticleService();
-            $article = Article::factory()->create();
-
-            $result = $service->getArticleById($article->_id);
-
-            expect($result)->toBeInstanceOf(Article::class)
-                ->and($result->_id)->toBe($article->_id);
-        });
-
-        it('returns null when article not found', function (): void {
-            $service = setupArticleService();
-
-            $result = $service->getArticleById('507f1f77bcf86cd799439011');
-
-            expect($result)->toBeNull();
-        });
-    });
-
-    describe('getArticleBySlug method', function (): void {
-        it('returns article when found by slug', function (): void {
-            $service = setupArticleService();
-            Article::factory()->create(['slug' => 'test-article']);
-
-            $result = $service->getArticleBySlug('test-article');
-
-            expect($result)->toBeInstanceOf(Article::class)
-                ->and($result->slug)->toBe('test-article');
-        });
-
-        it('returns null when article not found by slug', function (): void {
-            $service = setupArticleService();
-
-            $result = $service->getArticleBySlug('nonexistent-slug');
-
-            expect($result)->toBeNull();
-        });
-    });
-}
-
-function testArticlePaginationMethods(): void
-{
-    describe('getArticles method', function (): void {
-        it('returns paginated articles with default parameters', function (): void {
-            $service = setupArticleService();
-            Article::factory()->count(20)->create();
-
-            $result = $service->getArticles();
-
-            expect($result)->toBeInstanceOf(LengthAwarePaginator::class)
-                ->and($result->perPage())->toBe(15)
-                ->and($result->total())->toBe(20);
-        });
-
-        it('returns paginated articles with custom parameters', function (): void {
-            $service = setupArticleService();
-            Article::factory()->count(25)->create(['status' => ArticleStatus::PUBLISHED]);
-
-            $result = $service->getArticles(10, ['status' => ArticleStatus::PUBLISHED->value]);
-
-            expect($result)->toBeInstanceOf(LengthAwarePaginator::class)
-                ->and($result->perPage())->toBe(10)
-                ->and($result->total())->toBe(25);
-        });
-    });
-}
-
-function testArticleQueryMethods(): void
-{
-    describe('getPublishedArticles method', function (): void {
-        it('returns collection of published articles', function (): void {
-            $service = setupArticleService();
-            Article::factory()->count(3)->create([
-                'status' => 'published',
-                'published_at' => now()->subDay(),
-            ]);
-            Article::factory()->count(2)->create(['status' => 'draft']);
-
-            $result = $service->getPublishedArticles();
-
-            expect($result)->toBeInstanceOf(Collection::class)
-                ->and($result->count())->toBe(3);
-        });
-    });
-
-    describe('getFeaturedArticles method', function (): void {
-        it('returns collection of featured articles', function (): void {
-            $service = setupArticleService();
-            Article::factory()->count(2)->create([
-                'is_featured' => true,
-                'status' => 'published',
-            ]);
-            Article::factory()->count(3)->create(['is_featured' => false]);
-
-            $result = $service->getFeaturedArticles();
-
-            expect($result)->toBeInstanceOf(Collection::class)
-                ->and($result->count())->toBe(2);
-        });
-    });
-
-    describe('getArticlesByAuthor method', function (): void {
-        it('returns collection of articles by author', function (): void {
-            $service = setupArticleService();
-            $user = User::factory()->create();
-            Article::factory()->count(3)->create(['author_id' => $user->_id]);
-            Article::factory()->count(2)->create();
-
-            $result = $service->getArticlesByAuthor($user->_id);
-
-            expect($result)->toBeInstanceOf(Collection::class)
-                ->and($result->count())->toBe(3);
-        });
-    });
-
-    describe('getArticlesByType method', function (): void {
-        it('returns collection of articles by type', function (): void {
-            $service = setupArticleService();
-            Article::factory()->count(2)->create([
-                'type' => ArticleType::TUTORIAL,
-                'status' => 'published',
-            ]);
-            Article::factory()->count(3)->create([
-                'type' => ArticleType::ARTICLE,
-                'status' => 'published',
-            ]);
-
-            $result = $service->getArticlesByType(ArticleType::TUTORIAL);
-
-            expect($result)->toBeInstanceOf(Collection::class)
-                ->and($result->count())->toBe(2);
-        });
-    });
-}
-
-function testArticleSearchMethods(): void
-{
-    describe('searchArticles method', function (): void {
-        it('returns collection of articles matching search term', function (): void {
-            $service = setupArticleService();
-            Article::factory()->create([
-                'title' => 'PHP Tutorial',
-                'status' => 'published',
-            ]);
-            Article::factory()->create([
-                'title' => 'JavaScript Guide',
-                'status' => 'published',
-            ]);
-
-            $result = $service->searchArticles('PHP');
-
-            expect($result)->toBeInstanceOf(Collection::class)
-                ->and($result->count())->toBe(1);
-        });
-    });
-
-    describe('getArticlesByTags method', function (): void {
-        it('returns collection of articles by tags', function (): void {
-            $service = setupArticleService();
-            Article::factory()->create([
-                'tags' => ['php', 'laravel'],
-                'status' => 'published',
-            ]);
-            Article::factory()->create([
-                'tags' => ['javascript'],
-                'status' => 'published',
-            ]);
-
-            $result = $service->getArticlesByTags(['php']);
-
-            expect($result)->toBeInstanceOf(Collection::class)
-                ->and($result->count())->toBe(1);
-        });
-    });
-}
-
-function testArticleServiceConstructor(): void
-{
-    describe('constructor', function (): void {
-        it('creates service with repository dependency', function (): void {
-            $repository = new ArticleRepository(new Article);
-            $service = new ArticleService($repository);
-
-            expect($service)->toBeInstanceOf(ArticleService::class);
-        });
-
-        it('generates slug and excerpt when DTO returns empty values', function (): void {
-            $service = setupArticleService();
+        it('generates slug and excerpt when DTO returns empty values', function () {
             $user = User::factory()->create();
 
             $dto = new class($user->_id) extends CreateArticleDTO
@@ -409,15 +212,14 @@ function testArticleServiceConstructor(): void
                 }
             };
 
-            $result = $service->createArticle($dto);
+            $result = $this->service->createArticle($dto);
 
             expect($result)->toBeInstanceOf(Article::class)
                 ->and($result->slug)->not->toBeEmpty()
                 ->and($result->excerpt)->not->toBeEmpty();
         });
 
-        it('generates excerpt for short content without ellipsis', function (): void {
-            $service = setupArticleService();
+        it('generates excerpt for short content without ellipsis', function () {
             $user = User::factory()->create();
 
             $dto = new class($user->_id) extends CreateArticleDTO
@@ -452,15 +254,14 @@ function testArticleServiceConstructor(): void
                 }
             };
 
-            $result = $service->createArticle($dto);
+            $result = $this->service->createArticle($dto);
 
             expect($result)->toBeInstanceOf(Article::class)
                 ->and($result->excerpt)->toBe('Short')
                 ->and($result->excerpt)->not->toContain('...');
         });
 
-        it('generates excerpt when not provided in DTO', function (): void {
-            $service = setupArticleService();
+        it('generates excerpt when not provided in DTO', function () {
             $user = User::factory()->create();
 
             $dto = CreateArticleDTO::fromArray([
@@ -471,15 +272,14 @@ function testArticleServiceConstructor(): void
                 'type' => ArticleType::ARTICLE->value,
             ]);
 
-            $result = $service->createArticle($dto);
+            $result = $this->service->createArticle($dto);
 
             expect($result)->toBeInstanceOf(Article::class)
                 ->and($result->excerpt)->not->toBeEmpty()
                 ->and($result->excerpt)->toBeString();
         });
 
-        it('generates excerpt without ellipsis for short content', function (): void {
-            $service = setupArticleService();
+        it('generates excerpt without ellipsis for short content', function () {
             $user = User::factory()->create();
             $shortContent = 'Short content';
 
@@ -491,24 +291,164 @@ function testArticleServiceConstructor(): void
                 'type' => ArticleType::ARTICLE->value,
             ]);
 
-            $result = $service->createArticle($dto);
+            $result = $this->service->createArticle($dto);
 
             expect($result)->toBeInstanceOf(Article::class)
                 ->and($result->excerpt)->toBe($shortContent)
                 ->and($result->excerpt)->not->toContain('...');
         });
     });
-}
 
-describe('ArticleService', function (): void {
-    afterEach(function (): void {
-        cleanupAfterArticleTest();
+    describe('getArticleById method', function () {
+        it('returns article when found', function () {
+            $article = Article::factory()->create();
+
+            $result = $this->service->getArticleById($article->_id);
+
+            expect($result)->toBeInstanceOf(Article::class)
+                ->and($result->_id)->toBe($article->_id);
+        });
+
+        it('returns null when article not found', function () {
+            $result = $this->service->getArticleById('507f1f77bcf86cd799439011');
+
+            expect($result)->toBeNull();
+        });
     });
 
-    testArticleCreationMethods();
-    testArticleFindMethods();
-    testArticlePaginationMethods();
-    testArticleQueryMethods();
-    testArticleSearchMethods();
-    testArticleServiceConstructor();
+    describe('getArticleBySlug method', function () {
+        it('returns article when found by slug', function () {
+            Article::factory()->create(['slug' => 'test-article']);
+
+            $result = $this->service->getArticleBySlug('test-article');
+
+            expect($result)->toBeInstanceOf(Article::class)
+                ->and($result->slug)->toBe('test-article');
+        });
+
+        it('returns null when article not found by slug', function () {
+            $result = $this->service->getArticleBySlug('nonexistent-slug');
+
+            expect($result)->toBeNull();
+        });
+    });
+
+    describe('getArticles method', function () {
+        it('returns paginated articles with default parameters', function () {
+            Article::factory()->count(20)->create();
+
+            $result = $this->service->getArticles();
+
+            expect($result)->toBeInstanceOf(LengthAwarePaginator::class)
+                ->and($result->perPage())->toBe(15)
+                ->and($result->total())->toBe(20);
+        });
+
+        it('returns paginated articles with custom parameters', function () {
+            Article::factory()->count(25)->create(['status' => ArticleStatus::PUBLISHED]);
+
+            $result = $this->service->getArticles(10, ['status' => ArticleStatus::PUBLISHED->value]);
+
+            expect($result)->toBeInstanceOf(LengthAwarePaginator::class)
+                ->and($result->perPage())->toBe(10)
+                ->and($result->total())->toBe(25);
+        });
+    });
+
+    describe('getPublishedArticles method', function () {
+        it('returns collection of published articles', function () {
+            Article::factory()->count(3)->create([
+                'status' => 'published',
+                'published_at' => now()->subDay(),
+            ]);
+            Article::factory()->count(2)->create(['status' => 'draft']);
+
+            $result = $this->service->getPublishedArticles();
+
+            expect($result)->toBeInstanceOf(Collection::class)
+                ->and($result->count())->toBe(3);
+        });
+    });
+
+    describe('getFeaturedArticles method', function () {
+        it('returns collection of featured articles', function () {
+            Article::factory()->count(2)->create([
+                'is_featured' => true,
+                'status' => 'published',
+            ]);
+            Article::factory()->count(3)->create(['is_featured' => false]);
+
+            $result = $this->service->getFeaturedArticles();
+
+            expect($result)->toBeInstanceOf(Collection::class)
+                ->and($result->count())->toBe(2);
+        });
+    });
+
+    describe('getArticlesByAuthor method', function () {
+        it('returns collection of articles by author', function () {
+            $user = User::factory()->create();
+            Article::factory()->count(3)->create(['author_id' => $user->_id]);
+            Article::factory()->count(2)->create();
+
+            $result = $this->service->getArticlesByAuthor($user->_id);
+
+            expect($result)->toBeInstanceOf(Collection::class)
+                ->and($result->count())->toBe(3);
+        });
+    });
+
+    describe('getArticlesByType method', function () {
+        it('returns collection of articles by type', function () {
+            Article::factory()->count(2)->create([
+                'type' => ArticleType::TUTORIAL,
+                'status' => 'published',
+            ]);
+            Article::factory()->count(3)->create([
+                'type' => ArticleType::ARTICLE,
+                'status' => 'published',
+            ]);
+
+            $result = $this->service->getArticlesByType(ArticleType::TUTORIAL);
+
+            expect($result)->toBeInstanceOf(Collection::class)
+                ->and($result->count())->toBe(2);
+        });
+    });
+
+    describe('searchArticles method', function () {
+        it('returns collection of articles matching search term', function () {
+            Article::factory()->create([
+                'title' => 'PHP Tutorial',
+                'status' => 'published',
+            ]);
+            Article::factory()->create([
+                'title' => 'JavaScript Guide',
+                'status' => 'published',
+            ]);
+
+            $result = $this->service->searchArticles('PHP');
+
+            expect($result)->toBeInstanceOf(Collection::class)
+                ->and($result->count())->toBe(1);
+        });
+    });
+
+    describe('getArticlesByTags method', function () {
+        it('returns collection of articles by tags', function () {
+            Article::factory()->create([
+                'tags' => ['php', 'laravel'],
+                'status' => 'published',
+            ]);
+            Article::factory()->create([
+                'tags' => ['javascript'],
+                'status' => 'published',
+            ]);
+
+            $result = $this->service->getArticlesByTags(['php']);
+
+            expect($result)->toBeInstanceOf(Collection::class)
+                ->and($result->count())->toBe(1);
+        });
+    });
 });
