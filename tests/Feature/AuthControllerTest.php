@@ -35,7 +35,7 @@ describe('POST /api/register', function () {
 
         postJson('/api/register', $userData)
             ->assertStatus(JsonResponse::HTTP_CREATED)
-            ->assertJson([['token' => 'test-token']]);
+            ->assertJson(['token' => 'test-token']);
     });
 });
 
@@ -56,7 +56,7 @@ describe('POST /api/login', function () {
 
         postJson('/api/login', $credentials)
             ->assertStatus(JsonResponse::HTTP_OK)
-            ->assertJson([['token' => 'test-token']]);
+            ->assertJson(['token' => 'test-token']);
     });
 });
 

@@ -24,9 +24,7 @@ class AuthController extends Controller
     {
         $result = $this->authService->register($request->validated());
 
-        return response()->json([
-            $result
-        ], JsonResponse::HTTP_CREATED);
+        return response()->json($result, JsonResponse::HTTP_CREATED);
     }
 
     /**
@@ -43,9 +41,7 @@ class AuthController extends Controller
             password: $validated['password']
         );
 
-        return response()->json([
-            $result
-        ], JsonResponse::HTTP_OK);
+        return response()->json($result, JsonResponse::HTTP_OK);
     }
 
     /**
