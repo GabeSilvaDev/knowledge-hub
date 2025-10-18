@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Laravel\Sanctum\PersonalAccessToken as SanctumPersonalAccessToken;
+use MongoDB\Laravel\Eloquent\Casts\ObjectId;
 use MongoDB\Laravel\Eloquent\DocumentModel;
 
 class PersonalAccessToken extends SanctumPersonalAccessToken
@@ -50,4 +51,20 @@ class PersonalAccessToken extends SanctumPersonalAccessToken
      * @var string
      */
     protected $keyType = 'string';
+
+    /**
+     * Get the value of the model's primary key.
+     *
+     * @return mixed
+     */
+    public function getKey()
+    {
+        $key = parent::getKey();
+        
+        if ($key instanceof ObjectId) {
+            return (string) $key;
+        }
+        
+        return $key;
+    }
 }
