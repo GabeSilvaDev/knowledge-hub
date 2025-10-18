@@ -57,7 +57,7 @@ class AuthService implements AuthServiceInterface
     {
         $user = $this->userRepository->findByEmail($email);
 
-        if (! $user || ! Hash::check($password, $user->password)) {
+        if (!$user || !Hash::check($password, $user->password)) {
             throw ValidationException::withMessages([
                 'email' => ['The provided credentials are incorrect.'],
             ]);
