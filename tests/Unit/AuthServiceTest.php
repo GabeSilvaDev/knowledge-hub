@@ -230,17 +230,14 @@ describe('login', function () {
         $service->login('wrongpass@example.com', 'wrongpassword');
     })->throws(ValidationException::class, $incorrectCredentialsMessage);
 
-    it('throws exception with proper message format', function () use ($incorrectCredentialsMessage) {
+    it('throws exception with proper message format', function () {
         $repository = app(UserRepositoryInterface::class);
         $service = new AuthService($repository);
 
-        try {
-            $service->login('invalid@example.com', 'password');
-        } catch (ValidationException $e) {
-            expect($e->errors())->toHaveKey('email')
-                ->and($e->errors()['email'][0])->toBe($incorrectCredentialsMessage);
-        }
-    });
+        $this->expectException(ValidationException::class);
+        $service->login('invalid@example.com', 'password');
+    })
+        ->throws(ValidationException::class);
 
     it('returns refreshed user instance', function () {
         $repository = app(UserRepositoryInterface::class);

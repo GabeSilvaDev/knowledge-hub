@@ -2,12 +2,13 @@
 
 use App\Http\Requests\RegisterRequest;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 const TEST_USER_NAME = 'Test User';
 const TEST_USER_EMAIL = 'test@example.com';
 const TEST_USER_USERNAME = 'testuser';
-const TEST_USER_PASSWORD = 'password123';
+const TEST_USER_PASSWORD = 'Password123';
 
 const EXISTING_USER_NAME = 'Existing User';
 const EXISTING_USER_EMAIL = 'existing@example.com';
@@ -15,6 +16,7 @@ const EXISTING_USER_USERNAME = 'existinguser';
 
 beforeEach(function () {
     User::query()->delete();
+    DB::connection('mongodb')->getCollection('users')->deleteMany([]);
 });
 
 afterEach(function () {
