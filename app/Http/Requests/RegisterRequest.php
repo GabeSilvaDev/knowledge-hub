@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 use Override;
 
@@ -27,9 +28,9 @@ class RegisterRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'min:3', self::MAX_255],
-            'email' => ['required', 'string', 'email', self::MAX_255, 'unique:users,email'],
-            'username' => ['required', 'string', 'min:3', self::MAX_255, 'unique:users,username', 'alpha_dash'],
-            'password' => ['required', 'string', 'confirmed', Password::min(8)->letters()->numbers()],
+            'email' => ['required', 'string', 'email', self::MAX_255, Rule::unique('users', 'email')],
+            'username' => ['required', 'string', 'min:3', self::MAX_255, Rule::unique('users', 'username'), 'alpha_dash'],
+            'password' => ['required', 'string', 'confirmed', Password::min(8)->letters()->numbers(), 'regex:/[A-Z]/'],
             'bio' => ['nullable', 'string', 'max:500'],
             'avatar_url' => ['nullable', 'string', 'url', 'max:500'],
         ];
@@ -56,6 +57,7 @@ class RegisterRequest extends FormRequest
             'username.alpha_dash' => 'O nome de usuário pode conter apenas letras, números, hífens e underscores.',
             'password.required' => 'A senha é obrigatória.',
             'password.confirmed' => 'A confirmação de senha não confere.',
+            'password.regex' => 'A senha deve conter pelo menos uma letra maiúscula.',
             'bio.max' => 'A biografia não pode ter mais de 500 caracteres.',
             'avatar_url.url' => 'A URL do avatar deve ser válida.',
         ];
