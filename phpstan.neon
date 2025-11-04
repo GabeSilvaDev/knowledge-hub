@@ -12,8 +12,5 @@ parameters:
     # Level 9 is the highest level
     level: 10
 
-    ignoreErrors:
-        - '#PHPDoc tag @var#'
-
     excludePaths:
         - ./*/*/FileToBeExcluded.php
