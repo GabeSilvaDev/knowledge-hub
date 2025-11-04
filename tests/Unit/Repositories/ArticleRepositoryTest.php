@@ -8,6 +8,9 @@ use App\Models\Article;
 use App\Models\User;
 use App\Repositories\ArticleRepository;
 use Illuminate\Pagination\LengthAwarePaginator;
+
+use function Pest\Laravel\mock;
+
 use Spatie\QueryBuilder\QueryBuilder;
 
 describe('ArticleRepository', function (): void {
@@ -101,12 +104,18 @@ describe('ArticleRepository', function (): void {
         it('throws exception when fresh article is null', function (): void {
             $article = Article::factory()->create();
 
-            $articleMock = Mockery::mock($article)->makePartial();
+            $article->disableVersioning();
+
+            $articleMock = mock(Article::class)->makePartial();
             $articleMock->shouldReceive('update')->andReturn(true);
             $articleMock->shouldReceive('fresh')->andReturn(null);
+            $articleMock->shouldReceive('disableVersioning')->andReturnSelf();
+            $articleMock->shouldReceive('enableVersioning')->andReturnSelf();
+            $articleMock->_id = $article->_id;
 
-            $this->repository->update($articleMock, ['title' => 'New Title']);
-        })->throws(ArticleRefreshException::class);
+            expect(fn () => $this->repository->update($articleMock, ['title' => 'New Title']))
+                ->toThrow(ArticleRefreshException::class);
+        });
     });
 
     describe('delete method', function (): void {
