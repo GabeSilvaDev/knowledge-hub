@@ -11,8 +11,8 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Sanctum\HasApiTokens;
 use Laravel\Sanctum\NewAccessToken;
-use Mockery;
 use MongoDB\Laravel\Auth\User as Authenticatable;
+
 use function Pest\Laravel\mock;
 
 describe('User Model Basic Functionality', function (): void {
