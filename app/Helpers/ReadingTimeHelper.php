@@ -11,7 +11,7 @@ class ReadingTimeHelper
     {
         $wordCount = str_word_count(strip_tags($content));
 
-        return max(1, ceil($wordCount / $wordsPerMinute));
+        return max(1, (int) ceil($wordCount / $wordsPerMinute));
     }
 
     /**
