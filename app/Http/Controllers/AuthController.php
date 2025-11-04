@@ -3,19 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Contracts\AuthServiceInterface;
-use App\DTOs\CreateUserDTO;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Response;
 
 class AuthController extends Controller
 {
     public function __construct(
         private readonly AuthServiceInterface $authService
-    ) {
-    }
+    ) {}
 
     /**
      * Register a new user.
@@ -29,16 +27,23 @@ class AuthController extends Controller
 
     /**
      * Login user and create token.
-     * @param LoginRequest $request
-     * @return JsonResponse
      */
     public function login(LoginRequest $request): JsonResponse
     {
         $validated = $request->validated();
 
+        $email = $validated['email'];
+        $password = $validated['password'];
+
+        if (! is_string($email) || ! is_string($password)) {
+            return response()->json([
+                'message' => 'Invalid credentials format',
+            ], JsonResponse::HTTP_BAD_REQUEST);
+        }
+
         $result = $this->authService->login(
-            email: $validated['email'],
-            password: $validated['password']
+            email: $email,
+            password: $password
         );
 
         return response()->json($result, JsonResponse::HTTP_OK);
@@ -49,9 +54,19 @@ class AuthController extends Controller
      */
     public function logout(Request $request): JsonResponse
     {
+        $user = $request->user();
+
+        if (! $user instanceof User) {
+            return response()->json([
+                'message' => 'Unauthenticated',
+            ], JsonResponse::HTTP_UNAUTHORIZED);
+        }
+
+        $currentToken = $user->currentAccessToken();
+
         $this->authService->logout(
-            user: $request->user(),
-            currentToken: $request->user()->currentAccessToken()->id
+            user: $user,
+            currentToken: (string) $currentToken->id
         );
 
         return response()->json([
@@ -64,7 +79,15 @@ class AuthController extends Controller
      */
     public function revokeAll(Request $request): JsonResponse
     {
-        $this->authService->revokeAllTokens($request->user());
+        $user = $request->user();
+
+        if (! $user instanceof User) {
+            return response()->json([
+                'message' => 'Unauthenticated',
+            ], JsonResponse::HTTP_UNAUTHORIZED);
+        }
+
+        $this->authService->revokeAllTokens($user);
 
         return response()->json([
             'message' => 'All tokens revoked successfully',

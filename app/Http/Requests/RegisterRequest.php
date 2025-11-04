@@ -17,7 +17,7 @@ class RegisterRequest extends FormRequest
         return true;
     }
 
-    private const MAX_255 = 'max:255';
+    private const string MAX_255 = 'max:255';
 
     /**
      * Get the validation rules that apply to the request.
