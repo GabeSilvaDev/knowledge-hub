@@ -47,7 +47,7 @@ final readonly class Content implements Stringable
 
     public function getReadingTime(int $wordsPerMinute = 200): int
     {
-        return max(1, ceil($this->getWordCount() / $wordsPerMinute));
+        return max(1, (int) ceil($this->getWordCount() / $wordsPerMinute));
     }
 
     public function isEmpty(): bool

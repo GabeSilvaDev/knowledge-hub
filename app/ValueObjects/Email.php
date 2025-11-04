@@ -25,12 +25,16 @@ final readonly class Email implements Stringable
 
     public function getDomain(): string
     {
-        return substr($this->value, strpos($this->value, '@') + 1);
+        $atPosition = strpos($this->value, '@');
+
+        return $atPosition !== false ? substr($this->value, $atPosition + 1) : '';
     }
 
     public function getLocalPart(): string
     {
-        return substr($this->value, 0, strpos($this->value, '@'));
+        $atPosition = strpos($this->value, '@');
+
+        return $atPosition !== false ? substr($this->value, 0, $atPosition) : '';
     }
 
     public function equals(Email $other): bool

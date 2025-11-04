@@ -27,7 +27,7 @@ final readonly class Name implements Stringable
     {
         $parts = explode(' ', trim($this->value));
 
-        return $parts[0] ?? '';
+        return $parts[0];
     }
 
     public function getLastName(): string

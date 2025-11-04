@@ -24,12 +24,16 @@ final readonly class Url implements \Stringable
 
     public function getDomain(): string
     {
-        return parse_url($this->value, PHP_URL_HOST) ?? '';
+        $host = parse_url($this->value, PHP_URL_HOST);
+
+        return is_string($host) ? $host : '';
     }
 
     public function getScheme(): string
     {
-        return parse_url($this->value, PHP_URL_SCHEME) ?? '';
+        $scheme = parse_url($this->value, PHP_URL_SCHEME);
+
+        return is_string($scheme) ? $scheme : '';
     }
 
     public function isSecure(): bool

@@ -11,6 +11,7 @@ use App\ValueObjects\Url;
 use App\ValueObjects\UserCredentials;
 use App\ValueObjects\Username;
 use App\ValueObjects\UserProfile;
+use InvalidArgumentException;
 
 class CreateUserDTO
 {
@@ -41,18 +42,58 @@ class CreateUserDTO
      */
     public static function fromArray(array $data): self
     {
+        $name = $data['name'] ?? '';
+        $username = $data['username'] ?? '';
+        $email = $data['email'] ?? '';
+        $password = $data['password'] ?? '';
+        $bio = $data['bio'] ?? null;
+        $avatarUrl = $data['avatar_url'] ?? null;
+        $roles = $data['roles'] ?? [UserRole::READER];
+
+        if (! is_string($name) || ! is_string($username) || ! is_string($email) || ! is_string($password)) {
+            throw new InvalidArgumentException('Name, username, email and password must be strings');
+        }
+
+        if ($bio !== null && ! is_string($bio)) {
+            throw new InvalidArgumentException('Bio must be a string or null');
+        }
+
+        if ($avatarUrl !== null && ! is_string($avatarUrl)) {
+            throw new InvalidArgumentException('Avatar URL must be a string or null');
+        }
+
+        if (! is_array($roles)) {
+            throw new InvalidArgumentException('Roles must be an array');
+        }
+
+        /** @var array<UserRole> $validatedRoles */
+        $validatedRoles = [];
+        foreach ($roles as $role) {
+            if ($role instanceof UserRole) {
+                $validatedRoles[] = $role;
+            } elseif (is_string($role)) {
+                $validatedRoles[] = UserRole::from($role);
+            } else {
+                throw new InvalidArgumentException('Each role must be a UserRole enum or valid string');
+            }
+        }
+
+        if (empty($validatedRoles)) {
+            $validatedRoles = [UserRole::READER];
+        }
+
         return new self(
             profile: UserProfile::create(
-                name: Name::from($data['name']),
-                username: Username::from($data['username']),
-                bio: Bio::from($data['bio'] ?? null)
+                name: Name::from($name),
+                username: Username::from($username),
+                bio: Bio::from($bio)
             ),
             credentials: UserCredentials::create(
-                email: Email::from($data['email']),
-                password: Password::fromPlainText($data['password']),
-                roles: $data['roles'] ?? [UserRole::READER]
+                email: Email::from($email),
+                password: Password::fromPlainText($password),
+                roles: $validatedRoles
             ),
-            avatar_url: isset($data['avatar_url']) ? Url::from($data['avatar_url']) : null,
+            avatar_url: $avatarUrl !== null ? Url::from($avatarUrl) : null,
         );
     }
 }
