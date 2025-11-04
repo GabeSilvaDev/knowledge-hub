@@ -6,18 +6,18 @@ use App\Services\AuthService;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
-beforeEach(function () {
+beforeEach(function (): void {
     User::query()->delete();
     DB::connection('mongodb')->getCollection('personal_access_tokens')->deleteMany([]);
 });
 
-afterEach(function () {
+afterEach(function (): void {
     User::query()->delete();
     DB::connection('mongodb')->getCollection('personal_access_tokens')->deleteMany([]);
 });
 
-describe('register', function () {
-    it('creates user with all required fields', function () {
+describe('register', function (): void {
+    it('creates user with all required fields', function (): void {
         $repository = app(UserRepositoryInterface::class);
         $service = new AuthService($repository);
 
@@ -40,7 +40,7 @@ describe('register', function () {
             ->and(Hash::check('Password123', $result['user']->password))->toBeTrue();
     });
 
-    it('creates user with optional bio and avatar_url', function () {
+    it('creates user with optional bio and avatar_url', function (): void {
         $repository = app(UserRepositoryInterface::class);
         $service = new AuthService($repository);
 
@@ -59,7 +59,7 @@ describe('register', function () {
             ->and($result['user']->avatar_url)->toBe('https://example.com/avatar.jpg');
     });
 
-    it('creates user without optional fields when not provided', function () {
+    it('creates user without optional fields when not provided', function (): void {
         $repository = app(UserRepositoryInterface::class);
         $service = new AuthService($repository);
 
@@ -76,7 +76,7 @@ describe('register', function () {
             ->and($result['user']->avatar_url)->toBeNull();
     });
 
-    it('assigns default user role', function () {
+    it('assigns default user role', function (): void {
         $repository = app(UserRepositoryInterface::class);
         $service = new AuthService($repository);
 
@@ -92,7 +92,7 @@ describe('register', function () {
         expect($result['user']->roles)->toBe(['reader']);
     });
 
-    it('generates authentication token', function () {
+    it('generates authentication token', function (): void {
         $repository = app(UserRepositoryInterface::class);
         $service = new AuthService($repository);
 
@@ -110,7 +110,7 @@ describe('register', function () {
             ->and($result['user']->tokens()->count())->toBe(1);
     });
 
-    it('hashes password before storing', function () {
+    it('hashes password before storing', function (): void {
         $repository = app(UserRepositoryInterface::class);
         $service = new AuthService($repository);
 
@@ -127,7 +127,7 @@ describe('register', function () {
             ->and(Hash::check('PlainPassword123', $result['user']->password))->toBeTrue();
     });
 
-    it('creates user in database', function () {
+    it('creates user in database', function (): void {
         $repository = app(UserRepositoryInterface::class);
         $service = new AuthService($repository);
 
@@ -146,10 +146,10 @@ describe('register', function () {
     });
 });
 
-describe('login', function () {
+describe('login', function (): void {
     $incorrectCredentialsMessage = 'The provided credentials are incorrect.';
 
-    it('authenticates user with valid credentials', function () {
+    it('authenticates user with valid credentials', function (): void {
         $repository = app(UserRepositoryInterface::class);
         $service = new AuthService($repository);
         $loginEmail = 'login@example.com';
@@ -170,7 +170,7 @@ describe('login', function () {
             ->and($result['token'])->toBeString();
     });
 
-    it('generates new token on login', function () {
+    it('generates new token on login', function (): void {
         $repository = app(UserRepositoryInterface::class);
         $service = new AuthService($repository);
 
@@ -188,7 +188,7 @@ describe('login', function () {
             ->and(strlen($result['token']))->toBeGreaterThan(20);
     });
 
-    it('updates last_login_at timestamp', function () {
+    it('updates last_login_at timestamp', function (): void {
         $repository = app(UserRepositoryInterface::class);
         $service = new AuthService($repository);
 
@@ -208,14 +208,14 @@ describe('login', function () {
         expect($user->last_login_at)->not->toBeNull();
     });
 
-    it('throws exception when email does not exist', function () {
+    it('throws exception when email does not exist', function (): void {
         $repository = app(UserRepositoryInterface::class);
         $service = new AuthService($repository);
 
         $service->login('nonexistent@example.com', 'Password123');
     })->throws(ValidationException::class, $incorrectCredentialsMessage);
 
-    it('throws exception when password is incorrect', function () {
+    it('throws exception when password is incorrect', function (): void {
         $repository = app(UserRepositoryInterface::class);
         $service = new AuthService($repository);
 
@@ -230,7 +230,7 @@ describe('login', function () {
         $service->login('wrongpass@example.com', 'wrongpassword');
     })->throws(ValidationException::class, $incorrectCredentialsMessage);
 
-    it('throws exception with proper message format', function () {
+    it('throws exception with proper message format', function (): void {
         $repository = app(UserRepositoryInterface::class);
         $service = new AuthService($repository);
 
@@ -239,7 +239,7 @@ describe('login', function () {
     })
         ->throws(ValidationException::class);
 
-    it('returns refreshed user instance', function () {
+    it('returns refreshed user instance', function (): void {
         $repository = app(UserRepositoryInterface::class);
         $service = new AuthService($repository);
 
@@ -256,7 +256,7 @@ describe('login', function () {
         expect($result['user']->last_login_at)->not->toBeNull();
     });
 
-    it('accepts case-sensitive password', function () {
+    it('accepts case-sensitive password', function (): void {
         $repository = app(UserRepositoryInterface::class);
         $service = new AuthService($repository);
         $caseEmail = 'case@example.com';
@@ -269,7 +269,7 @@ describe('login', function () {
             'roles' => ['user'],
         ]);
 
-        expect(fn() => $service->login($caseEmail, 'Password123'))
+        expect(fn (): array => $service->login($caseEmail, 'Password123'))
             ->toThrow(ValidationException::class);
 
         $result = $service->login($caseEmail, 'PassWord123');
@@ -277,9 +277,9 @@ describe('login', function () {
     });
 });
 
-describe('logout', function () {
+describe('logout', function (): void {
 
-    it('does nothing when token does not exist', function () {
+    it('does nothing when token does not exist', function (): void {
         $repository = app(UserRepositoryInterface::class);
         $service = new AuthService($repository);
 
@@ -297,8 +297,8 @@ describe('logout', function () {
     });
 });
 
-describe('revokeAllTokens', function () {
-    it('revokes all user tokens', function () {
+describe('revokeAllTokens', function (): void {
+    it('revokes all user tokens', function (): void {
         $repository = app(UserRepositoryInterface::class);
         $service = new AuthService($repository);
 
@@ -321,7 +321,7 @@ describe('revokeAllTokens', function () {
         expect($user->tokens()->count())->toBe(0);
     });
 
-    it('does nothing when user has no tokens', function () {
+    it('does nothing when user has no tokens', function (): void {
         $repository = app(UserRepositoryInterface::class);
         $service = new AuthService($repository);
 
@@ -340,7 +340,7 @@ describe('revokeAllTokens', function () {
         expect($user->tokens()->count())->toBe(0);
     });
 
-    it('only revokes tokens for specified user', function () {
+    it('only revokes tokens for specified user', function (): void {
         $repository = app(UserRepositoryInterface::class);
         $service = new AuthService($repository);
 
@@ -375,8 +375,8 @@ describe('revokeAllTokens', function () {
     });
 });
 
-describe('Integration', function () {
-    it('complete registration and login flow', function () {
+describe('Integration', function (): void {
+    it('complete registration and login flow', function (): void {
         $repository = app(UserRepositoryInterface::class);
         $service = new AuthService($repository);
         $flowEmail = 'flow@example.com';
@@ -402,7 +402,7 @@ describe('Integration', function () {
             ->and($loginResult['user']->tokens()->count())->toBe(1);
     });
 
-    it('multiple sessions management', function () {
+    it('multiple sessions management', function (): void {
         $repository = app(UserRepositoryInterface::class);
         $service = new AuthService($repository);
         $multiSessionEmail = 'multisession@example.com';
