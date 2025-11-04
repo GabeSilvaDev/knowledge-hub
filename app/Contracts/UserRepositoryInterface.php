@@ -31,16 +31,22 @@ interface UserRepositoryInterface
 
     /**
      * Get paginated users.
+     *
+     * @return LengthAwarePaginator<int, User>
      */
     public function paginate(int $perPage = 15): LengthAwarePaginator;
 
     /**
      * Get users by role.
+     *
+     * @return Collection<int, User>
      */
     public function getByRole(string $role): Collection;
 
     /**
      * Search users by name or username.
+     *
+     * @return Collection<int, User>
      */
     public function search(string $term): Collection;
 

@@ -2,15 +2,15 @@
 
 namespace App\Contracts;
 
-use Illuminate\Validation\ValidationException;
 use App\Models\User;
+use Illuminate\Validation\ValidationException;
 
 interface AuthServiceInterface
 {
     /**
      * Register a new user.
      *
-     * @param array $data
+     * @param  array<string, mixed>  $data
      * @return array{user: User, token: string}
      */
     public function register(array $data): array;
@@ -18,27 +18,19 @@ interface AuthServiceInterface
     /**
      * Authenticate a user and generate token.
      *
-     * @param string $email
-     * @param string $password
      * @return array{user: User, token: string}
+     *
      * @throws ValidationException
      */
     public function login(string $email, string $password): array;
 
     /**
      * Revoke the current access token.
-     *
-     * @param User $user
-     * @param string $currentToken
-     * @return void
      */
     public function logout(User $user, string $currentToken): void;
 
     /**
      * Revoke all tokens for a user.
-     *
-     * @param User $user
-     * @return void
      */
     public function revokeAllTokens(User $user): void;
 }

@@ -4,20 +4,16 @@ namespace App\Contracts;
 
 use App\DTOs\CreateArticleDTO;
 use App\Models\Article;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Database\Eloquent\Collection;
+use Spatie\QueryBuilder\QueryBuilder;
 
 interface ArticleRepositoryInterface
 {
     /**
-     * Find article by ID.
+     * Get query builder for articles with filtering, sorting, and including.
+     *
+     * @return QueryBuilder<Article>
      */
-    public function findById(string $id): ?Article;
-
-    /**
-     * Find article by slug.
-     */
-    public function findBySlug(string $slug): ?Article;
+    public function query(): QueryBuilder;
 
     /**
      * Create a new article.
@@ -25,37 +21,14 @@ interface ArticleRepositoryInterface
     public function create(CreateArticleDTO $dto): Article;
 
     /**
-     * Get paginated articles.
+     * Update an existing article.
+     *
+     * @param  array<string, mixed>  $data
      */
-    public function paginate(int $perPage = 15, array $filters = []): LengthAwarePaginator;
+    public function update(Article $article, array $data): Article;
 
     /**
-     * Get published articles.
+     * Delete an article (soft delete).
      */
-    public function getPublished(): Collection;
-
-    /**
-     * Get featured articles.
-     */
-    public function getFeatured(): Collection;
-
-    /**
-     * Get articles by author.
-     */
-    public function getByAuthor(string $authorId): Collection;
-
-    /**
-     * Get articles by type.
-     */
-    public function getByType(string $type): Collection;
-
-    /**
-     * Search articles.
-     */
-    public function search(string $term): Collection;
-
-    /**
-     * Get articles by tags.
-     */
-    public function getByTags(array $tags): Collection;
+    public function delete(Article $article): bool;
 }
