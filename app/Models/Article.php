@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\Versionable;
 use Database\Factories\ArticleFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -18,6 +19,7 @@ class Article extends Model
     use HasFactory;
 
     use SoftDeletes;
+    use Versionable;
 
     protected $connection = 'mongodb';
 
