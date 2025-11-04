@@ -1,0 +1,580 @@
+{
+	"info": {
+		"_postman_id": "3e4354fd-15f1-4dac-84e7-94a3f66f3c66",
+		"name": "Knowledge Hub API",
+		"description": "Collection to test Knowledge Hub routes (register, login, logout, revoke-all, web root).\nVariables: {{base_url}} and {{token}}.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "45821675",
+		"_collection_link": "https://gabrielsilva-9335689.postman.co/workspace/Gabriel-SIlva's-Workspace~a999e8a2-0a37-4cc8-8853-c7a482e44d19/collection/45821675-3e4354fd-15f1-4dac-84e7-94a3f66f3c66?action=share&source=collection_link&creator=45821675"
+	},
+	"item": [
+		{
+			"name": "Register (POST /api/register)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"Gabriel Silva\",\n  \"email\": \"gabriel@example.com\",\n  \"username\": \"gabesilva\",\n  \"password\": \"Secret123\",\n  \"password_confirmation\": \"Secret123\",\n  \"bio\": \"Backend developer\",\n  \"avatar_url\": \"https://example.com/avatar.jpg\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/api/register",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"register"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "201 Created - sample",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": ""
+						}
+					},
+					"status": "Created",
+					"code": 201,
+					"_postman_previewlanguage": "Text",
+					"header": [],
+					"cookie": [],
+					"body": ""
+				}
+			]
+		},
+		{
+			"name": "Login (POST /api/login)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"try {",
+							"    const response = pm.response.json();",
+							"",
+							"    if (response.token) {",
+							"        pm.collectionVariables.set(\"token\", response.token);",
+							"",
+							"        console.log(\"✅ Token salvo na variável da collection:\", response.token);",
+							"        pm.test(\"Token salvo na collection\", function () {",
+							"            pm.expect(pm.collectionVariables.get(\"token\")).to.eql(response.token);",
+							"        });",
+							"    } else {",
+							"        console.warn(\"⚠️ O campo 'token' não foi encontrado na resposta.\");",
+							"        pm.test(\"Token não encontrado\", function () {",
+							"            pm.expect.fail(\"Campo 'token' ausente na resposta.\");",
+							"        });",
+							"    }",
+							"} catch (e) {",
+							"    console.error(\"❌ Erro ao processar resposta JSON:\", e);",
+							"    pm.test(\"Erro ao processar JSON\", function () {",
+							"        pm.expect.fail(\"Resposta não é um JSON válido.\");",
+							"    });",
+							"}"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"email\": \"gabriel@example.com\",\n  \"password\": \"Secret123\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/api/login",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"login"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "200 OK - sample",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": ""
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "Text",
+					"header": [],
+					"cookie": [],
+					"body": ""
+				}
+			]
+		},
+		{
+			"name": "Logout (POST /api/logout)",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/api/logout",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"logout"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "200 OK - sample",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": ""
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "Text",
+					"header": [],
+					"cookie": [],
+					"body": ""
+				}
+			]
+		},
+		{
+			"name": "Revoke All (POST /api/revoke-all)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/api/revoke-all",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"revoke-all"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "200 OK - sample",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": ""
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "Text",
+					"header": [],
+					"cookie": [],
+					"body": ""
+				}
+			]
+		},
+		{
+			"name": "Articles",
+			"item": [
+				{
+					"name": "List Articles (GET /api/articles)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/articles",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"articles"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1",
+									"description": "Page number",
+									"disabled": true
+								},
+								{
+									"key": "per_page",
+									"value": "15",
+									"description": "Items per page",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "200 OK - sample",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": ""
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "Text",
+							"header": [],
+							"cookie": [],
+							"body": ""
+						}
+					]
+				},
+				{
+					"name": "Create Article (POST /api/articles)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Introdução ao Laravel\",\n  \"slug\": \"introducao-ao-laravel\",\n  \"content\": \"Laravel é um framework PHP moderno e elegante...\",\n  \"excerpt\": \"Aprenda os conceitos básicos do Laravel\",\n  \"status\": \"draft\",\n  \"type\": \"tutorial\",\n  \"featured_image\": \"https://example.com/images/laravel.jpg\",\n  \"tags\": [\"laravel\", \"php\", \"backend\"],\n  \"categories\": [\"Desenvolvimento Web\", \"PHP\"],\n  \"is_featured\": false,\n  \"is_pinned\": false,\n  \"published_at\": \"2025-11-03T12:00:00Z\",\n  \"seo_title\": \"Introdução ao Laravel - Tutorial Completo\",\n  \"seo_description\": \"Aprenda Laravel do zero com este tutorial completo\",\n  \"seo_keywords\": \"laravel, php, tutorial, framework\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/articles",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"articles"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "201 Created - sample",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": ""
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "Text",
+							"header": [],
+							"cookie": [],
+							"body": ""
+						}
+					]
+				},
+				{
+					"name": "Get Article (GET /api/articles/:id)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/articles/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"articles",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1",
+									"description": "Article ID"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "200 OK - sample",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": ""
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "Text",
+							"header": [],
+							"cookie": [],
+							"body": ""
+						}
+					]
+				},
+				{
+					"name": "Update Article (PUT /api/articles/:id)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Introdução ao Laravel - Atualizado\",\n  \"content\": \"Laravel é um framework PHP moderno, elegante e poderoso...\",\n  \"status\": \"published\",\n  \"is_featured\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/articles/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"articles",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1",
+									"description": "Article ID"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "200 OK - sample",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": ""
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "Text",
+							"header": [],
+							"cookie": [],
+							"body": ""
+						}
+					]
+				},
+				{
+					"name": "Delete Article (DELETE /api/articles/:id)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/articles/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"articles",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1",
+									"description": "Article ID"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "200 OK - sample",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": ""
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "Text",
+							"header": [],
+							"cookie": [],
+							"body": ""
+						}
+					]
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8000",
+			"description": {
+				"content": "Set to your app base URL (include http:// or https://)",
+				"type": "text/plain"
+			}
+		},
+		{
+			"key": "token",
+			"value": "",
+			"description": {
+				"content": "Set after logging in. Used for Authorization: Bearer {{token}}",
+				"type": "text/plain"
+			}
+		}
+	]
+}
