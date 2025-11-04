@@ -8,26 +8,25 @@ use Laravel\Sanctum\Sanctum;
 use function Pest\Laravel\mock;
 use function Pest\Laravel\postJson;
 
-beforeEach(function () {
-    mock(AuthServiceInterface::class);
-});
+describe('POST /api/register', function (): void {
+    beforeEach(function (): void {
+        test()->authService = mock(AuthServiceInterface::class);
+    });
 
-describe('POST /api/register', function () {
-    test('returns created response on successful registration', function () {
+    it('POST /api/register → returns created response on successful registration', function (): void {
         $userData = [
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+            'name' => 'John Doe',
+            'email' => 'john@example.com',
+            'username' => 'johndoe',
             'password' => 'Password123',
             'password_confirmation' => 'Password123',
-            'username' => 'testuser',
         ];
 
-        $validatedUserData = $userData;
-        unset($validatedUserData['password_confirmation']);
+        $validatedUserData = array_diff_key($userData, ['password_confirmation' => '']);
 
-        $user = User::factory()->make($validatedUserData);
+        $user = User::factory()->make(['email' => $userData['email']]);
 
-        app(AuthServiceInterface::class)
+        test()->authService
             ->shouldReceive('register')
             ->once()
             ->with($validatedUserData)
@@ -39,16 +38,20 @@ describe('POST /api/register', function () {
     });
 });
 
-describe('POST /api/login', function () {
-    test('returns ok response on successful login', function () {
+describe('POST /api/login', function (): void {
+    beforeEach(function (): void {
+        test()->authService = mock(AuthServiceInterface::class);
+    });
+
+    it('POST /api/login → returns ok response on successful login', function (): void {
         $credentials = [
-            'email' => 'test@example.com',
-            'password' => 'password',
+            'email' => 'john@example.com',
+            'password' => 'password123',
         ];
 
         $user = User::factory()->make(['email' => $credentials['email']]);
 
-        app(AuthServiceInterface::class)
+        test()->authService
             ->shouldReceive('login')
             ->once()
             ->with($credentials['email'], $credentials['password'])
@@ -60,12 +63,15 @@ describe('POST /api/login', function () {
     });
 });
 
-describe('POST /api/logout', function () {
-    test('returns ok response on successful logout', function () {
+describe('POST /api/logout', function (): void {
+    test('returns ok response on successful logout', function (): void {
         $user = User::factory()->create();
         Sanctum::actingAs($user);
 
-        app(AuthServiceInterface::class)->shouldReceive('logout')->once();
+        mock(AuthServiceInterface::class)
+            ->shouldReceive('logout')
+            ->once()
+            ->andReturn();
 
         postJson('/api/logout')
             ->assertStatus(JsonResponse::HTTP_OK)
@@ -73,12 +79,14 @@ describe('POST /api/logout', function () {
     });
 });
 
-describe('POST /api/revoke-all', function () {
-    test('returns ok response on successful token revocation', function () {
+describe('POST /api/revoke-all', function (): void {
+    test('returns ok response on successful token revocation', function (): void {
         $user = User::factory()->create();
         Sanctum::actingAs($user);
 
-        app(AuthServiceInterface::class)->shouldReceive('revokeAllTokens')->once();
+        mock(AuthServiceInterface::class)
+            ->shouldReceive('revokeAllTokens')
+            ->once();
 
         postJson('/api/revoke-all')
             ->assertStatus(JsonResponse::HTTP_OK)
