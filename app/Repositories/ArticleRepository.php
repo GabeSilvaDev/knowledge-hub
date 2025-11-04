@@ -4,9 +4,10 @@ namespace App\Repositories;
 
 use App\Contracts\ArticleRepositoryInterface;
 use App\DTOs\CreateArticleDTO;
+use App\Exceptions\ArticleRefreshException;
 use App\Models\Article;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Database\Eloquent\Collection;
+use Spatie\QueryBuilder\AllowedFilter;
+use Spatie\QueryBuilder\QueryBuilder;
 
 class ArticleRepository implements ArticleRepositoryInterface
 {
@@ -14,14 +15,35 @@ class ArticleRepository implements ArticleRepositoryInterface
         private readonly Article $model
     ) {}
 
-    public function findById(string $id): ?Article
+    /**
+     * @return QueryBuilder<Article>
+     */
+    public function query(): QueryBuilder
     {
-        return $this->model->find($id);
-    }
-
-    public function findBySlug(string $slug): ?Article
-    {
-        return $this->model->where('slug', $slug)->first();
+        return QueryBuilder::for(Article::class)
+            ->allowedFilters([
+                AllowedFilter::exact('status'),
+                AllowedFilter::exact('type'),
+                AllowedFilter::exact('author_id'),
+                AllowedFilter::exact('is_featured'),
+                AllowedFilter::exact('is_pinned'),
+                AllowedFilter::partial('title'),
+                AllowedFilter::partial('content'),
+                AllowedFilter::partial('excerpt'),
+                AllowedFilter::scope('tags'),
+                AllowedFilter::scope('categories'),
+            ])
+            ->allowedSorts([
+                'title',
+                'created_at',
+                'updated_at',
+                'published_at',
+                'view_count',
+                'like_count',
+                'reading_time',
+            ])
+            ->allowedIncludes(['author'])
+            ->defaultSort('-created_at');
     }
 
     public function create(CreateArticleDTO $dto): Article
@@ -29,86 +51,21 @@ class ArticleRepository implements ArticleRepositoryInterface
         return $this->model->create($dto->toArray());
     }
 
-    public function paginate(int $perPage = 15, array $filters = []): LengthAwarePaginator
+    public function update(Article $article, array $data): Article
     {
-        $query = $this->model->newQuery();
+        $article->update($data);
 
-        if (isset($filters['status'])) {
-            $query->where('status', $filters['status']);
+        $freshArticle = $article->fresh();
+
+        if ($freshArticle === null) {
+            throw ArticleRefreshException::failedToRefresh();
         }
 
-        if (isset($filters['type'])) {
-            $query->where('type', $filters['type']);
-        }
-
-        if (isset($filters['author_id'])) {
-            $query->where('author_id', $filters['author_id']);
-        }
-
-        if (isset($filters['featured'])) {
-            $query->where('is_featured', $filters['featured']);
-        }
-
-        return $query->orderBy('created_at', 'desc')->paginate($perPage);
+        return $freshArticle;
     }
 
-    public function getPublished(): Collection
+    public function delete(Article $article): bool
     {
-        return $this->model
-            ->where('status', 'published')
-            ->where('published_at', '<=', now())
-            ->orderBy('published_at', 'desc')
-            ->get();
-    }
-
-    public function getFeatured(): Collection
-    {
-        return $this->model
-            ->where('is_featured', true)
-            ->where('status', 'published')
-            ->orderBy('created_at', 'desc')
-            ->get();
-    }
-
-    public function getByAuthor(string $authorId): Collection
-    {
-        return $this->model
-            ->where('author_id', $authorId)
-            ->orderBy('created_at', 'desc')
-            ->get();
-    }
-
-    public function getByType(string $type): Collection
-    {
-        return $this->model
-            ->where('type', $type)
-            ->where('status', 'published')
-            ->orderBy('created_at', 'desc')
-            ->get();
-    }
-
-    public function search(string $term): Collection
-    {
-        return $this->model
-            ->where('title', 'like', "%{$term}%")
-            ->orWhere('content', 'like', "%{$term}%")
-            ->orWhere('excerpt', 'like', "%{$term}%")
-            ->where('status', 'published')
-            ->orderBy('created_at', 'desc')
-            ->get();
-    }
-
-    public function getByTags(array $tags): Collection
-    {
-        $query = $this->model->newQuery();
-
-        foreach ($tags as $tag) {
-            $query->orWhere('tags', 'like', "%{$tag}%");
-        }
-
-        return $query
-            ->where('status', 'published')
-            ->orderBy('created_at', 'desc')
-            ->get();
+        return (bool) $article->delete();
     }
 }
