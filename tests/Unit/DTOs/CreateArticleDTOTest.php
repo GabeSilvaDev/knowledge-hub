@@ -298,3 +298,249 @@ describe('CreateArticleDTO fromArray', function (): void {
             ->and($dto->seo->getSeoKeywords())->toBe('keyword1, keyword2');
     });
 });
+
+describe('CreateArticleDTO Validation Errors', function (): void {
+    it('throws exception when title is not a string', function (): void {
+        $data = [
+            'title' => 123,
+            'content' => 'Valid content',
+            'author_id' => '507f1f77bcf86cd799439020',
+        ];
+
+        CreateArticleDTO::fromArray($data);
+    })->throws(InvalidArgumentException::class, 'Title, content and author_id must be strings');
+
+    it('throws exception when content is not a string', function (): void {
+        $data = [
+            'title' => 'Valid title',
+            'content' => ['invalid'],
+            'author_id' => '507f1f77bcf86cd799439021',
+        ];
+
+        CreateArticleDTO::fromArray($data);
+    })->throws(InvalidArgumentException::class, 'Title, content and author_id must be strings');
+
+    it('throws exception when author_id is not a string', function (): void {
+        $data = [
+            'title' => 'Valid title',
+            'content' => 'Valid content',
+            'author_id' => 12345,
+        ];
+
+        CreateArticleDTO::fromArray($data);
+    })->throws(InvalidArgumentException::class, 'Title, content and author_id must be strings');
+
+    it('throws exception when slug is not a string', function (): void {
+        $data = [
+            'title' => 'Valid title',
+            'content' => 'Valid content',
+            'author_id' => '507f1f77bcf86cd799439022',
+            'slug' => 123,
+        ];
+
+        CreateArticleDTO::fromArray($data);
+    })->throws(InvalidArgumentException::class, 'Field slug must be a string or null');
+
+    it('throws exception when seo_title is not a string', function (): void {
+        $data = [
+            'title' => 'Valid title',
+            'content' => 'Valid content',
+            'author_id' => '507f1f77bcf86cd799439023',
+            'seo_title' => ['invalid'],
+        ];
+
+        CreateArticleDTO::fromArray($data);
+    })->throws(InvalidArgumentException::class, 'Field seo_title must be a string or null');
+
+    it('throws exception when seo_description is not a string', function (): void {
+        $data = [
+            'title' => 'Valid title',
+            'content' => 'Valid content',
+            'author_id' => '507f1f77bcf86cd799439024',
+            'seo_description' => 123,
+        ];
+
+        CreateArticleDTO::fromArray($data);
+    })->throws(InvalidArgumentException::class, 'Field seo_description must be a string or null');
+
+    it('throws exception when seo_keywords is not a string', function (): void {
+        $data = [
+            'title' => 'Valid title',
+            'content' => 'Valid content',
+            'author_id' => '507f1f77bcf86cd799439025',
+            'seo_keywords' => true,
+        ];
+
+        CreateArticleDTO::fromArray($data);
+    })->throws(InvalidArgumentException::class, 'Field seo_keywords must be a string or null');
+
+    it('throws exception when featured_image is not a string', function (): void {
+        $data = [
+            'title' => 'Valid title',
+            'content' => 'Valid content',
+            'author_id' => '507f1f77bcf86cd799439026',
+            'featured_image' => 999,
+        ];
+
+        CreateArticleDTO::fromArray($data);
+    })->throws(InvalidArgumentException::class, 'Field featured_image must be a string or null');
+
+    it('throws exception when published_at is not a string', function (): void {
+        $data = [
+            'title' => 'Valid title',
+            'content' => 'Valid content',
+            'author_id' => '507f1f77bcf86cd799439027',
+            'published_at' => false,
+        ];
+
+        CreateArticleDTO::fromArray($data);
+    })->throws(InvalidArgumentException::class, 'Field published_at must be a string or null');
+
+    it('throws exception when is_featured is not a boolean', function (): void {
+        $data = [
+            'title' => 'Valid title',
+            'content' => 'Valid content',
+            'author_id' => '507f1f77bcf86cd799439028',
+            'is_featured' => 'yes',
+        ];
+
+        CreateArticleDTO::fromArray($data);
+    })->throws(InvalidArgumentException::class, 'is_featured and is_pinned must be booleans');
+
+    it('throws exception when is_pinned is not a boolean', function (): void {
+        $data = [
+            'title' => 'Valid title',
+            'content' => 'Valid content',
+            'author_id' => '507f1f77bcf86cd799439029',
+            'is_pinned' => 1,
+        ];
+
+        CreateArticleDTO::fromArray($data);
+    })->throws(InvalidArgumentException::class, 'is_featured and is_pinned must be booleans');
+
+    it('throws exception when status is not a string or int', function (): void {
+        $data = [
+            'title' => 'Valid title',
+            'content' => 'Valid content',
+            'author_id' => '507f1f77bcf86cd799439030',
+            'status' => ['invalid'],
+        ];
+
+        CreateArticleDTO::fromArray($data);
+    })->throws(InvalidArgumentException::class, 'Status and type must be strings or ints');
+
+    it('throws exception when type is not a string or int', function (): void {
+        $data = [
+            'title' => 'Valid title',
+            'content' => 'Valid content',
+            'author_id' => '507f1f77bcf86cd799439031',
+            'type' => ['invalid'],
+        ];
+
+        CreateArticleDTO::fromArray($data);
+    })->throws(InvalidArgumentException::class, 'Status and type must be strings or ints');
+});
+
+describe('CreateArticleDTO Array Handling', function (): void {
+    it('filters non-string items from tags array', function (): void {
+        $data = [
+            'title' => 'Tags Filter Test',
+            'content' => 'Testing tag filtering',
+            'author_id' => '507f1f77bcf86cd799439032',
+            'tags' => ['valid', 123, 'also-valid', null, true, 'last-valid'],
+        ];
+
+        $dto = CreateArticleDTO::fromArray($data);
+
+        expect($dto->tags)->toBe(['valid', 'also-valid', 'last-valid']);
+    });
+
+    it('returns empty array when tags is not an array', function (): void {
+        $data = [
+            'title' => 'Invalid Tags Test',
+            'content' => 'Testing invalid tags',
+            'author_id' => '507f1f77bcf86cd799439033',
+            'tags' => 'not-an-array',
+        ];
+
+        $dto = CreateArticleDTO::fromArray($data);
+
+        expect($dto->tags)->toBe([]);
+    });
+
+    it('filters non-string items from categories array', function (): void {
+        $data = [
+            'title' => 'Categories Filter Test',
+            'content' => 'Testing category filtering',
+            'author_id' => '507f1f77bcf86cd799439034',
+            'categories' => ['valid-cat', 456, 'another-cat', false],
+        ];
+
+        $dto = CreateArticleDTO::fromArray($data);
+
+        expect($dto->categories)->toBe(['valid-cat', 'another-cat']);
+    });
+
+    it('returns empty array when categories is not an array', function (): void {
+        $data = [
+            'title' => 'Invalid Categories Test',
+            'content' => 'Testing invalid categories',
+            'author_id' => '507f1f77bcf86cd799439035',
+            'categories' => 123,
+        ];
+
+        $dto = CreateArticleDTO::fromArray($data);
+
+        expect($dto->categories)->toBe([]);
+    });
+
+    it('filters non-string keys from meta_data', function (): void {
+        $data = [
+            'title' => 'Meta Data Filter Test',
+            'content' => 'Testing meta data filtering',
+            'author_id' => '507f1f77bcf86cd799439036',
+            'meta_data' => [
+                'valid_key' => 'value1',
+                0 => 'numeric-key-value',
+                'another_key' => 123,
+                1 => 'another-numeric',
+            ],
+        ];
+
+        $dto = CreateArticleDTO::fromArray($data);
+
+        expect($dto->meta_data)->toBe([
+            'valid_key' => 'value1',
+            'another_key' => 123,
+        ]);
+    });
+
+    it('returns empty array when meta_data is not an array', function (): void {
+        $data = [
+            'title' => 'Invalid Meta Data Test',
+            'content' => 'Testing invalid meta data',
+            'author_id' => '507f1f77bcf86cd799439037',
+            'meta_data' => 'not-an-array',
+        ];
+
+        $dto = CreateArticleDTO::fromArray($data);
+
+        expect($dto->meta_data)->toBe([]);
+    });
+
+    it('creates seo object when only seo_title is provided', function (): void {
+        $data = [
+            'title' => 'Only SEO Title',
+            'content' => 'Content with only SEO title',
+            'author_id' => '507f1f77bcf86cd799439038',
+            'seo_title' => 'Just the SEO Title',
+        ];
+
+        $dto = CreateArticleDTO::fromArray($data);
+
+        expect($dto->seo)->not->toBeNull()
+            ->and($dto->seo->getSeoTitle()->getValue())->toBe('Just the SEO Title')
+            ->and($dto->seo->getSeoDescription())->toBeNull()
+            ->and($dto->seo->getSeoKeywords())->toBeNull();
+    });
+});

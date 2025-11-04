@@ -267,3 +267,183 @@ describe('CreateUserDTO fromArray', function (): void {
         expect($dto->profile->getBio()->getValue())->toBe('');
     });
 });
+
+describe('CreateUserDTO Validation Errors', function (): void {
+    it('throws exception when name is not a string', function (): void {
+        $data = [
+            'name' => 123,
+            'username' => 'testuser',
+            'email' => 'test@example.com',
+            'password' => 'TestPass123!',
+        ];
+
+        CreateUserDTO::fromArray($data);
+    })->throws(InvalidArgumentException::class, 'Name, username, email and password must be strings');
+
+    it('throws exception when username is not a string', function (): void {
+        $data = [
+            'name' => 'Test User',
+            'username' => ['invalid'],
+            'email' => 'test@example.com',
+            'password' => 'TestPass123!',
+        ];
+
+        CreateUserDTO::fromArray($data);
+    })->throws(InvalidArgumentException::class, 'Name, username, email and password must be strings');
+
+    it('throws exception when email is not a string', function (): void {
+        $data = [
+            'name' => 'Test User',
+            'username' => 'testuser',
+            'email' => 999,
+            'password' => 'TestPass123!',
+        ];
+
+        CreateUserDTO::fromArray($data);
+    })->throws(InvalidArgumentException::class, 'Name, username, email and password must be strings');
+
+    it('throws exception when password is not a string', function (): void {
+        $data = [
+            'name' => 'Test User',
+            'username' => 'testuser',
+            'email' => 'test@example.com',
+            'password' => true,
+        ];
+
+        CreateUserDTO::fromArray($data);
+    })->throws(InvalidArgumentException::class, 'Name, username, email and password must be strings');
+
+    it('throws exception when bio is not a string or null', function (): void {
+        $data = [
+            'name' => 'Test User',
+            'username' => 'testuser',
+            'email' => 'test@example.com',
+            'password' => 'TestPass123!',
+            'bio' => 123,
+        ];
+
+        CreateUserDTO::fromArray($data);
+    })->throws(InvalidArgumentException::class, 'Bio must be a string or null');
+
+    it('throws exception when avatar_url is not a string or null', function (): void {
+        $data = [
+            'name' => 'Test User',
+            'username' => 'testuser',
+            'email' => 'test@example.com',
+            'password' => 'TestPass123!',
+            'avatar_url' => false,
+        ];
+
+        CreateUserDTO::fromArray($data);
+    })->throws(InvalidArgumentException::class, 'Avatar URL must be a string or null');
+
+    it('throws exception when roles is not an array', function (): void {
+        $data = [
+            'name' => 'Test User',
+            'username' => 'testuser',
+            'email' => 'test@example.com',
+            'password' => 'TestPass123!',
+            'roles' => 'not-an-array',
+        ];
+
+        CreateUserDTO::fromArray($data);
+    })->throws(InvalidArgumentException::class, 'Roles must be an array');
+
+    it('throws exception when role item is invalid type', function (): void {
+        $data = [
+            'name' => 'Test User',
+            'username' => 'testuser',
+            'email' => 'test@example.com',
+            'password' => 'TestPass123!',
+            'roles' => [123, 'valid-role'],
+        ];
+
+        CreateUserDTO::fromArray($data);
+    })->throws(InvalidArgumentException::class, 'Each role must be a UserRole enum or valid string');
+});
+
+describe('CreateUserDTO Array Handling', function (): void {
+    it('accepts roles as UserRole enums', function (): void {
+        $data = [
+            'name' => 'Test User',
+            'username' => 'testuser',
+            'email' => 'test@example.com',
+            'password' => 'TestPass123!',
+            'roles' => [UserRole::ADMIN, UserRole::AUTHOR],
+        ];
+
+        $dto = CreateUserDTO::fromArray($data);
+
+        expect($dto->credentials->getRoles())->toBe([UserRole::ADMIN, UserRole::AUTHOR]);
+    });
+
+    it('accepts roles as strings', function (): void {
+        $data = [
+            'name' => 'Test User',
+            'username' => 'testuser',
+            'email' => 'test@example.com',
+            'password' => 'TestPass123!',
+            'roles' => ['admin', 'author'],
+        ];
+
+        $dto = CreateUserDTO::fromArray($data);
+
+        expect($dto->credentials->getRoles())->toBe([UserRole::ADMIN, UserRole::AUTHOR]);
+    });
+
+    it('accepts mixed roles (UserRole enums and strings)', function (): void {
+        $data = [
+            'name' => 'Test User',
+            'username' => 'testuser',
+            'email' => 'test@example.com',
+            'password' => 'TestPass123!',
+            'roles' => [UserRole::ADMIN, 'author', UserRole::READER],
+        ];
+
+        $dto = CreateUserDTO::fromArray($data);
+
+        expect($dto->credentials->getRoles())->toBe([UserRole::ADMIN, UserRole::AUTHOR, UserRole::READER]);
+    });
+
+    it('uses default READER role when roles array is empty', function (): void {
+        $data = [
+            'name' => 'Test User',
+            'username' => 'testuser',
+            'email' => 'test@example.com',
+            'password' => 'TestPass123!',
+            'roles' => [],
+        ];
+
+        $dto = CreateUserDTO::fromArray($data);
+
+        expect($dto->credentials->getRoles())->toBe([UserRole::READER]);
+    });
+
+    it('handles null bio correctly', function (): void {
+        $data = [
+            'name' => 'Test User',
+            'username' => 'testuser',
+            'email' => 'test@example.com',
+            'password' => 'TestPass123!',
+            'bio' => null,
+        ];
+
+        $dto = CreateUserDTO::fromArray($data);
+
+        expect($dto->profile->getBio()->getValue())->toBeNull();
+    });
+
+    it('handles null avatar_url correctly', function (): void {
+        $data = [
+            'name' => 'Test User',
+            'username' => 'testuser',
+            'email' => 'test@example.com',
+            'password' => 'TestPass123!',
+            'avatar_url' => null,
+        ];
+
+        $dto = CreateUserDTO::fromArray($data);
+
+        expect($dto->avatar_url)->toBeNull();
+    });
+});
