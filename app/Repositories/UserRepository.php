@@ -34,16 +34,25 @@ class UserRepository implements UserRepositoryInterface
         return $this->model->create($dto->toArray());
     }
 
+    /**
+     * @return LengthAwarePaginator<int, User>
+     */
     public function paginate(int $perPage = 15): LengthAwarePaginator
     {
         return $this->model->paginate($perPage);
     }
 
+    /**
+     * @return Collection<int, User>
+     */
     public function getByRole(string $role): Collection
     {
         return $this->model->where('roles', 'like', "%{$role}%")->get();
     }
 
+    /**
+     * @return Collection<int, User>
+     */
     public function search(string $term): Collection
     {
         return $this->model

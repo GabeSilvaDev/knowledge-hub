@@ -49,6 +49,8 @@ class UserService
 
     /**
      * Get paginated users.
+     *
+     * @return LengthAwarePaginator<int, User>
      */
     public function getUsers(int $perPage = 15): LengthAwarePaginator
     {
@@ -57,6 +59,8 @@ class UserService
 
     /**
      * Get users by role.
+     *
+     * @return Collection<int, User>
      */
     public function getUsersByRole(UserRole $role): Collection
     {
@@ -65,6 +69,8 @@ class UserService
 
     /**
      * Search users.
+     *
+     * @return Collection<int, User>
      */
     public function searchUsers(string $term): Collection
     {

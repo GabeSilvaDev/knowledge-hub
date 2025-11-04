@@ -14,13 +14,12 @@ class AuthService implements AuthServiceInterface
 {
     public function __construct(
         private readonly UserRepositoryInterface $userRepository
-    ) {
-    }
+    ) {}
 
     /**
      * Register a new user.
      *
-     * @param array $data
+     * @param  array<string, mixed>  $data
      * @return array{user: User, token: string}
      */
     public function register(array $data): array
@@ -48,16 +47,15 @@ class AuthService implements AuthServiceInterface
     /**
      * Authenticate a user and generate token.
      *
-     * @param string $email
-     * @param string $password
      * @return array{user: User, token: string}
+     *
      * @throws ValidationException
      */
     public function login(string $email, string $password): array
     {
         $user = $this->userRepository->findByEmail($email);
 
-        if (!$user || !Hash::check($password, $user->password)) {
+        if (! $user || ! Hash::check($password, $user->password)) {
             throw ValidationException::withMessages([
                 'email' => ['The provided credentials are incorrect.'],
             ]);
@@ -75,10 +73,6 @@ class AuthService implements AuthServiceInterface
 
     /**
      * Revoke the current access token.
-     *
-     * @param User $user
-     * @param string $currentToken
-     * @return void
      */
     public function logout(User $user, string $currentToken): void
     {
@@ -87,9 +81,6 @@ class AuthService implements AuthServiceInterface
 
     /**
      * Revoke all tokens for a user.
-     *
-     * @param User $user
-     * @return void
      */
     public function revokeAllTokens(User $user): void
     {
