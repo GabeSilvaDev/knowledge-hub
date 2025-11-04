@@ -260,3 +260,136 @@ describe('Article Model Factory Integration', function (): void {
             ->and($article->exists)->toBeFalse();
     });
 });
+
+describe('Article Model Scopes', function (): void {
+    beforeEach(function (): void {
+        Article::query()->forceDelete();
+        $this->user = User::factory()->create();
+    });
+
+    describe('scopeTags', function (): void {
+        it('filters articles by single tag as string', function (): void {
+            Article::factory()->create([
+                'tags' => ['php', 'laravel'],
+                'author_id' => $this->user->_id,
+            ]);
+            Article::factory()->create([
+                'tags' => ['javascript', 'react'],
+                'author_id' => $this->user->_id,
+            ]);
+
+            $results = Article::tags('php')->get();
+
+            expect($results)->toHaveCount(1)
+                ->and($results->first()->tags)->toContain('php');
+        });
+
+        it('filters articles by multiple tags as string', function (): void {
+            Article::factory()->create([
+                'tags' => ['php', 'laravel'],
+                'author_id' => $this->user->_id,
+            ]);
+            Article::factory()->create([
+                'tags' => ['javascript', 'react'],
+                'author_id' => $this->user->_id,
+            ]);
+            Article::factory()->create([
+                'tags' => ['python', 'django'],
+                'author_id' => $this->user->_id,
+            ]);
+
+            $results = Article::tags('php,javascript')->get();
+
+            expect($results)->toHaveCount(2);
+        });
+
+        it('filters articles by tags as array', function (): void {
+            Article::factory()->create([
+                'tags' => ['php', 'laravel'],
+                'author_id' => $this->user->_id,
+            ]);
+            Article::factory()->create([
+                'tags' => ['javascript', 'react'],
+                'author_id' => $this->user->_id,
+            ]);
+
+            $results = Article::tags(['php', 'javascript'])->get();
+
+            expect($results)->toHaveCount(2);
+        });
+
+        it('trims whitespace from tag names', function (): void {
+            Article::factory()->create([
+                'tags' => ['php', 'laravel'],
+                'author_id' => $this->user->_id,
+            ]);
+
+            $results = Article::tags(' php , laravel ')->get();
+
+            expect($results)->toHaveCount(1);
+        });
+    });
+
+    describe('scopeCategories', function (): void {
+        it('filters articles by single category as string', function (): void {
+            Article::factory()->create([
+                'categories' => ['programming', 'backend'],
+                'author_id' => $this->user->_id,
+            ]);
+            Article::factory()->create([
+                'categories' => ['design', 'frontend'],
+                'author_id' => $this->user->_id,
+            ]);
+
+            $results = Article::categories('programming')->get();
+
+            expect($results)->toHaveCount(1)
+                ->and($results->first()->categories)->toContain('programming');
+        });
+
+        it('filters articles by multiple categories as string', function (): void {
+            Article::factory()->create([
+                'categories' => ['programming', 'backend'],
+                'author_id' => $this->user->_id,
+            ]);
+            Article::factory()->create([
+                'categories' => ['design', 'frontend'],
+                'author_id' => $this->user->_id,
+            ]);
+            Article::factory()->create([
+                'categories' => ['devops', 'infrastructure'],
+                'author_id' => $this->user->_id,
+            ]);
+
+            $results = Article::categories('programming,design')->get();
+
+            expect($results)->toHaveCount(2);
+        });
+
+        it('filters articles by categories as array', function (): void {
+            Article::factory()->create([
+                'categories' => ['programming', 'backend'],
+                'author_id' => $this->user->_id,
+            ]);
+            Article::factory()->create([
+                'categories' => ['design', 'frontend'],
+                'author_id' => $this->user->_id,
+            ]);
+
+            $results = Article::categories(['programming', 'design'])->get();
+
+            expect($results)->toHaveCount(2);
+        });
+
+        it('trims whitespace from category names', function (): void {
+            Article::factory()->create([
+                'categories' => ['programming', 'backend'],
+                'author_id' => $this->user->_id,
+            ]);
+
+            $results = Article::categories(' programming , backend ')->get();
+
+            expect($results)->toHaveCount(1);
+        });
+    });
+});
