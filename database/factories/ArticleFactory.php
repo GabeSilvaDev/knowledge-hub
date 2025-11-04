@@ -17,7 +17,7 @@ class ArticleFactory extends Factory
     /**
      * The name of the factory's corresponding model.
      *
-     * @var string
+     * @var class-string<Article>
      */
     protected $model = Article::class;
 
@@ -29,7 +29,9 @@ class ArticleFactory extends Factory
     public function definition(): array
     {
         $title = $this->faker->sentence(6, true);
-        $content = $this->faker->paragraphs(8, true);
+        $content = is_array($this->faker->paragraphs(8, true))
+            ? implode("\n\n", $this->faker->paragraphs(8, true))
+            : $this->faker->paragraphs(8, true);
 
         return [
             'title' => $title,
@@ -51,13 +53,31 @@ class ArticleFactory extends Factory
             ]),
             'featured_image' => $this->faker->imageUrl(800, 600, 'technology'),
             'tags' => $this->faker->randomElements([
-                'PHP', 'Laravel', 'MongoDB', 'JavaScript', 'Vue.js', 'React',
-                'Python', 'Docker', 'AWS', 'DevOps', 'Machine Learning',
-                'Data Science', 'Frontend', 'Backend', 'Full Stack',
+                'PHP',
+                'Laravel',
+                'MongoDB',
+                'JavaScript',
+                'Vue.js',
+                'React',
+                'Python',
+                'Docker',
+                'AWS',
+                'DevOps',
+                'Machine Learning',
+                'Data Science',
+                'Frontend',
+                'Backend',
+                'Full Stack',
             ], random_int(2, 5)),
             'categories' => $this->faker->randomElements([
-                'Tecnologia', 'Programação', 'Tutorial', 'Notícias',
-                'Análise', 'Opinião', 'Review', 'Guia',
+                'Tecnologia',
+                'Programação',
+                'Tutorial',
+                'Notícias',
+                'Análise',
+                'Opinião',
+                'Review',
+                'Guia',
             ], random_int(1, 3)),
             'meta_data' => [
                 'difficulty' => $this->faker->randomElement(['beginner', 'intermediate', 'advanced']),
@@ -73,7 +93,7 @@ class ArticleFactory extends Factory
             'published_at' => $this->faker->optional(0.8)->dateTimeBetween('-6 months', 'now'),
             'seo_title' => $title,
             'seo_description' => $this->faker->sentence(20),
-            'seo_keywords' => implode(', ', $this->faker->words(10)),
+            'seo_keywords' => implode(', ', (array) $this->faker->words(10)),
         ];
     }
 
