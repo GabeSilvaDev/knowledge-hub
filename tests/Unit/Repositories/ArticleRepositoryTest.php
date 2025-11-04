@@ -3,66 +3,61 @@
 use App\DTOs\CreateArticleDTO;
 use App\Enums\ArticleStatus;
 use App\Enums\ArticleType;
+use App\Exceptions\ArticleRefreshException;
 use App\Models\Article;
 use App\Models\User;
 use App\Repositories\ArticleRepository;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Spatie\QueryBuilder\QueryBuilder;
 
-describe('ArticleRepository', function () {
-    beforeEach(function () {
+describe('ArticleRepository', function (): void {
+    beforeEach(function (): void {
         $this->repository = new ArticleRepository(new Article);
     });
 
-    afterEach(function () {
+    afterEach(function (): void {
         Article::query()->delete();
         User::query()->delete();
     });
 
-    describe('constructor', function () {
-        it('creates repository with Article model dependency', function () {
+    describe('constructor', function (): void {
+        it('creates repository with Article model dependency', function (): void {
             expect($this->repository)->toBeInstanceOf(ArticleRepository::class);
         });
     });
 
-    describe('findById method', function () {
-        it('returns article when found', function () {
-            $article = Article::factory()->create();
+    describe('query method', function (): void {
+        it('returns QueryBuilder instance', function (): void {
+            $result = $this->repository->query();
 
-            $result = $this->repository->findById($article->_id);
-
-            expect($result)->not->toBeNull()
-                ->and($result->_id)->toBe($article->_id)
-                ->and($result->title)->toBe($article->title);
+            expect($result)->toBeInstanceOf(QueryBuilder::class);
         });
 
-        it('returns null when article not found', function () {
-            $result = $this->repository->findById('507f1f77bcf86cd799439011');
+        it('can filter articles by status', function (): void {
+            Article::factory()->count(5)->create(['status' => ArticleStatus::PUBLISHED->value]);
+            Article::factory()->count(3)->create(['status' => ArticleStatus::DRAFT->value]);
 
-            expect($result)->toBeNull();
-        });
-    });
+            $result = $this->repository->query()
+                ->where('status', ArticleStatus::PUBLISHED->value)
+                ->get();
 
-    describe('findBySlug method', function () {
-        it('returns article when found by slug', function () {
-            $article = Article::factory()->create(['slug' => 'test-article-slug']);
-
-            $result = $this->repository->findBySlug('test-article-slug');
-
-            expect($result)->not->toBeNull()
-                ->and($result->slug)->toBe('test-article-slug')
-                ->and($result->_id)->toBe($article->_id);
+            expect($result)->toHaveCount(5);
         });
 
-        it('returns null when article not found by slug', function () {
-            $result = $this->repository->findBySlug('non-existent-slug');
+        it('can filter articles by type', function (): void {
+            Article::factory()->count(4)->create(['type' => ArticleType::TUTORIAL->value]);
+            Article::factory()->count(6)->create(['type' => ArticleType::ARTICLE->value]);
 
-            expect($result)->toBeNull();
+            $result = $this->repository->query()
+                ->where('type', ArticleType::TUTORIAL->value)
+                ->get();
+
+            expect($result)->toHaveCount(4);
         });
     });
 
-    describe('create method', function () {
-        it('creates article from DTO', function () {
+    describe('create method', function (): void {
+        it('creates article from DTO', function (): void {
             $user = User::factory()->create();
             $dto = CreateArticleDTO::fromArray([
                 'title' => 'Test Article',
@@ -85,310 +80,165 @@ describe('ArticleRepository', function () {
         });
     });
 
-    describe('paginate method', function () {
-        it('paginates articles without filters', function () {
-            Article::factory()->count(25)->create();
-
-            $result = $this->repository->paginate(10);
-
-            expect($result)->toBeInstanceOf(LengthAwarePaginator::class)
-                ->and($result->perPage())->toBe(10)
-                ->and($result->total())->toBe(25)
-                ->and(count($result->items()))->toBe(10);
-        });
-
-        it('paginates articles with status filter', function () {
-            Article::factory()->count(5)->create(['status' => ArticleStatus::PUBLISHED]);
-            Article::factory()->count(3)->create(['status' => ArticleStatus::DRAFT]);
-
-            $result = $this->repository->paginate(10, ['status' => ArticleStatus::PUBLISHED->value]);
-
-            expect($result->total())->toBe(5);
-            foreach ($result->items() as $article) {
-                expect($article->status)->toBe(ArticleStatus::PUBLISHED->value);
-            }
-        });
-
-        it('paginates articles with type filter', function () {
-            Article::factory()->count(4)->create(['type' => ArticleType::TUTORIAL]);
-            Article::factory()->count(6)->create(['type' => ArticleType::ARTICLE]);
-
-            $result = $this->repository->paginate(10, ['type' => ArticleType::TUTORIAL->value]);
-
-            expect($result->total())->toBe(4);
-            foreach ($result->items() as $article) {
-                expect($article->type)->toBe(ArticleType::TUTORIAL->value);
-            }
-        });
-
-        it('paginates articles with author_id filter', function () {
-            $user1 = User::factory()->create();
-            $user2 = User::factory()->create();
-
-            Article::factory()->count(3)->create(['author_id' => $user1->_id]);
-            Article::factory()->count(2)->create(['author_id' => $user2->_id]);
-
-            $result = $this->repository->paginate(10, ['author_id' => $user1->_id]);
-
-            expect($result->total())->toBe(3);
-            foreach ($result->items() as $article) {
-                expect($article->author_id)->toBe($user1->_id);
-            }
-        });
-
-        it('paginates articles with featured filter', function () {
-            Article::factory()->count(3)->create(['is_featured' => true]);
-            Article::factory()->count(7)->create(['is_featured' => false]);
-
-            $result = $this->repository->paginate(10, ['featured' => true]);
-
-            expect($result->total())->toBe(3);
-            foreach ($result->items() as $article) {
-                expect($article->is_featured)->toBeTrue();
-            }
-        });
-
-        it('paginates articles with multiple filters', function () {
-            $user = User::factory()->create();
-
-            Article::factory()->count(2)->create([
-                'status' => ArticleStatus::PUBLISHED,
-                'type' => ArticleType::ARTICLE,
-                'author_id' => $user->_id,
-                'is_featured' => true,
+    describe('update method', function (): void {
+        it('updates article successfully', function (): void {
+            $article = Article::factory()->create([
+                'title' => 'Original Title',
+                'content' => 'Original Content',
             ]);
 
-            Article::factory()->count(3)->create([
-                'status' => ArticleStatus::DRAFT,
-                'type' => ArticleType::ARTICLE,
-                'author_id' => $user->_id,
-                'is_featured' => true,
+            $result = $this->repository->update($article, [
+                'title' => 'Updated Title',
+                'content' => 'Updated Content',
             ]);
 
-            $filters = [
-                'status' => ArticleStatus::PUBLISHED->value,
-                'type' => ArticleType::ARTICLE->value,
-                'author_id' => $user->_id,
-                'featured' => true,
-            ];
+            expect($result)->toBeInstanceOf(Article::class)
+                ->and($result->title)->toBe('Updated Title')
+                ->and($result->content)->toBe('Updated Content')
+                ->and($result->_id)->toBe($article->_id);
+        });
 
-            $result = $this->repository->paginate(10, $filters);
+        it('throws exception when fresh article is null', function (): void {
+            $article = Article::factory()->create();
 
-            expect($result->total())->toBe(2);
-            foreach ($result->items() as $article) {
-                expect($article->status)->toBe(ArticleStatus::PUBLISHED->value)
-                    ->and($article->type)->toBe(ArticleType::ARTICLE->value)
-                    ->and($article->author_id)->toBe($user->_id)
-                    ->and($article->is_featured)->toBeTrue();
-            }
+            $articleMock = Mockery::mock($article)->makePartial();
+            $articleMock->shouldReceive('update')->andReturn(true);
+            $articleMock->shouldReceive('fresh')->andReturn(null);
+
+            $this->repository->update($articleMock, ['title' => 'New Title']);
+        })->throws(ArticleRefreshException::class);
+    });
+
+    describe('delete method', function (): void {
+        it('deletes article successfully', function (): void {
+            $article = Article::factory()->create();
+            $articleId = $article->_id;
+
+            $result = $this->repository->delete($article);
+
+            expect($result)->toBeTrue()
+                ->and(Article::find($articleId))->toBeNull();
+        });
+
+        it('returns true when article is deleted', function (): void {
+            $article = Article::factory()->create();
+
+            $result = $this->repository->delete($article);
+
+            expect($result)->toBe(true);
         });
     });
 
-    describe('getPublished method', function () {
-        it('returns only published articles with published_at in past', function () {
-            Article::factory()->count(3)->create([
-                'status' => 'published',
-                'published_at' => now()->subDay(),
-            ]);
+    it('can paginate articles without filters', function (): void {
+        Article::factory()->count(25)->create();
 
-            Article::factory()->count(2)->create([
-                'status' => 'draft',
-                'published_at' => now()->subDay(),
-            ]);
+        $result = $this->repository->query()->paginate(10);
 
-            Article::factory()->count(1)->create([
-                'status' => 'published',
-                'published_at' => now()->addDay(),
-            ]);
-
-            $result = $this->repository->getPublished();
-
-            expect($result)->toBeInstanceOf(Collection::class)
-                ->and($result->count())->toBe(3);
-
-            foreach ($result as $article) {
-                expect($article->status)->toBe('published')
-                    ->and($article->published_at->isPast())->toBeTrue();
-            }
-        });
+        expect($result)->toBeInstanceOf(LengthAwarePaginator::class)
+            ->and($result->perPage())->toBe(10)
+            ->and($result->total())->toBe(25)
+            ->and(count($result->items()))->toBe(10);
     });
 
-    describe('getFeatured method', function () {
-        it('returns only featured published articles', function () {
-            Article::factory()->count(2)->create([
-                'is_featured' => true,
-                'status' => 'published',
-            ]);
+    it('can filter by status', function (): void {
+        Article::factory()->count(5)->create(['status' => ArticleStatus::PUBLISHED->value]);
+        Article::factory()->count(3)->create(['status' => ArticleStatus::DRAFT->value]);
 
-            Article::factory()->count(3)->create([
-                'is_featured' => false,
-                'status' => 'published',
-            ]);
+        $result = $this->repository->query()
+            ->where('status', ArticleStatus::PUBLISHED->value)
+            ->get();
 
-            Article::factory()->count(1)->create([
-                'is_featured' => true,
-                'status' => 'draft',
-            ]);
-
-            $result = $this->repository->getFeatured();
-
-            expect($result)->toBeInstanceOf(Collection::class)
-                ->and($result->count())->toBe(2);
-
-            foreach ($result as $article) {
-                expect($article->is_featured)->toBeTrue()
-                    ->and($article->status)->toBe('published');
-            }
-        });
+        expect($result)->toHaveCount(5);
+        foreach ($result as $article) {
+            expect($article->status)->toBe(ArticleStatus::PUBLISHED->value);
+        }
     });
 
-    describe('getByAuthor method', function () {
-        it('returns articles by specific author', function () {
-            $user1 = User::factory()->create();
-            $user2 = User::factory()->create();
+    it('can filter by type', function (): void {
+        Article::factory()->count(4)->create(['type' => ArticleType::TUTORIAL->value]);
+        Article::factory()->count(6)->create(['type' => ArticleType::ARTICLE->value]);
 
-            Article::factory()->count(4)->create(['author_id' => $user1->_id]);
-            Article::factory()->count(2)->create(['author_id' => $user2->_id]);
+        $result = $this->repository->query()
+            ->where('type', ArticleType::TUTORIAL->value)
+            ->get();
 
-            $result = $this->repository->getByAuthor($user1->_id);
-
-            expect($result)->toBeInstanceOf(Collection::class)
-                ->and($result->count())->toBe(4);
-
-            foreach ($result as $article) {
-                expect($article->author_id)->toBe($user1->_id);
-            }
-        });
+        expect($result)->toHaveCount(4);
+        foreach ($result as $article) {
+            expect($article->type)->toBe(ArticleType::TUTORIAL->value);
+        }
     });
 
-    describe('getByType method', function () {
-        it('returns only published articles of specific type', function () {
-            Article::factory()->count(3)->create([
-                'type' => ArticleType::TUTORIAL,
-                'status' => 'published',
-            ]);
+    it('can filter by author_id', function (): void {
+        $user1 = User::factory()->create();
+        $user2 = User::factory()->create();
 
-            Article::factory()->count(2)->create([
-                'type' => ArticleType::ARTICLE,
-                'status' => 'published',
-            ]);
+        Article::factory()->count(3)->create(['author_id' => $user1->_id]);
+        Article::factory()->count(2)->create(['author_id' => $user2->_id]);
 
-            Article::factory()->count(1)->create([
-                'type' => ArticleType::TUTORIAL,
-                'status' => 'draft',
-            ]);
+        $result = $this->repository->query()
+            ->where('author_id', $user1->_id)
+            ->get();
 
-            $result = $this->repository->getByType(ArticleType::TUTORIAL->value);
-
-            expect($result)->toBeInstanceOf(Collection::class)
-                ->and($result->count())->toBe(3);
-
-            foreach ($result as $article) {
-                expect($article->type)->toBe(ArticleType::TUTORIAL->value)
-                    ->and($article->status)->toBe('published');
-            }
-        });
+        expect($result)->toHaveCount(3);
+        foreach ($result as $article) {
+            expect($article->author_id)->toBe($user1->_id);
+        }
     });
 
-    describe('search method', function () {
-        it('searches articles by term in title, content and excerpt', function () {
-            Article::factory()->create([
-                'title' => 'PHP Tutorial',
-                'content' => 'Learning PHP basics',
-                'excerpt' => 'Basic PHP guide',
-                'status' => 'published',
-            ]);
+    it('can filter by featured status', function (): void {
+        Article::factory()->count(3)->create(['is_featured' => true]);
+        Article::factory()->count(7)->create(['is_featured' => false]);
 
-            Article::factory()->create([
-                'title' => 'JavaScript Guide',
-                'content' => 'Advanced PHP techniques',
-                'excerpt' => 'JS fundamentals',
-                'status' => 'published',
-            ]);
+        $result = $this->repository->query()
+            ->where('is_featured', true)
+            ->get();
 
-            Article::factory()->create([
-                'title' => 'Laravel Tips',
-                'content' => 'Laravel best practices',
-                'excerpt' => 'Great PHP framework tips',
-                'status' => 'published',
-            ]);
-
-            Article::factory()->create([
-                'title' => 'PHP Advanced',
-                'content' => 'Advanced concepts',
-                'excerpt' => 'Advanced guide',
-                'status' => 'draft',
-            ]);
-
-            $result = $this->repository->search('PHP');
-
-            expect($result)->toBeInstanceOf(Collection::class)
-                ->and($result->count())->toBe(3);
-        });
+        expect($result)->toHaveCount(3);
+        foreach ($result as $article) {
+            expect($article->is_featured)->toBeTrue();
+        }
     });
 
-    describe('getByTags method', function () {
-        it('returns articles by single tag', function () {
-            Article::factory()->create([
-                'tags' => ['php', 'web'],
-                'status' => 'published',
-            ]);
+    it('can filter by tags', function (): void {
+        Article::factory()->create(['tags' => ['php', 'web']]);
+        Article::factory()->create(['tags' => ['javascript', 'frontend']]);
+        Article::factory()->create(['tags' => ['php', 'laravel']]);
 
-            Article::factory()->create([
-                'tags' => ['javascript', 'frontend'],
-                'status' => 'published',
-            ]);
+        $result = Article::query()->tags(['php'])->get();
 
-            Article::factory()->create([
-                'tags' => ['php', 'laravel'],
-                'status' => 'published',
-            ]);
+        expect($result)->toHaveCount(2);
+    });
 
-            Article::factory()->create([
-                'tags' => ['php', 'backend'],
-                'status' => 'draft',
-            ]);
+    it('can combine multiple filters', function (): void {
+        $user = User::factory()->create();
 
-            $result = $this->repository->getByTags(['php']);
+        Article::factory()->count(2)->create([
+            'status' => ArticleStatus::PUBLISHED->value,
+            'type' => ArticleType::ARTICLE->value,
+            'author_id' => $user->_id,
+            'is_featured' => true,
+        ]);
 
-            expect($result)->toBeInstanceOf(Collection::class)
-                ->and($result->count())->toBe(2);
-        });
+        Article::factory()->count(3)->create([
+            'status' => ArticleStatus::DRAFT->value,
+            'type' => ArticleType::ARTICLE->value,
+            'author_id' => $user->_id,
+            'is_featured' => true,
+        ]);
 
-        it('returns articles by multiple tags', function () {
-            Article::factory()->create([
-                'tags' => ['php', 'web'],
-                'status' => 'published',
-            ]);
+        $result = $this->repository->query()
+            ->where('status', ArticleStatus::PUBLISHED->value)
+            ->where('type', ArticleType::ARTICLE->value)
+            ->where('author_id', $user->_id)
+            ->where('is_featured', true)
+            ->get();
 
-            Article::factory()->create([
-                'tags' => ['laravel', 'framework'],
-                'status' => 'published',
-            ]);
-
-            Article::factory()->create([
-                'tags' => ['testing', 'phpunit'],
-                'status' => 'published',
-            ]);
-
-            $result = $this->repository->getByTags(['php', 'laravel']);
-
-            expect($result)->toBeInstanceOf(Collection::class)
-                ->and($result->count())->toBe(3);
-        });
-
-        it('returns published articles only when filtering by tags with empty array', function () {
-            Article::factory()->count(5)->create(['status' => 'published']);
-            Article::factory()->count(3)->create(['status' => 'draft']);
-
-            $result = $this->repository->getByTags([]);
-
-            expect($result)->toBeInstanceOf(Collection::class)
-                ->and($result->count())->toBe(5);
-
-            foreach ($result as $article) {
-                expect($article->status)->toBe('published');
-            }
-        });
+        expect($result)->toHaveCount(2);
+        foreach ($result as $article) {
+            expect($article->status)->toBe(ArticleStatus::PUBLISHED->value)
+                ->and($article->type)->toBe(ArticleType::ARTICLE->value)
+                ->and($article->author_id)->toBe($user->_id)
+                ->and($article->is_featured)->toBeTrue();
+        }
     });
 });

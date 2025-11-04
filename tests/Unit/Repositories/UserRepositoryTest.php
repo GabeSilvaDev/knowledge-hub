@@ -13,23 +13,23 @@ const JOHN_EMAIL = 'john@example.com';
 const JANE_SMITH_NAME = 'Jane Smith';
 const JANE_EMAIL = 'jane@example.com';
 
-describe('UserRepository', function () {
-    beforeEach(function () {
+describe('UserRepository', function (): void {
+    beforeEach(function (): void {
         $this->repository = new UserRepository(new User);
     });
 
-    afterEach(function () {
+    afterEach(function (): void {
         User::query()->delete();
     });
 
-    describe('constructor', function () {
-        it('creates repository with User model dependency', function () {
+    describe('constructor', function (): void {
+        it('creates repository with User model dependency', function (): void {
             expect($this->repository)->toBeInstanceOf(UserRepository::class);
         });
     });
 
-    describe('findById method', function () {
-        it('returns user when found', function () {
+    describe('findById method', function (): void {
+        it('returns user when found', function (): void {
             $user = User::factory()->create();
 
             $result = $this->repository->findById($user->_id);
@@ -40,15 +40,15 @@ describe('UserRepository', function () {
                 ->and($result->email)->toBe($user->email);
         });
 
-        it('returns null when user not found', function () {
+        it('returns null when user not found', function (): void {
             $result = $this->repository->findById('507f1f77bcf86cd799439011');
 
             expect($result)->toBeNull();
         });
     });
 
-    describe('findByEmail method', function () {
-        it('returns user when found by email', function () {
+    describe('findByEmail method', function (): void {
+        it('returns user when found by email', function (): void {
             $user = User::factory()->create(['email' => TEST_EMAIL]);
 
             $result = $this->repository->findByEmail(TEST_EMAIL);
@@ -58,15 +58,15 @@ describe('UserRepository', function () {
                 ->and($result->_id)->toBe($user->_id);
         });
 
-        it('returns null when user not found by email', function () {
+        it('returns null when user not found by email', function (): void {
             $result = $this->repository->findByEmail('nonexistent@example.com');
 
             expect($result)->toBeNull();
         });
     });
 
-    describe('findByUsername method', function () {
-        it('returns user when found by username', function () {
+    describe('findByUsername method', function (): void {
+        it('returns user when found by username', function (): void {
             $user = User::factory()->create(['username' => 'testuser']);
 
             $result = $this->repository->findByUsername('testuser');
@@ -76,15 +76,15 @@ describe('UserRepository', function () {
                 ->and($result->_id)->toBe($user->_id);
         });
 
-        it('returns null when user not found by username', function () {
+        it('returns null when user not found by username', function (): void {
             $result = $this->repository->findByUsername('nonexistentuser');
 
             expect($result)->toBeNull();
         });
     });
 
-    describe('create method', function () {
-        it('creates user from DTO', function () {
+    describe('create method', function (): void {
+        it('creates user from DTO', function (): void {
             $dto = CreateUserDTO::fromArray([
                 'name' => 'Test User',
                 'username' => 'testuser',
@@ -102,7 +102,7 @@ describe('UserRepository', function () {
                 ->and($result->roles)->toBe([UserRole::READER->value]);
         });
 
-        it('creates user with minimal required fields', function () {
+        it('creates user with minimal required fields', function (): void {
             $dto = CreateUserDTO::fromArray([
                 'name' => 'Minimal User',
                 'username' => 'minimaluser',
@@ -120,8 +120,8 @@ describe('UserRepository', function () {
         });
     });
 
-    describe('paginate method', function () {
-        it('paginates users with default per page', function () {
+    describe('paginate method', function (): void {
+        it('paginates users with default per page', function (): void {
             User::factory()->count(20)->create();
 
             $result = $this->repository->paginate();
@@ -132,7 +132,7 @@ describe('UserRepository', function () {
                 ->and(count($result->items()))->toBe(15);
         });
 
-        it('paginates users with custom per page', function () {
+        it('paginates users with custom per page', function (): void {
             User::factory()->count(25)->create();
 
             $result = $this->repository->paginate(10);
@@ -143,7 +143,7 @@ describe('UserRepository', function () {
                 ->and(count($result->items()))->toBe(10);
         });
 
-        it('returns empty pagination when no users exist', function () {
+        it('returns empty pagination when no users exist', function (): void {
             $result = $this->repository->paginate();
 
             expect($result)->toBeInstanceOf(LengthAwarePaginator::class)
@@ -152,8 +152,8 @@ describe('UserRepository', function () {
         });
     });
 
-    describe('getByRole method', function () {
-        it('returns users with specific role', function () {
+    describe('getByRole method', function (): void {
+        it('returns users with specific role', function (): void {
             User::factory()->count(3)->admin()->create();
             User::factory()->count(5)->reader()->create();
 
@@ -167,7 +167,7 @@ describe('UserRepository', function () {
             }
         });
 
-        it('returns users with author role', function () {
+        it('returns users with author role', function (): void {
             User::factory()->count(2)->author()->create();
             User::factory()->count(2)->reader()->create();
 
@@ -181,7 +181,7 @@ describe('UserRepository', function () {
             }
         });
 
-        it('returns empty collection when no users have the role', function () {
+        it('returns empty collection when no users have the role', function (): void {
             User::factory()->count(5)->reader()->create();
 
             $result = $this->repository->getByRole(UserRole::ADMIN->value);
@@ -190,7 +190,7 @@ describe('UserRepository', function () {
                 ->and($result->count())->toBe(0);
         });
 
-        it('returns users with multiple roles including searched role', function () {
+        it('returns users with multiple roles including searched role', function (): void {
             User::factory()->create([
                 'roles' => [UserRole::READER->value, UserRole::ADMIN->value, UserRole::AUTHOR->value],
             ]);
@@ -202,8 +202,8 @@ describe('UserRepository', function () {
         });
     });
 
-    describe('search method', function () {
-        it('searches users by name', function () {
+    describe('search method', function (): void {
+        it('searches users by name', function (): void {
             User::factory()->create(['name' => JOHN_DOE_NAME, 'username' => 'johndoe', 'email' => JOHN_EMAIL]);
             User::factory()->create(['name' => JANE_SMITH_NAME, 'username' => 'janesmith', 'email' => JANE_EMAIL]);
 
@@ -214,7 +214,7 @@ describe('UserRepository', function () {
                 ->and($result->first()->name)->toBe(JOHN_DOE_NAME);
         });
 
-        it('searches users by username', function () {
+        it('searches users by username', function (): void {
             User::factory()->create(['name' => JOHN_DOE_NAME, 'username' => 'johndoe', 'email' => JOHN_EMAIL]);
             User::factory()->create(['name' => JANE_SMITH_NAME, 'username' => 'janesmith', 'email' => JANE_EMAIL]);
 
@@ -225,7 +225,7 @@ describe('UserRepository', function () {
                 ->and($result->first()->username)->toBe('johndoe');
         });
 
-        it('searches users by email', function () {
+        it('searches users by email', function (): void {
             User::factory()->create(['name' => JOHN_DOE_NAME, 'username' => 'johndoe', 'email' => JOHN_EMAIL]);
             User::factory()->create(['name' => JANE_SMITH_NAME, 'username' => 'janesmith', 'email' => JANE_EMAIL]);
 
@@ -236,7 +236,7 @@ describe('UserRepository', function () {
                 ->and($result->first()->email)->toBe(JOHN_EMAIL);
         });
 
-        it('searches users across multiple fields', function () {
+        it('searches users across multiple fields', function (): void {
             User::factory()->create(['name' => 'Test User', 'username' => 'testuser', 'email' => TEST_EMAIL]);
             User::factory()->create(['name' => 'Another User', 'username' => 'anotheruser', 'email' => 'another@test.com']);
             User::factory()->create(['name' => JOHN_DOE_NAME, 'username' => 'johndoe', 'email' => JOHN_EMAIL]);
@@ -248,7 +248,7 @@ describe('UserRepository', function () {
                 ->and($result->count())->toBe(3);
         });
 
-        it('returns empty collection when no users match search term', function () {
+        it('returns empty collection when no users match search term', function (): void {
             User::factory()->create(['name' => JOHN_DOE_NAME, 'username' => 'johndoe', 'email' => JOHN_EMAIL]);
 
             $result = $this->repository->search('nonexistent');
@@ -257,7 +257,7 @@ describe('UserRepository', function () {
                 ->and($result->count())->toBe(0);
         });
 
-        it('is case insensitive', function () {
+        it('is case insensitive', function (): void {
             User::factory()->create(['name' => JOHN_DOE_NAME, 'username' => 'johndoe', 'email' => JOHN_EMAIL]);
 
             $result = $this->repository->search('JOHN');
