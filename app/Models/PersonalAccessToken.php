@@ -3,8 +3,8 @@
 namespace App\Models;
 
 use Laravel\Sanctum\PersonalAccessToken as SanctumPersonalAccessToken;
-use MongoDB\Laravel\Eloquent\Casts\ObjectId;
 use MongoDB\Laravel\Eloquent\DocumentModel;
+use Override;
 
 class PersonalAccessToken extends SanctumPersonalAccessToken
 {
@@ -54,17 +54,20 @@ class PersonalAccessToken extends SanctumPersonalAccessToken
 
     /**
      * Get the value of the model's primary key.
-     *
-     * @return mixed
      */
-    public function getKey()
+    #[Override]
+    public function getKey(): ?string
     {
         $key = parent::getKey();
-        
-        if ($key instanceof ObjectId) {
+
+        if ($key === null) {
+            return null;
+        }
+
+        if (is_scalar($key)) {
             return (string) $key;
         }
-        
-        return $key;
+
+        return null;
     }
 }

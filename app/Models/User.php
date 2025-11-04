@@ -2,6 +2,9 @@
 
 namespace App\Models;
 
+use App\Exceptions\TokenCreationException;
+use Database\Factories\UserFactory;
+use DateTimeInterface;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
@@ -10,7 +13,6 @@ use Laravel\Sanctum\HasApiTokens;
 use Laravel\Sanctum\NewAccessToken;
 use Laravel\Sanctum\Sanctum;
 use MongoDB\Laravel\Auth\User as Authenticatable;
-use DateTimeInterface;
 
 class User extends Authenticatable
 {
@@ -67,9 +69,8 @@ class User extends Authenticatable
 
     /**
      * Get the articles written by this user.
-     */
-    /**
-     * @return HasMany<Article>
+     *
+     * @return HasMany<Article, User>
      */
     public function articles(): HasMany
     {
@@ -79,7 +80,7 @@ class User extends Authenticatable
     /**
      * Override tokens relationship to use MongoDB connection.
      *
-     * @return MorphMany<PersonalAccessToken>
+     * @return MorphMany<PersonalAccessToken, User>
      */
     public function tokens(): MorphMany
     {
@@ -93,12 +94,11 @@ class User extends Authenticatable
     }
 
     /**
-     * Override createToken to handle MongoDB ObjectId properly.
+     * Create a new personal access token for the user.
      *
-     * @param string $name
-     * @param array $abilities
-     * @param DateTimeInterface|null $expiresAt
-     * @return NewAccessToken
+     * @param  array<int, string>  $abilities
+     *
+     * @throws TokenCreationException
      */
     public function createToken(string $name, array $abilities = ['*'], ?DateTimeInterface $expiresAt = null): NewAccessToken
     {
@@ -116,6 +116,16 @@ class User extends Authenticatable
             ->where('token', hash('sha256', $plainTextToken))
             ->first();
 
-        return new NewAccessToken($token, $token->getKey().'|'.$plainTextToken);
+        if ($token === null) {
+            throw new TokenCreationException('Failed to create token: token not found after creation');
+        }
+
+        $tokenKey = $token->getKey();
+
+        if ($tokenKey === null) {
+            throw new TokenCreationException('Failed to create token: token key is null');
+        }
+
+        return new NewAccessToken($token, $tokenKey . '|' . $plainTextToken);
     }
 }
