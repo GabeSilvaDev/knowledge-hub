@@ -3,10 +3,11 @@
 [![PHP](https://img.shields.io/badge/PHP-8.4-777BB4?style=flat-square&logo=php&logoColor=white)](https://php.net)
 [![Laravel](https://img.shields.io/badge/Laravel-12.0-FF2D20?style=flat-square&logo=laravel&logoColor=white)](https://laravel.com)
 [![MongoDB](https://img.shields.io/badge/MongoDB-6.0-47A248?style=flat-square&logo=mongodb&logoColor=white)](https://mongodb.com)
+[![Redis](https://img.shields.io/badge/Redis-7.0-DC382D?style=flat-square&logo=redis&logoColor=white)](https://redis.io)
 [![Pest](https://img.shields.io/badge/Pest-4.1-8BC34A?style=flat-square&logo=pest&logoColor=white)](https://pestphp.com)
 [![Docker](https://img.shields.io/badge/Docker-Enabled-2496ED?style=flat-square&logo=docker&logoColor=white)](https://docker.com)
 
-> API RESTful moderna para gerenciamento de conhecimento com suporte a artigos versionados, autenticação segura e MongoDB.
+> API RESTful moderna para gerenciamento de conhecimento com suporte a artigos versionados, autenticação segura, MongoDB e Redis.
 
 ## 📖 Sobre o Projeto
 
@@ -80,19 +81,19 @@ docker-compose up -d
 ### 4. Instale as dependências
 
 ```bash
-docker exec -it knowledge-hub-knowledge-hub-1 composer install
+docker exec -it knowledge-hub-app composer install
 ```
 
 ### 5. Gere a chave da aplicação
 
 ```bash
-docker exec -it knowledge-hub-knowledge-hub-1 php artisan key:generate
+docker exec -it knowledge-hub-app php artisan key:generate
 ```
 
 ### 6. Execute as migrations
 
 ```bash
-docker exec -it knowledge-hub-knowledge-hub-1 php artisan migrate
+docker exec -it knowledge-hub-app php artisan migrate
 ```
 
 ### 7. Acesse a aplicação
@@ -207,26 +208,26 @@ app/
 
 ```bash
 # Todos os testes
-docker exec -it knowledge-hub-knowledge-hub-1 ./vendor/bin/pest
+docker exec -it knowledge-hub-app ./vendor/bin/pest
 
 # Testes específicos
-docker exec -it knowledge-hub-knowledge-hub-1 ./vendor/bin/pest tests/Unit/ArticleVersioningTest.php
+docker exec -it knowledge-hub-app ./vendor/bin/pest tests/Unit/ArticleVersioningTest.php
 
 # Com cobertura
-docker exec -it knowledge-hub-knowledge-hub-1 ./vendor/bin/pest --coverage
+docker exec -it knowledge-hub-app ./vendor/bin/pest --coverage
 ```
 
 ### Estatísticas
 
 - ✅ **735 testes** passando
-- ✅ **>98% cobertura** em componentes críticos
+- ✅ **>100% cobertura** em componentes críticos
 - ✅ Testes unitários e de integração
 
 ### Scripts de Demonstração
 
 ```bash
 # Testar versionamento manualmente
-docker exec -it knowledge-hub-knowledge-hub-1 php test-versioning.php
+docker exec -it knowledge-hub-app php test-versioning.php
 ```
 
 ## 🗄️ Banco de Dados
@@ -244,12 +245,12 @@ docker exec -it knowledge-hub-knowledge-hub-1 php test-versioning.php
 
 ```bash
 # Via mongosh
-docker exec -it knowledge-hub-mongo-1 mongosh
+docker exec -it knowledge-hub-mongo mongosh
 use knowledge_hub
 db.articles.find().pretty()
 
 # Via Laravel Tinker
-docker exec -it knowledge-hub-knowledge-hub-1 php artisan tinker
+docker exec -it knowledge-hub-app php artisan tinker
 Article::all()
 ArticleVersion::all()
 ```
@@ -260,19 +261,19 @@ ArticleVersion::all()
 
 ```bash
 # Acessar container
-docker exec -it knowledge-hub-knowledge-hub-1 bash
+docker exec -it knowledge-hub-app bash
 
 # Logs
-docker logs knowledge-hub-knowledge-hub-1 -f
+docker logs knowledge-hub-app -f
 
 # Rebuild
 docker-compose down && docker-compose up -d --build
 
 # Análise estática
-docker exec -it knowledge-hub-knowledge-hub-1 ./vendor/bin/phpstan analyse
+docker exec -it knowledge-hub-app ./vendor/bin/phpstan analyse
 
 # Code style
-docker exec -it knowledge-hub-knowledge-hub-1 ./vendor/bin/pint
+docker exec -it knowledge-hub-app ./vendor/bin/pint
 ```
 
 ## 🤝 Contribuindo
@@ -791,8 +792,8 @@ volumes:
 
 ```bash
 # Ver logs
-docker logs knowledge-hub-knowledge-hub-1 -f
-docker logs knowledge-hub-mongo-1 -f
+docker logs knowledge-hub-app -f
+docker logs knowledge-hub-mongo -f
 
 # Restart
 docker-compose restart
