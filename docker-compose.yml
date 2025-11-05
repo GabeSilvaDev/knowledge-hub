@@ -1,7 +1,9 @@
 services:
   knowledge-hub:
+    container_name: knowledge-hub-app
     build:
       context: .
+      dockerfile: Dockerfile
     volumes:
       - ./:/var/www
     ports:
@@ -13,15 +15,56 @@ services:
       DB_HOST: mongo
       DB_PORT: 27017
       DB_DATABASE: knowledge_hub
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
     depends_on:
-      - mongo
+      mongo:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - knowledge-hub-network
+    restart: unless-stopped
 
   mongo:
+    container_name: knowledge-hub-mongo
     image: mongo:6.0
     ports:
       - "27017:27017"
     volumes:
       - mongo-data:/data/db
+    networks:
+      - knowledge-hub-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  redis:
+    container_name: knowledge-hub-redis
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes --requirepass "${REDIS_PASSWORD:-}"
+    networks:
+      - knowledge-hub-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+networks:
+  knowledge-hub-network:
+    driver: bridge
 
 volumes:
   mongo-data:
+  redis-data:
