@@ -13,7 +13,8 @@ use Illuminate\Validation\ValidationException;
 class AuthService implements AuthServiceInterface
 {
     public function __construct(
-        private readonly UserRepositoryInterface $userRepository
+        private readonly UserRepositoryInterface $userRepository,
+        private readonly TokenService $tokenService
     ) {}
 
     /**
@@ -36,11 +37,11 @@ class AuthService implements AuthServiceInterface
 
         $user = $this->userRepository->create($dto);
 
-        $token = $user->createToken('auth_token')->plainTextToken;
+        $tokenResult = $this->tokenService->createToken($user, 'auth_token');
 
         return [
             'user' => $user,
-            'token' => $token,
+            'token' => $tokenResult->plainTextToken,
         ];
     }
 
@@ -63,11 +64,11 @@ class AuthService implements AuthServiceInterface
 
         $this->userRepository->updateLastLogin($user);
 
-        $token = $user->createToken('auth_token')->plainTextToken;
+        $tokenResult = $this->tokenService->createToken($user, 'auth_token');
 
         return [
             'user' => $user->refresh(),
-            'token' => $token,
+            'token' => $tokenResult->plainTextToken,
         ];
     }
 
@@ -76,6 +77,10 @@ class AuthService implements AuthServiceInterface
      */
     public function logout(User $user, string $currentToken): void
     {
+        $tokenId = $this->tokenService->extractTokenId($currentToken);
+
+        $this->tokenService->revokeToken($tokenId);
+
         $this->userRepository->revokeToken($user, $currentToken);
     }
 
@@ -84,6 +89,11 @@ class AuthService implements AuthServiceInterface
      */
     public function revokeAllTokens(User $user): void
     {
+        $userId = $user->getKey();
+        if (is_string($userId) || is_int($userId)) {
+            $this->tokenService->revokeAllUserTokens((string) $userId);
+        }
+
         $this->userRepository->revokeAllTokens($user);
     }
 }
