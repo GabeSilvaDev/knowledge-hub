@@ -3,6 +3,7 @@
 use App\Contracts\UserRepositoryInterface;
 use App\Models\User;
 use App\Services\AuthService;
+use App\Services\TokenService;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
@@ -19,7 +20,8 @@ afterEach(function (): void {
 describe('register', function (): void {
     it('creates user with all required fields', function (): void {
         $repository = app(UserRepositoryInterface::class);
-        $service = new AuthService($repository);
+        $tokenService = app(TokenService::class);
+        $service = new AuthService($repository, $tokenService);
 
         $data = [
             'name' => 'John Doe',
@@ -42,7 +44,8 @@ describe('register', function (): void {
 
     it('creates user with optional bio and avatar_url', function (): void {
         $repository = app(UserRepositoryInterface::class);
-        $service = new AuthService($repository);
+        $tokenService = app(TokenService::class);
+        $service = new AuthService($repository, $tokenService);
 
         $data = [
             'name' => 'Jane Smith',
@@ -61,7 +64,8 @@ describe('register', function (): void {
 
     it('creates user without optional fields when not provided', function (): void {
         $repository = app(UserRepositoryInterface::class);
-        $service = new AuthService($repository);
+        $tokenService = app(TokenService::class);
+        $service = new AuthService($repository, $tokenService);
 
         $data = [
             'name' => 'Bob Wilson',
@@ -78,7 +82,8 @@ describe('register', function (): void {
 
     it('assigns default user role', function (): void {
         $repository = app(UserRepositoryInterface::class);
-        $service = new AuthService($repository);
+        $tokenService = app(TokenService::class);
+        $service = new AuthService($repository, $tokenService);
 
         $data = [
             'name' => 'Test User',
@@ -94,7 +99,8 @@ describe('register', function (): void {
 
     it('generates authentication token', function (): void {
         $repository = app(UserRepositoryInterface::class);
-        $service = new AuthService($repository);
+        $tokenService = app(TokenService::class);
+        $service = new AuthService($repository, $tokenService);
 
         $data = [
             'name' => 'Token User',
@@ -112,7 +118,8 @@ describe('register', function (): void {
 
     it('hashes password before storing', function (): void {
         $repository = app(UserRepositoryInterface::class);
-        $service = new AuthService($repository);
+        $tokenService = app(TokenService::class);
+        $service = new AuthService($repository, $tokenService);
 
         $data = [
             'name' => 'Hash User',
@@ -129,7 +136,8 @@ describe('register', function (): void {
 
     it('creates user in database', function (): void {
         $repository = app(UserRepositoryInterface::class);
-        $service = new AuthService($repository);
+        $tokenService = app(TokenService::class);
+        $service = new AuthService($repository, $tokenService);
 
         $data = [
             'name' => 'DB User',
@@ -151,7 +159,8 @@ describe('login', function (): void {
 
     it('authenticates user with valid credentials', function (): void {
         $repository = app(UserRepositoryInterface::class);
-        $service = new AuthService($repository);
+        $tokenService = app(TokenService::class);
+        $service = new AuthService($repository, $tokenService);
         $loginEmail = 'login@example.com';
 
         User::create([
@@ -172,7 +181,8 @@ describe('login', function (): void {
 
     it('generates new token on login', function (): void {
         $repository = app(UserRepositoryInterface::class);
-        $service = new AuthService($repository);
+        $tokenService = app(TokenService::class);
+        $service = new AuthService($repository, $tokenService);
 
         User::create([
             'name' => 'Token Login',
@@ -190,7 +200,8 @@ describe('login', function (): void {
 
     it('updates last_login_at timestamp', function (): void {
         $repository = app(UserRepositoryInterface::class);
-        $service = new AuthService($repository);
+        $tokenService = app(TokenService::class);
+        $service = new AuthService($repository, $tokenService);
 
         $user = User::create([
             'name' => 'Timestamp User',
@@ -210,14 +221,16 @@ describe('login', function (): void {
 
     it('throws exception when email does not exist', function (): void {
         $repository = app(UserRepositoryInterface::class);
-        $service = new AuthService($repository);
+        $tokenService = app(TokenService::class);
+        $service = new AuthService($repository, $tokenService);
 
         $service->login('nonexistent@example.com', 'Password123');
     })->throws(ValidationException::class, $incorrectCredentialsMessage);
 
     it('throws exception when password is incorrect', function (): void {
         $repository = app(UserRepositoryInterface::class);
-        $service = new AuthService($repository);
+        $tokenService = app(TokenService::class);
+        $service = new AuthService($repository, $tokenService);
 
         User::create([
             'name' => 'Wrong Pass',
@@ -232,7 +245,8 @@ describe('login', function (): void {
 
     it('throws exception with proper message format', function (): void {
         $repository = app(UserRepositoryInterface::class);
-        $service = new AuthService($repository);
+        $tokenService = app(TokenService::class);
+        $service = new AuthService($repository, $tokenService);
 
         $this->expectException(ValidationException::class);
         $service->login('invalid@example.com', 'password');
@@ -241,7 +255,8 @@ describe('login', function (): void {
 
     it('returns refreshed user instance', function (): void {
         $repository = app(UserRepositoryInterface::class);
-        $service = new AuthService($repository);
+        $tokenService = app(TokenService::class);
+        $service = new AuthService($repository, $tokenService);
 
         User::create([
             'name' => 'Refresh User',
@@ -258,7 +273,8 @@ describe('login', function (): void {
 
     it('accepts case-sensitive password', function (): void {
         $repository = app(UserRepositoryInterface::class);
-        $service = new AuthService($repository);
+        $tokenService = app(TokenService::class);
+        $service = new AuthService($repository, $tokenService);
         $caseEmail = 'case@example.com';
 
         User::create([
@@ -281,7 +297,8 @@ describe('logout', function (): void {
 
     it('does nothing when token does not exist', function (): void {
         $repository = app(UserRepositoryInterface::class);
-        $service = new AuthService($repository);
+        $tokenService = app(TokenService::class);
+        $service = new AuthService($repository, $tokenService);
 
         $user = User::create([
             'name' => 'No Token',
@@ -300,7 +317,8 @@ describe('logout', function (): void {
 describe('revokeAllTokens', function (): void {
     it('revokes all user tokens', function (): void {
         $repository = app(UserRepositoryInterface::class);
-        $service = new AuthService($repository);
+        $tokenService = app(TokenService::class);
+        $service = new AuthService($repository, $tokenService);
 
         $user = User::create([
             'name' => 'Revoke All',
@@ -323,7 +341,8 @@ describe('revokeAllTokens', function (): void {
 
     it('does nothing when user has no tokens', function (): void {
         $repository = app(UserRepositoryInterface::class);
-        $service = new AuthService($repository);
+        $tokenService = app(TokenService::class);
+        $service = new AuthService($repository, $tokenService);
 
         $user = User::create([
             'name' => 'No Tokens',
@@ -342,7 +361,8 @@ describe('revokeAllTokens', function (): void {
 
     it('only revokes tokens for specified user', function (): void {
         $repository = app(UserRepositoryInterface::class);
-        $service = new AuthService($repository);
+        $tokenService = app(TokenService::class);
+        $service = new AuthService($repository, $tokenService);
 
         $user1 = User::create([
             'name' => 'User One',
@@ -378,7 +398,8 @@ describe('revokeAllTokens', function (): void {
 describe('Integration', function (): void {
     it('complete registration and login flow', function (): void {
         $repository = app(UserRepositoryInterface::class);
-        $service = new AuthService($repository);
+        $tokenService = app(TokenService::class);
+        $service = new AuthService($repository, $tokenService);
         $flowEmail = 'flow@example.com';
 
         $registerData = [
@@ -404,7 +425,8 @@ describe('Integration', function (): void {
 
     it('multiple sessions management', function (): void {
         $repository = app(UserRepositoryInterface::class);
-        $service = new AuthService($repository);
+        $tokenService = app(TokenService::class);
+        $service = new AuthService($repository, $tokenService);
         $multiSessionEmail = 'multisession@example.com';
 
         $data = [
