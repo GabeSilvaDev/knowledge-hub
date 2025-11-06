@@ -14,11 +14,22 @@ class ArticleVersionSeeder extends Seeder
         $articles = Article::limit(10)->get();
         $user = User::first();
 
+        if (! $user) {
+            return;
+        }
+
         Auth::login($user);
 
         foreach ($articles as $article) {
-            $article->update(['title' => $article->title . ' - Editado']);
-            $article->update(['content' => $article->content . "\n\nConteúdo atualizado."]);
+            $title = $article->getAttribute('title');
+            if (is_string($title)) {
+                $article->update(['title' => $title . ' - Editado']);
+            }
+
+            $content = $article->getAttribute('content');
+            if (is_string($content)) {
+                $article->update(['content' => $content . "\n\nConteúdo atualizado."]);
+            }
         }
 
         Auth::logout();
