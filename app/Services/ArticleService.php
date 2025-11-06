@@ -14,8 +14,7 @@ class ArticleService
 {
     public function __construct(
         private readonly ArticleRepositoryInterface $articleRepository
-    ) {
-    }
+    ) {}
 
     /**
      * Get query builder for articles.
