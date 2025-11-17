@@ -2,7 +2,11 @@
 
 namespace App\Providers;
 
+use App\Cache\RedisCacheInvalidator;
+use App\Contracts\CacheInvalidatorInterface;
+use App\Models\Article;
 use App\Models\PersonalAccessToken;
+use App\Observers\ArticleObserver;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Sanctum\Sanctum;
 
@@ -14,7 +18,7 @@ class AppServiceProvider extends ServiceProvider
     #[\Override]
     public function register(): void
     {
-        //
+        $this->app->bind(CacheInvalidatorInterface::class, RedisCacheInvalidator::class);
     }
 
     /**
@@ -23,5 +27,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Sanctum::usePersonalAccessTokenModel(PersonalAccessToken::class);
+
+        Article::observe(ArticleObserver::class);
     }
 }
