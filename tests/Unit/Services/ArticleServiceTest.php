@@ -1,5 +1,6 @@
 <?php
 
+use App\Cache\RedisCacheKeyGenerator;
 use App\DTOs\CreateArticleDTO;
 use App\Enums\ArticleStatus;
 use App\Enums\ArticleType;
@@ -12,7 +13,8 @@ use Illuminate\Pagination\LengthAwarePaginator;
 describe('ArticleService', function (): void {
     beforeEach(function (): void {
         $this->repository = new ArticleRepository(new Article);
-        $this->service = new ArticleService($this->repository);
+        $this->keyGenerator = new RedisCacheKeyGenerator;
+        $this->service = new ArticleService($this->repository, $this->keyGenerator);
     });
 
     afterEach(function (): void {
