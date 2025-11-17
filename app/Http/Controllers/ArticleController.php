@@ -80,4 +80,19 @@ class ArticleController extends Controller
             'message' => 'Artigo excluído com sucesso.',
         ], JsonResponse::HTTP_OK);
     }
+
+    /**
+     * Get popular articles.
+     */
+    public function popular(): JsonResponse
+    {
+        $limit = (int) request()->query('limit', 10);
+        $days = (int) request()->query('days', 30);
+
+        $articles = $this->articleService->getPopularArticles($limit, $days);
+
+        return response()->json([
+            'data' => $articles,
+        ], JsonResponse::HTTP_OK);
+    }
 }

@@ -31,4 +31,11 @@ interface ArticleRepositoryInterface
      * Delete an article (soft delete).
      */
     public function delete(Article $article): bool;
+
+    /**
+     * Get popular articles based on view count.
+     *
+     * @return \Illuminate\Database\Eloquent\Collection<int, Article>
+     */
+    public function getPopularArticles(int $limit = 10, int $days = 30): \Illuminate\Database\Eloquent\Collection;
 }

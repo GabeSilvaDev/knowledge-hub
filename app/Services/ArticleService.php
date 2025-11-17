@@ -2,18 +2,21 @@
 
 namespace App\Services;
 
+use App\Cache\RedisCacheKeyGenerator;
 use App\Contracts\ArticleRepositoryInterface;
 use App\DTOs\CreateArticleDTO;
 use App\Helpers\SlugHelper;
 use App\Models\Article;
 use App\Models\ArticleVersion;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Cache;
 use Spatie\QueryBuilder\QueryBuilder;
 
 class ArticleService
 {
     public function __construct(
-        private readonly ArticleRepositoryInterface $articleRepository
+        private readonly ArticleRepositoryInterface $articleRepository,
+        private readonly RedisCacheKeyGenerator $cacheKeyGenerator
     ) {}
 
     /**
@@ -151,5 +154,27 @@ class ArticleService
         $article->enableVersioning();
 
         return $updated;
+    }
+
+    /**
+     * Get popular articles with caching.
+     *
+     * @return Collection<int, Article>
+     */
+    public function getPopularArticles(int $limit = 10, int $days = 30): Collection
+    {
+        $cacheKey = $this->cacheKeyGenerator->generate('popular_articles', [
+            'limit' => $limit,
+            'days' => $days,
+        ]);
+
+        /** @var Collection<int, Article> $articles */
+        $articles = Cache::remember(
+            $cacheKey,
+            now()->addHours(1),
+            fn (): \Illuminate\Database\Eloquent\Collection => $this->articleRepository->getPopularArticles($limit, $days)
+        );
+
+        return $articles;
     }
 }

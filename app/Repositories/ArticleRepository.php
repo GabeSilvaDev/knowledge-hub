@@ -68,4 +68,21 @@ class ArticleRepository implements ArticleRepositoryInterface
     {
         return (bool) $article->delete();
     }
+
+    /**
+     * Get popular articles based on view count.
+     *
+     * @return \Illuminate\Database\Eloquent\Collection<int, Article>
+     */
+    public function getPopularArticles(int $limit = 10, int $days = 30): \Illuminate\Database\Eloquent\Collection
+    {
+        $startDate = now()->subDays($days);
+
+        return Article::query()
+            ->where('status', 'published')
+            ->where('published_at', '>=', $startDate)
+            ->orderBy('view_count', 'desc')
+            ->limit($limit)
+            ->get();
+    }
 }
