@@ -146,6 +146,9 @@ O Knowledge Hub oferece um sistema completo de gerenciamento de artigos com supo
 # Listar artigos
 GET /api/articles
 
+# Listar artigos populares (cache de 1 hora)
+GET /api/articles/popular?limit=10&days=30
+
 # Criar artigo
 POST /api/articles
 
@@ -483,6 +486,84 @@ GET /api/articles
     }
   ]
 }
+```
+
+#### 🔥 Listar Artigos Populares (com Cache)
+
+Endpoint público para recuperar os artigos mais populares baseados em visualizações. Os resultados são automaticamente cacheados por **1 hora** para melhor performance.
+
+```bash
+GET /api/articles/popular?limit=10&days=30
+```
+
+**Query Parameters:**
+
+| Parâmetro | Tipo | Padrão | Descrição |
+|-----------|------|--------|-----------|
+| `limit` | integer | 10 | Número máximo de artigos a retornar (1-100) |
+| `days` | integer | 30 | Período em dias para considerar artigos recentes (1-365) |
+
+**Exemplo de Requisição:**
+
+```bash
+# Top 5 artigos dos últimos 7 dias
+GET /api/articles/popular?limit=5&days=7
+
+# Top 20 artigos do último mês
+GET /api/articles/popular?limit=20&days=30
+```
+
+**Resposta:**
+
+```json
+{
+  "data": [
+    {
+      "_id": "507f1f77bcf86cd799439011",
+      "title": "Guia Completo de Docker",
+      "slug": "guia-completo-de-docker",
+      "type": "tutorial",
+      "status": "published",
+      "author_id": "507f191e810c19729de860ea",
+      "excerpt": "Aprenda Docker do zero ao avançado...",
+      "reading_time": 15,
+      "view_count": 1523,
+      "published_at": "2025-01-01T08:00:00Z",
+      "created_at": "2025-01-01T08:00:00Z",
+      "updated_at": "2025-01-04T10:00:00Z"
+    },
+    {
+      "_id": "507f1f77bcf86cd799439012",
+      "title": "Introdução ao MongoDB",
+      "slug": "introducao-ao-mongodb",
+      "type": "article",
+      "status": "published",
+      "view_count": 987,
+      "published_at": "2025-01-03T14:00:00Z"
+    }
+  ]
+}
+```
+
+**Características:**
+
+- ✅ **Cache Inteligente**: Resultados armazenados em Redis por 1 hora
+- ✅ **Invalidação Automática**: Cache atualizado quando artigos são criados, atualizados ou deletados
+- ✅ **Performance**: Queries otimizadas com índices MongoDB
+- ✅ **Filtros**: Apenas artigos publicados (status='published')
+- ✅ **Ordenação**: Classificado por `view_count` (decrescente)
+- ✅ **Período Configurável**: Filtra por `published_at` >= (hoje - N dias)
+
+**Implementação Técnica:**
+
+```php
+// Caminho do cache Redis
+Cache Key: "popular_articles:days:30:limit:10"
+
+// Invalidação automática via Observer
+ArticleObserver → created/updated/deleted/restored
+  → CacheInvalidator→invalidatePopularArticlesCache()
+  → Redis: DELETE "popular_articles:*"
 ```
 
 #### ➕ Criar Artigo

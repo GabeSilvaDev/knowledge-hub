@@ -313,6 +313,135 @@
 					]
 				},
 				{
+					"name": "List Popular Articles (GET /api/articles/popular)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/articles/popular?limit=10&days=30",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"articles",
+								"popular"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "10",
+									"description": "Maximum number of articles to return (default: 10, max: 100)"
+								},
+								{
+									"key": "days",
+									"value": "30",
+									"description": "Number of days to look back for popular articles (default: 30, max: 365)"
+								}
+							]
+						},
+						"description": "Returns the most popular published articles based on view count. Results are cached for 1 hour and automatically invalidated when articles are created, updated, or deleted.\n\n**Features:**\n- ✅ Public endpoint (no authentication required)\n- ✅ Cached for 1 hour in Redis\n- ✅ Automatic cache invalidation via Observer pattern\n- ✅ Only returns published articles (status='published')\n- ✅ Ordered by view_count (descending)\n- ✅ Filters by published_at >= (today - N days)\n\n**Query Parameters:**\n- `limit` (integer, default: 10): Maximum number of articles (1-100)\n- `days` (integer, default: 30): Period in days (1-365)\n\n**Cache Key Format:**\n```\npopular_articles:days:30:limit:10\n```"
+					},
+					"response": [
+						{
+							"name": "200 OK - Top 10 articles from last 30 days",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/articles/popular?limit=10&days=30",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"articles",
+										"popular"
+									],
+									"query": [
+										{
+											"key": "limit",
+											"value": "10"
+										},
+										{
+											"key": "days",
+											"value": "30"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": [\n        {\n            \"_id\": \"507f1f77bcf86cd799439011\",\n            \"title\": \"Guia Completo de Docker\",\n            \"slug\": \"guia-completo-de-docker\",\n            \"excerpt\": \"Aprenda Docker do zero ao avançado...\",\n            \"type\": \"tutorial\",\n            \"status\": \"published\",\n            \"author_id\": \"507f191e810c19729de860ea\",\n            \"view_count\": 1523,\n            \"reading_time\": 15,\n            \"published_at\": \"2025-01-01T08:00:00.000000Z\",\n            \"created_at\": \"2025-01-01T08:00:00.000000Z\",\n            \"updated_at\": \"2025-01-04T10:00:00.000000Z\"\n        },\n        {\n            \"_id\": \"507f1f77bcf86cd799439012\",\n            \"title\": \"Introdução ao MongoDB\",\n            \"slug\": \"introducao-ao-mongodb\",\n            \"excerpt\": \"Banco de dados NoSQL moderno...\",\n            \"type\": \"article\",\n            \"status\": \"published\",\n            \"author_id\": \"507f191e810c19729de860eb\",\n            \"view_count\": 987,\n            \"reading_time\": 8,\n            \"published_at\": \"2025-01-03T14:00:00.000000Z\",\n            \"created_at\": \"2025-01-03T14:00:00.000000Z\",\n            \"updated_at\": \"2025-01-03T14:00:00.000000Z\"\n        }\n    ]\n}"
+						},
+						{
+							"name": "200 OK - Top 5 articles from last 7 days",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/articles/popular?limit=5&days=7",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"articles",
+										"popular"
+									],
+									"query": [
+										{
+											"key": "limit",
+											"value": "5"
+										},
+										{
+											"key": "days",
+											"value": "7"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": []\n}"
+						}
+					]
+				},
+				{
 					"name": "Create Article (POST /api/articles)",
 					"request": {
 						"auth": {
