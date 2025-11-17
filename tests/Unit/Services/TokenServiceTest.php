@@ -241,47 +241,37 @@ it('returns empty array when getting tokens for user with no tokens', function (
 it('handles redis returning non-array for user tokens', function (): void {
     $userId = 'edge_case_user_' . uniqid();
 
-    // Get tokens for user that doesn't exist - Redis might return false/null
     $tokens = $this->tokenService->getUserTokens($userId);
 
     expect($tokens)->toBeArray();
 });
 
 it('returns null when redis returns empty array for metadata', function (): void {
-    // Create a token but manually delete it from Redis to force empty array scenario
     $tokenId = 'empty_metadata_' . uniqid();
     $userId = 'user_123';
 
     $this->tokenService->storeTokenMetadata($tokenId, $userId, 3600);
 
-    // Directly manipulate Redis to create the edge case
-    $redis = \Illuminate\Support\Facades\Redis::connection('tokens');
+    $redis = Redis::connection('tokens');
     $tokenKey = 'token:' . $tokenId;
 
-    // Delete all hash fields to make hgetall return empty array
     $redis->del($tokenKey);
-    // Recreate the key but with no data (simulate edge case)
     $redis->set($tokenKey, '');
 
     $metadata = $this->tokenService->getTokenMetadata($tokenId);
 
     expect($metadata)->toBeNull();
 
-    // Cleanup
     $redis->del($tokenKey);
 });
 
 it('getUserTokens always returns array even for non-existent users', function (): void {
-    // Testing edge case at line 162: if (!is_array($tokens)) return [];
-    // This is defensive programming - smembers should always return array
-
-    // Test with various edge case user IDs
     $edgeCaseUserIds = [
-        '',  // empty string
-        '0',  // string zero
-        0,  // integer zero
-        'null',  // string 'null'
-        'false',  // string 'false'
+        '',
+        '0',
+        0,
+        'null',
+        'false',
     ];
 
     foreach ($edgeCaseUserIds as $userId) {
