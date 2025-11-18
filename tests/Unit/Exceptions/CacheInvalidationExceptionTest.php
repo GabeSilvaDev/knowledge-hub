@@ -19,10 +19,10 @@ describe('CacheInvalidationException', function (): void {
     });
 
     it('creates exception with code and previous exception', function (): void {
-        $previous = new \Exception('Previous error');
-        $exception = new CacheInvalidationException('test_key', 'Error message', 500, $previous);
+        $previous = new Exception('Previous error');
+        $exception = new CacheInvalidationException('test_key', 'Error message', JsonResponse::HTTP_INTERNAL_SERVER_ERROR, $previous);
 
-        expect($exception->getCode())->toBe(500)
+        expect($exception->getCode())->toBe(JsonResponse::HTTP_INTERNAL_SERVER_ERROR)
             ->and($exception->getPrevious())->toBe($previous);
     });
 

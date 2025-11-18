@@ -28,7 +28,7 @@ describe('RedisCacheInvalidator', function (): void {
             $mockGenerator = Mockery::mock(RedisCacheKeyGenerator::class, function (MockInterface $mock): void {
                 $mock->shouldReceive('invalidateByPrefix')
                     ->once()
-                    ->andThrow(new \Exception('Redis connection failed'));
+                    ->andThrow(new Exception('Redis connection failed'));
             });
 
             $invalidator = new RedisCacheInvalidator($mockGenerator);

@@ -25,9 +25,9 @@ describe('ResourceNotFoundException', function (): void {
     });
 
     it('creates exception with custom code', function (): void {
-        $exception = new ResourceNotFoundException('Article', '', 404);
+        $exception = new ResourceNotFoundException('Article', '', JsonResponse::HTTP_NOT_FOUND);
 
-        expect($exception->getCode())->toBe(404)
+        expect($exception->getCode())->toBe(JsonResponse::HTTP_NOT_FOUND)
             ->and($exception->getResourceName())->toBe('Article');
     });
 
@@ -44,7 +44,7 @@ describe('ResourceNotFoundException', function (): void {
         $response = $exception->render();
 
         expect($response)->toBeInstanceOf(JsonResponse::class)
-            ->and($response->getStatusCode())->toBe(404)
+            ->and($response->getStatusCode())->toBe(JsonResponse::HTTP_NOT_FOUND)
             ->and($response->getData(true))->toBe([
                 'message' => ARTICLE_DEFAULT_MESSAGE,
                 'error' => ERROR_TYPE,
@@ -59,7 +59,7 @@ describe('ResourceNotFoundException', function (): void {
             'message' => 'User not found in database',
             'error' => ERROR_TYPE,
         ])
-            ->and($response->getStatusCode())->toBe(404);
+            ->and($response->getStatusCode())->toBe(JsonResponse::HTTP_NOT_FOUND);
     });
 
     it('can be thrown and caught', function (): void {
