@@ -172,7 +172,7 @@ class ArticleService
         $articles = Cache::remember(
             $cacheKey,
             now()->addHours(1),
-            fn (): Collection => $this->articleRepository->getPopularArticles($limit, $days)
+            fn(): Collection => $this->articleRepository->getPopularArticles($limit, $days)
         );
 
         return $articles;
