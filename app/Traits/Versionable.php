@@ -242,4 +242,20 @@ trait Versionable
     {
         return $this->versions()->count();
     }
+
+    /**
+     * Execute a callback without creating versions.
+     *
+     * @param  callable(): mixed  $callback
+     */
+    public function withoutVersioning(callable $callback): mixed
+    {
+        $this->disableVersioning();
+
+        try {
+            return $callback();
+        } finally {
+            $this->enableVersioning();
+        }
+    }
 }
