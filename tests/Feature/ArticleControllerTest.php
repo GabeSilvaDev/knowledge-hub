@@ -251,3 +251,60 @@ describe('ArticleController integration flows', function (): void {
             ->assertStatus(JsonResponse::HTTP_NOT_FOUND);
     });
 });
+
+describe('GET /api/articles/popular', function (): void {
+    it('returns popular articles', function (): void {
+        Article::factory()->count(5)->create([
+            'status' => 'published',
+            'view_count' => 100,
+            'published_at' => now()->subDays(5),
+        ]);
+
+        $response = getJson('/api/articles/popular');
+
+        $response->assertStatus(JsonResponse::HTTP_OK)
+            ->assertJsonStructure([
+                'data' => [
+                    '*' => [
+                        'id',
+                        'title',
+                        'slug',
+                        'view_count',
+                    ],
+                ],
+            ]);
+    });
+
+    it('respects limit query parameter', function (): void {
+        Article::factory()->count(20)->create([
+            'status' => 'published',
+            'published_at' => now()->subDays(5),
+        ]);
+
+        $response = getJson('/api/articles/popular?limit=5');
+
+        $response->assertStatus(JsonResponse::HTTP_OK);
+        expect($response->json('data'))->toHaveCount(5);
+    });
+
+    it('respects days query parameter', function (): void {
+        Article::truncate();
+
+        Article::factory()->create([
+            'status' => 'published',
+            'view_count' => 100,
+            'published_at' => now()->subDays(5),
+        ]);
+
+        Article::factory()->create([
+            'status' => 'published',
+            'view_count' => 200,
+            'published_at' => now()->subDays(40),
+        ]);
+
+        $response = getJson('/api/articles/popular?days=30');
+
+        $response->assertStatus(JsonResponse::HTTP_OK);
+        expect($response->json('data'))->toHaveCount(1);
+    });
+});
