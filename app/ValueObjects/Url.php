@@ -3,8 +3,9 @@
 namespace App\ValueObjects;
 
 use InvalidArgumentException;
+use Stringable;
 
-final readonly class Url implements \Stringable
+final readonly class Url implements Stringable
 {
     public function __construct(
         private string $value

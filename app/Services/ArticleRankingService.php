@@ -101,7 +101,7 @@ class ArticleRankingService implements ArticleRankingServiceInterface
 
         /** @var array<string, float> $topArticle */
         $topArticle = Redis::zrevrange(self::RANKING_KEY, 0, 0, ['withscores' => true]);
-        $topScore = empty($topArticle) ? 0.0 : (float) array_values($topArticle)[0];
+        $topScore = empty($topArticle) ? 0.0 : array_values($topArticle)[0];
 
         /** @var array<string, float> $allScores */
         $allScores = Redis::zrange(self::RANKING_KEY, 0, -1, ['withscores' => true]);

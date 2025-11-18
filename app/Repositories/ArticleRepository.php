@@ -6,6 +6,7 @@ use App\Contracts\ArticleRepositoryInterface;
 use App\DTOs\CreateArticleDTO;
 use App\Exceptions\ArticleRefreshException;
 use App\Models\Article;
+use Illuminate\Database\Eloquent\Collection;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
@@ -72,9 +73,9 @@ class ArticleRepository implements ArticleRepositoryInterface
     /**
      * Get popular articles based on view count.
      *
-     * @return \Illuminate\Database\Eloquent\Collection<int, Article>
+     * @return Collection<int, Article>
      */
-    public function getPopularArticles(int $limit = 10, int $days = 30): \Illuminate\Database\Eloquent\Collection
+    public function getPopularArticles(int $limit = 10, int $days = 30): Collection
     {
         $startDate = now()->subDays($days);
 

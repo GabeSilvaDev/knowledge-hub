@@ -9,13 +9,14 @@ use App\Repositories\ArticleRepository;
 use App\Repositories\UserRepository;
 use App\Services\AuthService;
 use Illuminate\Support\ServiceProvider;
+use Override;
 
 class RepositoryServiceProvider extends ServiceProvider
 {
     /**
      * Register services.
      */
-    #[\Override]
+    #[Override]
     public function register(): void
     {
         $this->app->bind(

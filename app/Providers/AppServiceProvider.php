@@ -11,13 +11,14 @@ use App\Observers\ArticleObserver;
 use App\Services\ArticleRankingService;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Sanctum\Sanctum;
+use Override;
 
 class AppServiceProvider extends ServiceProvider
 {
     /**
      * Register any application services.
      */
-    #[\Override]
+    #[Override]
     public function register(): void
     {
         $this->app->bind(CacheInvalidatorInterface::class, RedisCacheInvalidator::class);

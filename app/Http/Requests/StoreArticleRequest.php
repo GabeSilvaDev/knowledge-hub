@@ -6,6 +6,7 @@ use App\Enums\ArticleStatus;
 use App\Enums\ArticleType;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Override;
 
 class StoreArticleRequest extends FormRequest
 {
@@ -55,7 +56,7 @@ class StoreArticleRequest extends FormRequest
      *
      * @return array<string, string>
      */
-    #[\Override]
+    #[Override]
     public function messages(): array
     {
         return [

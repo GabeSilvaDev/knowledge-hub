@@ -7,6 +7,7 @@ use App\Enums\ArticleType;
 use App\Models\Article;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Override;
 
 class UpdateArticleRequest extends FormRequest
 {
@@ -60,7 +61,7 @@ class UpdateArticleRequest extends FormRequest
      *
      * @return array<string, string>
      */
-    #[\Override]
+    #[Override]
     public function messages(): array
     {
         return [

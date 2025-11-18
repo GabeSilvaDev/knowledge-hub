@@ -4,6 +4,7 @@ namespace App\Contracts;
 
 use App\DTOs\CreateArticleDTO;
 use App\Models\Article;
+use Illuminate\Database\Eloquent\Collection;
 use Spatie\QueryBuilder\QueryBuilder;
 
 interface ArticleRepositoryInterface
@@ -35,7 +36,7 @@ interface ArticleRepositoryInterface
     /**
      * Get popular articles based on view count.
      *
-     * @return \Illuminate\Database\Eloquent\Collection<int, Article>
+     * @return Collection<int, Article>
      */
-    public function getPopularArticles(int $limit = 10, int $days = 30): \Illuminate\Database\Eloquent\Collection;
+    public function getPopularArticles(int $limit = 10, int $days = 30): Collection;
 }

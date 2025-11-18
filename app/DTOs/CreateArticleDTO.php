@@ -13,6 +13,7 @@ use App\ValueObjects\Title;
 use App\ValueObjects\Url;
 use App\ValueObjects\UserId;
 use DateTime;
+use InvalidArgumentException;
 
 class CreateArticleDTO
 {
@@ -201,7 +202,7 @@ class CreateArticleDTO
         $authorId = $data['author_id'] ?? '';
 
         if (! is_string($title) || ! is_string($content) || ! is_string($authorId)) {
-            throw new \InvalidArgumentException('Title, content and author_id must be strings');
+            throw new InvalidArgumentException('Title, content and author_id must be strings');
         }
     }
 
@@ -215,7 +216,7 @@ class CreateArticleDTO
         foreach ($fields as $field) {
             $value = $data[$field] ?? null;
             if ($value !== null && ! is_string($value)) {
-                throw new \InvalidArgumentException("Field {$field} must be a string or null");
+                throw new InvalidArgumentException("Field {$field} must be a string or null");
             }
         }
     }
@@ -229,7 +230,7 @@ class CreateArticleDTO
         $isPinned = $data['is_pinned'] ?? false;
 
         if (! is_bool($isFeatured) || ! is_bool($isPinned)) {
-            throw new \InvalidArgumentException('is_featured and is_pinned must be booleans');
+            throw new InvalidArgumentException('is_featured and is_pinned must be booleans');
         }
     }
 
@@ -242,7 +243,7 @@ class CreateArticleDTO
         $type = $data['type'] ?? ArticleType::ARTICLE->value;
 
         if ((! is_string($status) && ! is_int($status)) || (! is_string($type) && ! is_int($type))) {
-            throw new \InvalidArgumentException('Status and type must be strings or ints');
+            throw new InvalidArgumentException('Status and type must be strings or ints');
         }
     }
 

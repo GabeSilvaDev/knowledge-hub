@@ -31,7 +31,7 @@ class ArticleRankingController extends Controller
             $article = $articles->get($item['article_id']);
 
             return [
-                'rank' => (int) $index + 1,
+                'rank' => $index + 1,
                 'article_id' => $item['article_id'],
                 'views' => (int) $item['score'],
                 'article' => $article ? [

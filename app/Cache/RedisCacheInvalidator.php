@@ -4,6 +4,7 @@ namespace App\Cache;
 
 use App\Contracts\CacheInvalidatorInterface;
 use App\Exceptions\CacheInvalidationException;
+use Exception;
 use Illuminate\Support\Facades\Log;
 
 class RedisCacheInvalidator implements CacheInvalidatorInterface
@@ -19,7 +20,7 @@ class RedisCacheInvalidator implements CacheInvalidatorInterface
     {
         try {
             $this->keyGenerator->invalidateByPrefix($prefix);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::warning('Falha ao invalidar cache por prefixo', [
                 'prefix' => $prefix,
                 'exception' => $e::class,

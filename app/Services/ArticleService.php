@@ -91,7 +91,7 @@ class ArticleService
     /**
      * Create a manual version of an article.
      */
-    public function createArticleVersion(Article $article, ?string $reason = null): \App\Models\ArticleVersion
+    public function createArticleVersion(Article $article, ?string $reason = null): ArticleVersion
     {
         return $article->createVersion($reason);
     }
@@ -99,7 +99,7 @@ class ArticleService
     /**
      * Get all versions of an article.
      *
-     * @return Collection<int, \App\Models\ArticleVersion>
+     * @return Collection<int, ArticleVersion>
      */
     public function getArticleVersions(Article $article): Collection
     {
@@ -172,7 +172,7 @@ class ArticleService
         $articles = Cache::remember(
             $cacheKey,
             now()->addHours(1),
-            fn (): \Illuminate\Database\Eloquent\Collection => $this->articleRepository->getPopularArticles($limit, $days)
+            fn (): Collection => $this->articleRepository->getPopularArticles($limit, $days)
         );
 
         return $articles;
