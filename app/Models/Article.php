@@ -6,11 +6,38 @@ use App\Traits\Versionable;
 use Database\Factories\ArticleFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use MongoDB\Laravel\Eloquent\Model;
+use Illuminate\Support\Carbon;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use MongoDB\Laravel\Eloquent\SoftDeletes;
 
 /**
+ * @property string $id
+ * @property string $title
+ * @property string $slug
+ * @property string $content
+ * @property string|null $excerpt
+ * @property string $author_id
+ * @property string $status
+ * @property string $type
+ * @property string|null $featured_image
+ * @property array<int, string> $tags
+ * @property array<int, string> $categories
+ * @property array<string, mixed> $meta_data
+ * @property int $view_count
+ * @property int $like_count
+ * @property int $comment_count
+ * @property int $reading_time
+ * @property bool $is_featured
+ * @property bool $is_pinned
+ * @property Carbon|null $published_at
+ * @property string|null $seo_title
+ * @property string|null $seo_description
+ * @property string|null $seo_keywords
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property Carbon|null $deleted_at
+ *
  * @use HasFactory<ArticleFactory>
  */
 class Article extends Model
@@ -90,8 +117,7 @@ class Article extends Model
 
     /**
      * Get the author of the article.
-     */
-    /**
+     *
      * @return BelongsTo<User, Article>
      */
     public function author()
