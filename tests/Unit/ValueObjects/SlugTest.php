@@ -115,7 +115,7 @@ describe('Slug Value Object', function (): void {
     it('implements Stringable interface', function (): void {
         $slug = Slug::from('test-slug');
 
-        expect($slug)->toBeInstanceOf(\Stringable::class);
+        expect($slug)->toBeInstanceOf(Stringable::class);
     });
 
     it('creates slug from title with hyphens and special handling', function (): void {

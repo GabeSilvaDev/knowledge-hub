@@ -115,7 +115,7 @@ it('can update token last used', function (): void {
     $metadata = $this->tokenService->getTokenMetadata($tokenId);
     expect($metadata)->not->toBeNull();
 
-    $lastUsed = new \DateTime($metadata['last_used_at']);
+    $lastUsed = new DateTime($metadata['last_used_at']);
     $diff = now()->diffInSeconds($lastUsed);
 
     expect($diff)->toBeLessThan(2);
