@@ -5,10 +5,13 @@ use App\DTOs\CreateArticleDTO;
 use App\Enums\ArticleStatus;
 use App\Enums\ArticleType;
 use App\Models\Article;
+use App\Models\ArticleVersion;
 use App\Models\User;
 use App\Repositories\ArticleRepository;
 use App\Services\ArticleService;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Cache;
+use Spatie\QueryBuilder\QueryBuilder;
 
 describe('ArticleService', function (): void {
     beforeEach(function (): void {
@@ -256,7 +259,7 @@ describe('ArticleService', function (): void {
         it('returns QueryBuilder instance', function (): void {
             $result = $this->service->query();
 
-            expect($result)->toBeInstanceOf(\Spatie\QueryBuilder\QueryBuilder::class);
+            expect($result)->toBeInstanceOf(QueryBuilder::class);
         });
 
         it('can filter articles by status through service', function (): void {
@@ -389,6 +392,217 @@ describe('ArticleService', function (): void {
 
             expect($result)->toBeTrue();
             expect(Article::find($article->_id))->toBeNull();
+        });
+    });
+
+    describe('getPopularArticles method', function (): void {
+        beforeEach(function (): void {
+            Cache::flush();
+            Article::truncate();
+            User::truncate();
+        });
+
+        it('returns popular articles from repository', function (): void {
+            Article::factory()->create([
+                'status' => 'published',
+                'view_count' => 100,
+                'published_at' => now()->subDays(5),
+            ]);
+
+            Article::factory()->create([
+                'status' => 'published',
+                'view_count' => 200,
+                'published_at' => now()->subDays(3),
+            ]);
+
+            $articles = $this->service->getPopularArticles(10, 30);
+
+            expect($articles)->toHaveCount(2)
+                ->and($articles->first()->view_count)->toBe(200)
+                ->and($articles->last()->view_count)->toBe(100);
+        });
+
+        it('caches popular articles', function (): void {
+            Article::factory()->create([
+                'status' => 'published',
+                'view_count' => 100,
+                'published_at' => now()->subDays(5),
+            ]);
+
+            $this->service->getPopularArticles(10, 30);
+
+            $cacheKey = 'popular_articles:days:30:limit:10';
+            expect(Cache::has($cacheKey))->toBeTrue();
+        });
+
+        it('returns cached data on subsequent calls', function (): void {
+            Article::factory()->create([
+                'status' => 'published',
+                'view_count' => 100,
+                'published_at' => now()->subDays(5),
+            ]);
+
+            $articles1 = $this->service->getPopularArticles(10, 30);
+            $articles2 = $this->service->getPopularArticles(10, 30);
+
+            expect($articles1->count())->toBe($articles2->count())
+                ->and($articles1->count())->toBe(1);
+        });
+
+        it('respects limit parameter', function (): void {
+            Article::factory()->count(20)->create([
+                'status' => 'published',
+                'published_at' => now()->subDays(5),
+            ]);
+
+            $articles = $this->service->getPopularArticles(5, 30);
+
+            expect($articles)->toHaveCount(5);
+        });
+
+        it('respects days parameter', function (): void {
+            Article::factory()->create([
+                'status' => 'published',
+                'view_count' => 100,
+                'published_at' => now()->subDays(5),
+            ]);
+
+            Article::factory()->create([
+                'status' => 'published',
+                'view_count' => 200,
+                'published_at' => now()->subDays(40),
+            ]);
+
+            $articles = $this->service->getPopularArticles(10, 30);
+
+            expect($articles)->toHaveCount(1)
+                ->and($articles->first()->view_count)->toBe(100);
+        });
+
+        it('uses default parameters when not specified', function (): void {
+            Article::factory()->create([
+                'status' => 'published',
+                'view_count' => 100,
+                'published_at' => now()->subDays(5),
+            ]);
+
+            $articles = $this->service->getPopularArticles();
+
+            expect($articles)->toHaveCount(1);
+
+            $cacheKey = 'popular_articles:days:30:limit:10';
+            expect(Cache::has($cacheKey))->toBeTrue();
+        });
+
+        it('generates different cache keys for different parameters', function (): void {
+            Article::factory()->count(15)->create([
+                'status' => 'published',
+                'published_at' => now()->subDays(5),
+            ]);
+
+            $this->service->getPopularArticles(10, 30);
+            $this->service->getPopularArticles(5, 7);
+            $this->service->getPopularArticles(20, 90);
+
+            expect(Cache::has('popular_articles:days:30:limit:10'))->toBeTrue()
+                ->and(Cache::has('popular_articles:days:7:limit:5'))->toBeTrue()
+                ->and(Cache::has('popular_articles:days:90:limit:20'))->toBeTrue();
+        });
+
+        it('only returns published articles', function (): void {
+            Article::factory()->create([
+                'status' => 'draft',
+                'view_count' => 300,
+                'published_at' => now()->subDays(5),
+            ]);
+
+            Article::factory()->create([
+                'status' => 'published',
+                'view_count' => 100,
+                'published_at' => now()->subDays(3),
+            ]);
+
+            $articles = $this->service->getPopularArticles();
+
+            expect($articles)->toHaveCount(1)
+                ->and($articles->first()->status)->toBe('published');
+        });
+    });
+
+    describe('Article Versioning Methods', function (): void {
+        it('creates manual article version', function (): void {
+            $article = Article::factory()->create(['title' => 'Original Title']);
+
+            $version = $this->service->createArticleVersion($article, 'Manual backup');
+
+            expect($version)->toBeInstanceOf(ArticleVersion::class)
+                ->and($version->version_reason)->toBe('Manual backup')
+                ->and($version->version_number)->toBe(1);
+        });
+
+        it('gets all article versions', function (): void {
+            $article = Article::factory()->create(['title' => 'Version 1']);
+            $article->update(['title' => 'Version 2']);
+            $article->update(['title' => 'Version 3']);
+
+            $versions = $this->service->getArticleVersions($article);
+
+            expect($versions)->toHaveCount(2);
+        });
+
+        it('gets specific article version', function (): void {
+            $article = Article::factory()->create(['title' => 'V1']);
+            $article->update(['title' => 'V2']);
+
+            $version = $this->service->getArticleVersion($article, 1);
+
+            expect($version)->not->toBeNull()
+                ->and($version->title)->toBe('V1')
+                ->and($version->version_number)->toBe(1);
+        });
+
+        it('restores article to specific version', function (): void {
+            $article = Article::factory()->create(['title' => 'Original', 'content' => 'Original Content']);
+            $article->update(['title' => 'Updated', 'content' => 'Updated Content']);
+
+            $result = $this->service->restoreArticleToVersion($article, 1);
+
+            expect($result)->toBeTrue();
+            $article->refresh();
+            expect($article->title)->toBe('Original')
+                ->and($article->content)->toBe('Original Content');
+        });
+
+        it('compares two article versions', function (): void {
+            $article = Article::factory()->create(['title' => 'Version 1']);
+            $article->update(['title' => 'Version 2']);
+            $article->update(['title' => 'Version 3']);
+
+            $differences = $this->service->compareArticleVersions($article, 1, 2);
+
+            expect($differences)->toBeArray()
+                ->toHaveKey('title');
+        });
+
+        it('gets article version count', function (): void {
+            $article = Article::factory()->create(['title' => 'V1']);
+            $article->update(['title' => 'V2']);
+            $article->update(['title' => 'V3']);
+
+            $count = $this->service->getArticleVersionCount($article);
+
+            expect($count)->toBe(2);
+        });
+
+        it('updates article without creating version', function (): void {
+            $article = Article::factory()->create(['title' => 'Original']);
+
+            $updated = $this->service->updateArticleWithoutVersioning($article, [
+                'title' => 'Updated Without Version',
+            ]);
+
+            expect($updated->title)->toBe('Updated Without Version');
+            expect($this->service->getArticleVersionCount($article))->toBe(0);
         });
     });
 });
