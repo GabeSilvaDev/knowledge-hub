@@ -8,41 +8,31 @@ use Illuminate\Http\JsonResponse;
 
 class ArticleRankingController extends Controller
 {
+    /**
+     * ArticleRankingController constructor.
+     *
+     * Initializes the controller with article ranking service dependency.
+     *
+     * @param  ArticleRankingServiceInterface  $rankingService  Service for handling article ranking operations
+     */
     public function __construct(
         private readonly ArticleRankingServiceInterface $rankingService
     ) {}
 
     /**
      * Get top ranked articles in real-time.
+     *
+     * Returns a list of the top-ranked articles based on view counts from Redis cache.
+     * Results include article details and ranking information.
+     *
+     * @return JsonResponse List of top-ranked articles with their details
      */
     public function index(): JsonResponse
     {
         $limit = (int) request()->query('limit', 10);
         $limit = min($limit, 100);
 
-        $ranking = $this->rankingService->getTopArticles($limit);
-
-        /** @var array<int, string> $articleIds */
-        $articleIds = $ranking->pluck('article_id')->toArray();
-        $articles = Article::whereIn('_id', $articleIds)->get()->keyBy('id');
-
-        $enrichedRanking = $ranking->map(function (array $item, int|string $index) use ($articles): array {
-            /** @var Article|null $article */
-            $article = $articles->get($item['article_id']);
-
-            return [
-                'rank' => $index + 1,
-                'article_id' => $item['article_id'],
-                'views' => (int) $item['score'],
-                'article' => $article ? [
-                    'title' => $article->title,
-                    'slug' => $article->slug,
-                    'excerpt' => $article->excerpt,
-                    'author_id' => $article->author_id,
-                    'published_at' => $article->published_at?->toISOString(),
-                ] : null,
-            ];
-        });
+        $enrichedRanking = $this->rankingService->getEnrichedTopArticles($limit);
 
         return response()->json([
             'data' => $enrichedRanking->values()->toArray(),
@@ -51,6 +41,11 @@ class ArticleRankingController extends Controller
 
     /**
      * Get ranking statistics.
+     *
+     * Returns overall statistics about the article ranking system, including
+     * total articles, total views, and highest score.
+     *
+     * @return JsonResponse Ranking statistics
      */
     public function statistics(): JsonResponse
     {
@@ -63,6 +58,11 @@ class ArticleRankingController extends Controller
 
     /**
      * Sync ranking from database.
+     *
+     * Synchronizes the Redis ranking cache with current view counts from the database.
+     * This operation resets the existing ranking and rebuilds it from published articles.
+     *
+     * @return JsonResponse Success message
      */
     public function sync(): JsonResponse
     {
@@ -75,26 +75,22 @@ class ArticleRankingController extends Controller
 
     /**
      * Get specific article ranking info.
+     *
+     * Returns detailed ranking information for a specific article including
+     * its rank position, view count, and article details.
+     *
+     * @param  Article  $article  The article to get ranking info for (route model binding)
+     * @return JsonResponse Article ranking information
      */
     public function show(Article $article): JsonResponse
     {
         $articleId = $article->id;
         assert(is_string($articleId));
 
-        $rank = $this->rankingService->getArticleRank($articleId);
-        $score = $this->rankingService->getArticleScore($articleId);
+        $rankingData = $this->rankingService->getEnrichedArticleRanking($articleId);
 
         return response()->json([
-            'data' => [
-                'article_id' => $articleId,
-                'rank' => $rank,
-                'views' => (int) $score,
-                'article' => [
-                    'title' => $article->title,
-                    'slug' => $article->slug,
-                    'view_count' => $article->view_count,
-                ],
-            ],
+            'data' => $rankingData,
         ], JsonResponse::HTTP_OK);
     }
 }

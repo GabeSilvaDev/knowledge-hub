@@ -11,12 +11,24 @@ use Illuminate\Http\Request;
 
 class AuthController extends Controller
 {
+    /**
+     * AuthController constructor.
+     *
+     * Initializes the controller with authentication service dependency.
+     *
+     * @param  AuthServiceInterface  $authService  Service for handling authentication operations
+     */
     public function __construct(
         private readonly AuthServiceInterface $authService
     ) {}
 
     /**
      * Register a new user.
+     *
+     * Creates a new user account and returns the user data with an authentication token.
+     *
+     * @param  RegisterRequest  $request  Validated registration request
+     * @return JsonResponse User data with authentication token
      */
     public function register(RegisterRequest $request): JsonResponse
     {
@@ -27,6 +39,11 @@ class AuthController extends Controller
 
     /**
      * Login user and create token.
+     *
+     * Authenticates a user with email and password, then generates an access token.
+     *
+     * @param  LoginRequest  $request  Validated login request
+     * @return JsonResponse User data with authentication token or error message
      */
     public function login(LoginRequest $request): JsonResponse
     {
@@ -51,6 +68,11 @@ class AuthController extends Controller
 
     /**
      * Logout user (Revoke the token).
+     *
+     * Revokes the current user's authentication token, effectively logging them out.
+     *
+     * @param  Request  $request  The HTTP request instance
+     * @return JsonResponse Success message or error message
      */
     public function logout(Request $request): JsonResponse
     {
@@ -76,6 +98,12 @@ class AuthController extends Controller
 
     /**
      * Revoke all tokens for the authenticated user.
+     *
+     * Invalidates all active authentication tokens for the current user,
+     * effectively logging them out from all devices/sessions.
+     *
+     * @param  Request  $request  The HTTP request instance
+     * @return JsonResponse Success message or error message
      */
     public function revokeAll(Request $request): JsonResponse
     {
