@@ -11,7 +11,12 @@ class RedisCacheKeyGenerator
     /**
      * Generate a structured cache key.
      *
-     * @param  array<string, mixed>  $params
+     * Creates a cache key from prefix and parameters, sorted for consistency.
+     * Registers the key for later invalidation by prefix.
+     *
+     * @param  string  $prefix  The cache key prefix
+     * @param  array<string, mixed>  $params  Optional parameters to include in the key
+     * @return string The generated cache key
      */
     public function generate(string $prefix, array $params = []): string
     {
@@ -36,6 +41,11 @@ class RedisCacheKeyGenerator
 
     /**
      * Invalidate all cache keys matching a prefix.
+     *
+     * Removes all cache entries that were registered under the specified prefix.
+     * Falls back to registry-based invalidation for non-Redis stores.
+     *
+     * @param  string  $prefix  The cache key prefix to invalidate
      */
     public function invalidateByPrefix(string $prefix): void
     {
@@ -46,6 +56,12 @@ class RedisCacheKeyGenerator
 
     /**
      * Register a cache key for a prefix.
+     *
+     * Stores the cache key in a registry for later bulk invalidation.
+     * Only used for non-Redis cache stores.
+     *
+     * @param  string  $prefix  The cache key prefix
+     * @param  string  $key  The full cache key to register
      */
     private function registerKey(string $prefix, string $key): void
     {
@@ -68,10 +84,14 @@ class RedisCacheKeyGenerator
 
     /**
      * Fallback invalidation for non-Redis stores.
+     *
+     * Uses the key registry to invalidate all keys under a prefix.
+     * Required for cache stores that don't support pattern-based deletion.
+     *
+     * @param  string  $prefix  The cache key prefix to invalidate
      */
     private function fallbackInvalidation(string $prefix): void
     {
-        /** @var array<string, array<int, string>> $registry */
         /** @var array<string, array<int, string>> $registry */
         $registry = Cache::get(self::KEY_REGISTRY, []);
 

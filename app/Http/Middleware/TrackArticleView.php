@@ -10,6 +10,13 @@ use Symfony\Component\HttpFoundation\Response;
 
 class TrackArticleView
 {
+    /**
+     * Initialize the middleware.
+     *
+     * Constructs the middleware with injected ranking service dependency.
+     *
+     * @param  ArticleRankingServiceInterface  $rankingService  Service for tracking article views
+     */
     public function __construct(
         private readonly ArticleRankingServiceInterface $rankingService
     ) {}
@@ -17,7 +24,12 @@ class TrackArticleView
     /**
      * Handle an incoming request.
      *
-     * @param  Closure(Request): (Response)  $next
+     * Tracks article views for GET requests by incrementing the view count in Redis
+     * and the database without creating a version.
+     *
+     * @param  Request  $request  The incoming HTTP request
+     * @param  Closure(Request): (Response)  $next  The next middleware closure
+     * @return Response The HTTP response
      */
     public function handle(Request $request, Closure $next): Response
     {

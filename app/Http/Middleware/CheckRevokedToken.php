@@ -9,6 +9,13 @@ use Symfony\Component\HttpFoundation\Response;
 
 class CheckRevokedToken
 {
+    /**
+     * Initialize the middleware.
+     *
+     * Constructs the middleware with injected token service dependency.
+     *
+     * @param  TokenService  $tokenService  Service for token validation and tracking
+     */
     public function __construct(
         private readonly TokenService $tokenService
     ) {}
@@ -16,7 +23,12 @@ class CheckRevokedToken
     /**
      * Handle an incoming request.
      *
-     * @param  Closure(Request): (Response)  $next
+     * Checks if the bearer token has been revoked and rejects the request if so.
+     * Stores the token ID in request attributes for later use in terminate method.
+     *
+     * @param  Request  $request  The incoming HTTP request
+     * @param  Closure(Request): (Response)  $next  The next middleware closure
+     * @return Response The HTTP response
      */
     public function handle(Request $request, Closure $next): Response
     {
@@ -40,6 +52,11 @@ class CheckRevokedToken
 
     /**
      * Perform any final actions for the request lifecycle.
+     *
+     * Updates the last used timestamp for the token in Redis if a valid token was present.
+     *
+     * @param  Request  $request  The HTTP request
+     * @param  Response  $response  The HTTP response
      */
     public function terminate(Request $request, Response $response): void
     {
