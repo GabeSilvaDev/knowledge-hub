@@ -14,6 +14,12 @@ use Laravel\Sanctum\NewAccessToken;
 use Laravel\Sanctum\Sanctum;
 use MongoDB\Laravel\Auth\User as Authenticatable;
 
+/**
+ * User Model.
+ *
+ * Represents a user account in the system with authentication, roles, and relationships
+ * to articles and tokens. Uses MongoDB for storage and Laravel Sanctum for API authentication.
+ */
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
@@ -70,7 +76,9 @@ class User extends Authenticatable
     /**
      * Get the articles written by this user.
      *
-     * @return HasMany<Article, User>
+     * Defines the one-to-many relationship between users and their articles.
+     *
+     * @return HasMany<Article, User> The articles relationship
      */
     public function articles(): HasMany
     {
@@ -80,7 +88,10 @@ class User extends Authenticatable
     /**
      * Override tokens relationship to use MongoDB connection.
      *
-     * @return MorphMany<PersonalAccessToken, User>
+     * Customizes Sanctum's token relationship to work with MongoDB's _id field
+     * instead of the default id field.
+     *
+     * @return MorphMany<PersonalAccessToken, User> The tokens relationship
      */
     public function tokens(): MorphMany
     {
@@ -96,9 +107,15 @@ class User extends Authenticatable
     /**
      * Create a new personal access token for the user.
      *
-     * @param  array<int, string>  $abilities
+     * Generates a new Sanctum API token with specified name and abilities.
+     * Overrides the default implementation to ensure MongoDB compatibility.
      *
-     * @throws TokenCreationException
+     * @param  string  $name  The token name
+     * @param  array<int, string>  $abilities  The token abilities/permissions (default: ['*'])
+     * @param  DateTimeInterface|null  $expiresAt  Optional expiration date
+     * @return NewAccessToken The created access token
+     *
+     * @throws TokenCreationException If token creation fails
      */
     public function createToken(string $name, array $abilities = ['*'], ?DateTimeInterface $expiresAt = null): NewAccessToken
     {

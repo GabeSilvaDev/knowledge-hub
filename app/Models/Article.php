@@ -12,6 +12,11 @@ use MongoDB\Laravel\Eloquent\Model;
 use MongoDB\Laravel\Eloquent\SoftDeletes;
 
 /**
+ * Article Model.
+ *
+ * Represents a content article in the system with versioning, soft deletes,
+ * and comprehensive metadata including SEO fields, tags, and categories.
+ *
  * @property string $id
  * @property string $title
  * @property string $slug
@@ -118,7 +123,9 @@ class Article extends Model
     /**
      * Get the author of the article.
      *
-     * @return BelongsTo<User, Article>
+     * Defines the relationship to the User who created this article.
+     *
+     * @return BelongsTo<User, Article> The author relationship
      */
     public function author()
     {
@@ -128,9 +135,12 @@ class Article extends Model
     /**
      * Scope a query to filter articles by tags.
      *
-     * @param  Builder<Article>  $query
-     * @param  string|array<int, string>  $tags
-     * @return Builder<Article>
+     * Filters articles that contain any of the specified tags.
+     * Tags can be provided as a comma-separated string or array.
+     *
+     * @param  Builder<Article>  $query  The query builder instance
+     * @param  string|array<int, string>  $tags  Tags to filter by
+     * @return Builder<Article> The filtered query builder
      */
     public function scopeTags(Builder $query, string|array $tags): Builder
     {
@@ -146,9 +156,12 @@ class Article extends Model
     /**
      * Scope a query to filter articles by categories.
      *
-     * @param  Builder<Article>  $query
-     * @param  string|array<int, string>  $categories
-     * @return Builder<Article>
+     * Filters articles that belong to any of the specified categories.
+     * Categories can be provided as a comma-separated string or array.
+     *
+     * @param  Builder<Article>  $query  The query builder instance
+     * @param  string|array<int, string>  $categories  Categories to filter by
+     * @return Builder<Article> The filtered query builder
      */
     public function scopeCategories(Builder $query, string|array $categories): Builder
     {

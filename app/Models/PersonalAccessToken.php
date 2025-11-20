@@ -6,6 +6,12 @@ use Laravel\Sanctum\PersonalAccessToken as SanctumPersonalAccessToken;
 use MongoDB\Laravel\Eloquent\DocumentModel;
 use Override;
 
+/**
+ * Personal Access Token Model.
+ *
+ * Custom implementation of Sanctum's PersonalAccessToken model adapted for MongoDB.
+ * Uses _id as primary key instead of id for MongoDB compatibility.
+ */
 class PersonalAccessToken extends SanctumPersonalAccessToken
 {
     use DocumentModel;
@@ -54,6 +60,11 @@ class PersonalAccessToken extends SanctumPersonalAccessToken
 
     /**
      * Get the value of the model's primary key.
+     *
+     * Overrides parent method to ensure MongoDB _id is returned as string.
+     * Handles conversion of ObjectId to string for Sanctum compatibility.
+     *
+     * @return string|null The primary key value as string or null if not set
      */
     #[Override]
     public function getKey(): ?string

@@ -9,6 +9,11 @@ use Illuminate\Support\Carbon;
 use MongoDB\Laravel\Eloquent\Model;
 
 /**
+ * Article Version Model.
+ *
+ * Represents a snapshot of an article at a specific point in time.
+ * Used by the Versionable trait to track article history and enable rollback functionality.
+ *
  * @use HasFactory<ArticleVersionFactory>
  *
  * @property string $article_id
@@ -112,7 +117,9 @@ class ArticleVersion extends Model
     /**
      * Get the article that owns this version.
      *
-     * @return BelongsTo<Article, ArticleVersion>
+     * Defines the relationship to the parent article being versioned.
+     *
+     * @return BelongsTo<Article, ArticleVersion> The article relationship
      */
     public function article(): BelongsTo
     {
@@ -122,7 +129,9 @@ class ArticleVersion extends Model
     /**
      * Get the author of this version.
      *
-     * @return BelongsTo<User, ArticleVersion>
+     * Defines the relationship to the user who authored the article at this version.
+     *
+     * @return BelongsTo<User, ArticleVersion> The author relationship
      */
     public function author(): BelongsTo
     {
@@ -132,7 +141,10 @@ class ArticleVersion extends Model
     /**
      * Get the user who created this version.
      *
-     * @return BelongsTo<User, ArticleVersion>
+     * Defines the relationship to the user who triggered the version creation.
+     * May differ from the article author if an admin/moderator edited the article.
+     *
+     * @return BelongsTo<User, ArticleVersion> The versioner relationship
      */
     public function versionedBy(): BelongsTo
     {
