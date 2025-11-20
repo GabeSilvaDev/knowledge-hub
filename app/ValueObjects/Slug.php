@@ -5,6 +5,12 @@ namespace App\ValueObjects;
 use InvalidArgumentException;
 use Stringable;
 
+/**
+ * Slug Value Object.
+ *
+ * Immutable value object representing a URL-friendly slug.
+ * Enforces lowercase alphanumeric characters with hyphens only.
+ */
 final readonly class Slug implements Stringable
 {
     public function __construct(
@@ -13,11 +19,27 @@ final readonly class Slug implements Stringable
         $this->validate($value);
     }
 
+    /**
+     * Create a new Slug instance from a slug string.
+     *
+     * @param  string  $slug  The slug to create from
+     * @return self The new Slug instance
+     *
+     * @throws InvalidArgumentException If slug is invalid
+     */
     public static function from(string $slug): self
     {
         return new self($slug);
     }
 
+    /**
+     * Create a new Slug instance from a title string.
+     *
+     * Converts title to lowercase, removes special characters, and replaces spaces with hyphens.
+     *
+     * @param  string  $title  The title to convert to slug
+     * @return self The new Slug instance
+     */
     public static function fromTitle(string $title): self
     {
         $slug = strtolower(trim($title));
@@ -28,21 +50,44 @@ final readonly class Slug implements Stringable
         return new self($slug);
     }
 
+    /**
+     * Get the raw slug value.
+     *
+     * @return string The slug text
+     */
     public function getValue(): string
     {
         return $this->value;
     }
 
+    /**
+     * Compare this slug with another for equality.
+     *
+     * @param  Slug  $other  The slug to compare with
+     * @return bool True if slugs are equal, false otherwise
+     */
     public function equals(Slug $other): bool
     {
         return $this->value === $other->value;
     }
 
+    /**
+     * Convert slug to its string representation.
+     *
+     * @return string The slug text
+     */
     public function __toString(): string
     {
         return $this->value;
     }
 
+    /**
+     * Validate the slug value.
+     *
+     * @param  string  $slug  The slug to validate
+     *
+     * @throws InvalidArgumentException If slug is empty, too long, contains invalid characters, or has invalid format
+     */
     private function validate(string $slug): void
     {
         if ($slug === '' || $slug === '0') {
