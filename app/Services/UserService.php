@@ -11,12 +11,24 @@ use Illuminate\Database\Eloquent\Collection;
 
 class UserService
 {
+    /**
+     * Initialize the User Service.
+     *
+     * Constructs the service with injected repository for user data access.
+     *
+     * @param  UserRepositoryInterface  $userRepository  Repository for user data access
+     */
     public function __construct(
         private readonly UserRepositoryInterface $userRepository
     ) {}
 
     /**
      * Create a new user.
+     *
+     * Creates a new user in the system using the provided DTO.
+     *
+     * @param  CreateUserDTO  $dto  Data transfer object containing user creation data
+     * @return User The newly created user instance
      */
     public function createUser(CreateUserDTO $dto): User
     {
@@ -25,6 +37,11 @@ class UserService
 
     /**
      * Get user by ID.
+     *
+     * Retrieves a user by their unique identifier.
+     *
+     * @param  string  $id  The user ID
+     * @return User|null The user instance or null if not found
      */
     public function getUserById(string $id): ?User
     {
@@ -33,6 +50,11 @@ class UserService
 
     /**
      * Get user by email.
+     *
+     * Retrieves a user by their email address.
+     *
+     * @param  string  $email  The user email address
+     * @return User|null The user instance or null if not found
      */
     public function getUserByEmail(string $email): ?User
     {
@@ -41,6 +63,11 @@ class UserService
 
     /**
      * Get user by username.
+     *
+     * Retrieves a user by their username.
+     *
+     * @param  string  $username  The username
+     * @return User|null The user instance or null if not found
      */
     public function getUserByUsername(string $username): ?User
     {
@@ -50,7 +77,10 @@ class UserService
     /**
      * Get paginated users.
      *
-     * @return LengthAwarePaginator<int, User>
+     * Retrieves a paginated list of all users in the system.
+     *
+     * @param  int  $perPage  Number of users per page (default: 15)
+     * @return LengthAwarePaginator<int, User> Paginated collection of users
      */
     public function getUsers(int $perPage = 15): LengthAwarePaginator
     {
@@ -60,7 +90,10 @@ class UserService
     /**
      * Get users by role.
      *
-     * @return Collection<int, User>
+     * Retrieves all users with the specified role.
+     *
+     * @param  UserRole  $role  The role to filter users by
+     * @return Collection<int, User> Collection of users with the specified role
      */
     public function getUsersByRole(UserRole $role): Collection
     {
@@ -70,7 +103,10 @@ class UserService
     /**
      * Search users.
      *
-     * @return Collection<int, User>
+     * Searches for users matching the provided search term across name, email, and username.
+     *
+     * @param  string  $term  The search term
+     * @return Collection<int, User> Collection of matching users
      */
     public function searchUsers(string $term): Collection
     {

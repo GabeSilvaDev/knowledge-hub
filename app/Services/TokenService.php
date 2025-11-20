@@ -17,6 +17,10 @@ class TokenService
 
     /**
      * Get the Redis connection for tokens.
+     *
+     * Returns the dedicated Redis connection configured for token storage.
+     *
+     * @return Connection The Redis connection instance
      */
     private function getConnection(): Connection
     {
@@ -25,6 +29,8 @@ class TokenService
 
     /**
      * Store token metadata in Redis.
+     *
+     * Stores token information in Redis with TTL and adds to user's token set.
      *
      * @param  string  $tokenId  The token ID (hash of the token)
      * @param  int|string  $userId  The user ID
@@ -53,6 +59,10 @@ class TokenService
 
     /**
      * Update the last used timestamp for a token.
+     *
+     * Updates the last_used_at field in Redis to track token activity.
+     *
+     * @param  string  $tokenId  The token ID to update
      */
     public function updateTokenLastUsed(string $tokenId): void
     {
@@ -66,6 +76,11 @@ class TokenService
 
     /**
      * Check if a token is revoked.
+     *
+     * Verifies if the token exists in the revoked tokens set in Redis.
+     *
+     * @param  string  $tokenId  The token ID to check
+     * @return bool True if the token is revoked
      */
     public function isTokenRevoked(string $tokenId): bool
     {
@@ -77,6 +92,8 @@ class TokenService
 
     /**
      * Revoke a specific token.
+     *
+     * Marks the token as revoked in Redis and removes it from user's active tokens set.
      *
      * @param  string  $tokenId  The token ID (hash of the token)
      * @param  int  $ttl  How long to keep the revocation record (default: 30 days)
@@ -106,6 +123,8 @@ class TokenService
     /**
      * Revoke all tokens for a user.
      *
+     * Revokes all active tokens belonging to the specified user.
+     *
      * @param  int|string  $userId  The user ID
      */
     public function revokeAllUserTokens(int|string $userId): void
@@ -125,7 +144,10 @@ class TokenService
     /**
      * Get token metadata.
      *
-     * @return array<string, mixed>|null
+     * Retrieves all metadata fields for a token from Redis.
+     *
+     * @param  string  $tokenId  The token ID to retrieve metadata for
+     * @return array<string, mixed>|null Token metadata or null if not found
      */
     public function getTokenMetadata(string $tokenId): ?array
     {
@@ -149,7 +171,10 @@ class TokenService
     /**
      * Get all active tokens for a user.
      *
-     * @return array<string>
+     * Returns all token IDs currently active for the specified user.
+     *
+     * @param  int|string  $userId  The user ID
+     * @return array<string> Array of token IDs
      */
     public function getUserTokens(int|string $userId): array
     {
@@ -161,6 +186,11 @@ class TokenService
 
     /**
      * Count active tokens for a user.
+     *
+     * Returns the total number of active tokens belonging to the user.
+     *
+     * @param  int|string  $userId  The user ID
+     * @return int Total number of active tokens
      */
     public function countUserTokens(int|string $userId): int
     {
@@ -172,6 +202,11 @@ class TokenService
 
     /**
      * Clean up expired tokens for a user.
+     *
+     * Removes expired token entries from the user's active tokens set.
+     *
+     * @param  int|string  $userId  The user ID
+     * @return int Number of tokens cleaned up
      */
     public function cleanupExpiredTokens(int|string $userId): int
     {
@@ -194,6 +229,13 @@ class TokenService
 
     /**
      * Create a new token and store its metadata.
+     *
+     * Generates a new Sanctum token and stores its metadata in Redis.
+     *
+     * @param  User  $user  The user to create token for
+     * @param  string  $name  The token name (default: 'auth_token')
+     * @param  int  $ttl  Time to live in seconds (default: 7 days)
+     * @return NewAccessToken The created access token
      */
     public function createToken(User $user, string $name = 'auth_token', int $ttl = 604800): NewAccessToken
     {
@@ -211,6 +253,11 @@ class TokenService
 
     /**
      * Extract token ID from plain text token.
+     *
+     * Extracts and hashes the token part from the Sanctum plain text token format.
+     *
+     * @param  string  $plainTextToken  The plain text token in format 'id|token'
+     * @return string The hashed token ID
      */
     public function extractTokenId(string $plainTextToken): string
     {

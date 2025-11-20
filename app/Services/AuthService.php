@@ -12,6 +12,14 @@ use Illuminate\Validation\ValidationException;
 
 class AuthService implements AuthServiceInterface
 {
+    /**
+     * Initialize the Authentication Service.
+     *
+     * Constructs the service with injected repository and token service dependencies.
+     *
+     * @param  UserRepositoryInterface  $userRepository  Repository for user data access
+     * @param  TokenService  $tokenService  Service for token management
+     */
     public function __construct(
         private readonly UserRepositoryInterface $userRepository,
         private readonly TokenService $tokenService
@@ -20,8 +28,10 @@ class AuthService implements AuthServiceInterface
     /**
      * Register a new user.
      *
-     * @param  array<string, mixed>  $data
-     * @return array{user: User, token: string}
+     * Creates a new user account with the provided data and generates an authentication token.
+     *
+     * @param  array<string, mixed>  $data  User registration data
+     * @return array{user: User, token: string} Array containing the created user and access token
      */
     public function register(array $data): array
     {
@@ -48,9 +58,13 @@ class AuthService implements AuthServiceInterface
     /**
      * Authenticate a user and generate token.
      *
-     * @return array{user: User, token: string}
+     * Validates user credentials, updates last login timestamp, and generates a new access token.
      *
-     * @throws ValidationException
+     * @param  string  $email  The user's email address
+     * @param  string  $password  The user's password
+     * @return array{user: User, token: string} Array containing the authenticated user and access token
+     *
+     * @throws ValidationException If credentials are invalid
      */
     public function login(string $email, string $password): array
     {
@@ -74,6 +88,11 @@ class AuthService implements AuthServiceInterface
 
     /**
      * Revoke the current access token.
+     *
+     * Invalidates the current authentication token in both Redis and database.
+     *
+     * @param  User  $user  The authenticated user
+     * @param  string  $currentToken  The token to revoke
      */
     public function logout(User $user, string $currentToken): void
     {
@@ -86,6 +105,10 @@ class AuthService implements AuthServiceInterface
 
     /**
      * Revoke all tokens for a user.
+     *
+     * Invalidates all authentication tokens belonging to the user in both Redis and database.
+     *
+     * @param  User  $user  The user to revoke all tokens for
      */
     public function revokeAllTokens(User $user): void
     {
