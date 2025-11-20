@@ -11,7 +11,13 @@ class SlugHelper
     /**
      * Generate a unique slug for a model.
      *
-     * @param  class-string<Model>  $modelClass
+     * Creates a URL-friendly slug from the title and ensures uniqueness by appending
+     * a numeric suffix if the slug already exists in the database.
+     *
+     * @param  string  $title  The title to generate slug from
+     * @param  class-string<Model>  $modelClass  The model class to check uniqueness against
+     * @param  string|null  $excludeId  Optional ID to exclude from uniqueness check (for updates)
+     * @return string The unique slug
      */
     public static function generateUniqueSlug(string $title, string $modelClass, ?string $excludeId = null): string
     {
@@ -30,7 +36,13 @@ class SlugHelper
     /**
      * Check if slug exists in model.
      *
-     * @param  class-string<Model>  $modelClass
+     * Verifies if a slug already exists in the specified model's collection.
+     * Optionally excludes a specific ID (useful for updates).
+     *
+     * @param  string  $slug  The slug to check
+     * @param  class-string<Model>  $modelClass  The model class to check against
+     * @param  string|null  $excludeId  Optional ID to exclude from the check
+     * @return bool True if slug exists (excluding the excluded ID)
      */
     private static function slugExists(string $slug, string $modelClass, ?string $excludeId = null): bool
     {
