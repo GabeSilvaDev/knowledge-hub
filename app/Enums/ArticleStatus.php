@@ -2,18 +2,31 @@
 
 namespace App\Enums;
 
+/**
+ * Article Status Enum.
+ *
+ * Defines the possible states an article can be in throughout its lifecycle.
+ */
 enum ArticleStatus: string
 {
+    /** Draft state - article is being written */
     case DRAFT = 'draft';
+
+    /** Published state - article is publicly visible */
     case PUBLISHED = 'published';
+
+    /** Private state - article is only visible to author */
     case PRIVATE = 'private';
+
+    /** Archived state - article is no longer active */
     case ARCHIVED = 'archived';
 
     /**
      * Get all status values.
-     */
-    /**
-     * @return array<string>
+     *
+     * Returns an array of all available status string values.
+     *
+     * @return array<string> Array of status values
      */
     public static function values(): array
     {
@@ -22,6 +35,10 @@ enum ArticleStatus: string
 
     /**
      * Get status display name.
+     *
+     * Returns a localized, human-readable label for the status.
+     *
+     * @return string The display label in Portuguese
      */
     public function label(): string
     {
@@ -35,6 +52,10 @@ enum ArticleStatus: string
 
     /**
      * Check if status is visible to public.
+     *
+     * Determines if articles with this status should be publicly accessible.
+     *
+     * @return bool True if status allows public visibility
      */
     public function isPublic(): bool
     {
@@ -43,6 +64,10 @@ enum ArticleStatus: string
 
     /**
      * Check if status allows editing.
+     *
+     * Determines if articles with this status can be modified.
+     *
+     * @return bool True if status allows editing
      */
     public function isEditable(): bool
     {
