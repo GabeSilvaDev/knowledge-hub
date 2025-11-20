@@ -49,6 +49,18 @@ class UserService
     }
 
     /**
+     * Update user profile.
+     *
+     * @param User $user
+     * @param array<string, mixed> $data
+     * @return User
+     */
+    public function updateUser(User $user, array $data): User
+    {
+        return $this->userRepository->update($user, $data);
+    }
+
+    /**
      * Get user by email.
      *
      * Retrieves a user by their email address.
