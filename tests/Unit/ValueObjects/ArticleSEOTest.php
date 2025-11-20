@@ -32,7 +32,7 @@ describe('ArticleSEO', function (): void {
         it('creates ArticleSEO with partial values', function (): void {
             $title = Title::from('Partial SEO Title');
 
-            $seo = new ArticleSEO($title, null, null);
+            $seo = new ArticleSEO($title);
 
             expect($seo->getSeoTitle())->toBe($title)
                 ->and($seo->getSeoDescription())->toBeNull()
@@ -64,7 +64,7 @@ describe('ArticleSEO', function (): void {
         it('creates ArticleSEO with mixed null and non-null values', function (): void {
             $description = 'Only description provided.';
 
-            $seo = ArticleSEO::create(null, $description, null);
+            $seo = ArticleSEO::create(null, $description);
 
             expect($seo->getSeoTitle())->toBeNull()
                 ->and($seo->getSeoDescription())->toBe($description)
@@ -110,13 +110,13 @@ describe('ArticleSEO', function (): void {
 
         it('returns false when seo_title is provided', function (): void {
             $title = Title::from('SEO Title');
-            $seo = ArticleSEO::create($title, null, null);
+            $seo = ArticleSEO::create($title);
 
             expect($seo->isEmpty())->toBeFalse();
         });
 
         it('returns false when seo_description is provided', function (): void {
-            $seo = ArticleSEO::create(null, 'SEO Description', null);
+            $seo = ArticleSEO::create(null, 'SEO Description');
 
             expect($seo->isEmpty())->toBeFalse();
         });
@@ -213,7 +213,7 @@ describe('ArticleSEO', function (): void {
         it('returns false when seo_keywords is null in one and not in other', function (): void {
             $title = Title::from('Same Title');
 
-            $seo1 = ArticleSEO::create($title, 'description', null);
+            $seo1 = ArticleSEO::create($title, 'description');
             $seo2 = ArticleSEO::create($title, 'description', 'keywords');
 
             expect($seo1->equals($seo2))->toBeFalse();

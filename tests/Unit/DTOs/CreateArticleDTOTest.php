@@ -59,8 +59,7 @@ describe('CreateArticleDTO Construction', function (): void {
             status: ArticleStatus::DRAFT,
             type: ArticleType::TUTORIAL,
             is_featured: true,
-            is_pinned: true,
-            published_at: null
+            is_pinned: true
         );
 
         $featuredImage = Url::from('https://example.com/image.jpg');

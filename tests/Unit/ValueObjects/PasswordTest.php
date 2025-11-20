@@ -42,7 +42,7 @@ describe('Password Value Object', function (): void {
         expect($password->getHashedValue())->toBeString();
     });
 
-    it('throws exception for weak passwords', function ($invalidPassword): void {
+    it('throws exception for weak passwords', function (string $invalidPassword): void {
         expect(fn (): Password => Password::fromPlainText($invalidPassword))
             ->toThrow(InvalidArgumentException::class);
     })->with([

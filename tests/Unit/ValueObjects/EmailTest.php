@@ -47,7 +47,7 @@ describe('Email Value Object', function (): void {
         expect($email->getLocalPart())->toBe('user');
     });
 
-    it('validates valid email formats', function ($validEmail): void {
+    it('validates valid email formats', function (string $validEmail): void {
         $email = Email::from($validEmail);
         expect($email->getValue())->toBe($validEmail);
     })->with([
@@ -56,7 +56,7 @@ describe('Email Value Object', function (): void {
         'user+tag@example.org',
     ]);
 
-    it('throws exception for invalid email formats', function ($invalidEmail): void {
+    it('throws exception for invalid email formats', function (string $invalidEmail): void {
         expect(fn (): Email => Email::from($invalidEmail))
             ->toThrow(InvalidArgumentException::class);
     })->with([

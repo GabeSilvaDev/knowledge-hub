@@ -1,12 +1,16 @@
 <?php
 
+use App\Contracts\ArticleRepositoryInterface;
 use App\Models\Article;
 use App\Services\ArticleRankingService;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Redis;
 
 beforeEach(function (): void {
     Redis::del('articles:ranking:views');
-    $this->service = new ArticleRankingService;
+
+    $this->repository = Mockery::mock(ArticleRepositoryInterface::class);
+    $this->service = new ArticleRankingService($this->repository);
 });
 
 it('increments view count for article', function (): void {
@@ -143,15 +147,21 @@ it('syncs from database correctly', function (): void {
         'view_count' => 50,
     ]);
 
-    Article::factory()->create([
+    $article3Draft = Article::factory()->create([
         'status' => 'draft',
         'view_count' => 200,
     ]);
 
-    Article::factory()->create([
+    $article4NoViews = Article::factory()->create([
         'status' => 'published',
         'view_count' => 0,
     ]);
+
+    // Mock repository para retornar apenas published com views > 0
+    $this->repository
+        ->shouldReceive('getPublishedWithViews')
+        ->once()
+        ->andReturn(new Collection([$article1, $article2]));
 
     $this->service->syncFromDatabase();
 

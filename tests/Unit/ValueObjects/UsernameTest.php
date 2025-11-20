@@ -28,7 +28,7 @@ describe('Username Value Object', function (): void {
             ->toThrow(InvalidArgumentException::class, 'Username cannot be longer than 50 characters');
     });
 
-    it('throws exception for invalid characters', function ($invalidUsername): void {
+    it('throws exception for invalid characters', function (string $invalidUsername): void {
         expect(fn (): Username => Username::from($invalidUsername))
             ->toThrow(InvalidArgumentException::class, 'Username can only contain letters, numbers, underscores and hyphens');
     })->with([
@@ -39,7 +39,7 @@ describe('Username Value Object', function (): void {
         'user#name',
     ]);
 
-    it('allows valid usernames', function ($validUsername): void {
+    it('allows valid usernames', function (string $validUsername): void {
         $username = Username::from($validUsername);
         expect($username->getValue())->toBe($validUsername);
     })->with([

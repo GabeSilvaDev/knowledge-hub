@@ -63,7 +63,7 @@ describe('UserProfile ValueObject Tests', function (): void {
             $name = Name::from('Charlie Brown');
             $username = Username::from('charliebrown');
 
-            $profile = UserProfile::create($name, $username, null);
+            $profile = UserProfile::create($name, $username);
 
             expect($profile->getName())->toBe($name)
                 ->and($profile->getUsername())->toBe($username)

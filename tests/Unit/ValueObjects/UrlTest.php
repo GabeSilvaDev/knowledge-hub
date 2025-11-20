@@ -18,7 +18,7 @@ describe('Url Value Object', function (): void {
             ->toThrow(InvalidArgumentException::class, 'URL cannot be empty');
     });
 
-    it('throws exception for invalid url format', function ($invalidUrl): void {
+    it('throws exception for invalid url format', function (string $invalidUrl): void {
         expect(fn (): Url => Url::from($invalidUrl))
             ->toThrow(InvalidArgumentException::class);
     })->with([
@@ -32,7 +32,7 @@ describe('Url Value Object', function (): void {
             ->toThrow(InvalidArgumentException::class, 'URL must use HTTP or HTTPS protocol');
     });
 
-    it('allows valid url formats', function ($validUrl): void {
+    it('allows valid url formats', function (string $validUrl): void {
         $url = Url::from($validUrl);
         expect($url->getValue())->toBe($validUrl);
     })->with([

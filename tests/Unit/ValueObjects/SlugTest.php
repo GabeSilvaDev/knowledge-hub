@@ -17,7 +17,7 @@ describe('Slug Value Object', function (): void {
             ->toThrow(InvalidArgumentException::class, SLUG_EMPTY_ERROR);
     });
 
-    it('throws exception for invalid slug format', function ($invalidSlug): void {
+    it('throws exception for invalid slug format', function (string $invalidSlug): void {
         expect(fn (): Slug => Slug::from($invalidSlug))
             ->toThrow(InvalidArgumentException::class, 'Slug can only contain lowercase letters, numbers and hyphens');
     })->with([
@@ -28,7 +28,7 @@ describe('Slug Value Object', function (): void {
         'slug.',
     ]);
 
-    it('allows valid slug formats', function ($validSlug): void {
+    it('allows valid slug formats', function (string $validSlug): void {
         $slug = Slug::from($validSlug);
         expect($slug->getValue())->toBe($validSlug);
     })->with([

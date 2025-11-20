@@ -16,7 +16,7 @@ describe('UserId Value Object', function (): void {
             ->toThrow(InvalidArgumentException::class, 'User ID cannot be empty');
     });
 
-    it('throws exception for invalid user id format', function ($invalidId): void {
+    it('throws exception for invalid user id format', function (string $invalidId): void {
         expect(fn (): UserId => UserId::from($invalidId))
             ->toThrow(InvalidArgumentException::class, 'Invalid User ID format');
     })->with([
@@ -27,7 +27,7 @@ describe('UserId Value Object', function (): void {
         '507f1f77bcf86cd799439011z',
     ]);
 
-    it('allows valid user id formats', function ($validId): void {
+    it('allows valid user id formats', function (string $validId): void {
         $userId = UserId::from($validId);
         expect($userId->getValue())->toBe($validId);
     })->with([
