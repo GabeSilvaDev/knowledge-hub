@@ -15,8 +15,26 @@ use App\ValueObjects\UserId;
 use DateTime;
 use InvalidArgumentException;
 
+/**
+ * Data Transfer Object for Article Creation.
+ *
+ * Encapsulates all data required to create a new article using Value Objects
+ * for validation and type safety.
+ */
 class CreateArticleDTO
 {
+    /**
+     * Create a new Article DTO instance.
+     *
+     * @param  ArticleContent  $content  Article content including title, body, and slug
+     * @param  UserId  $author_id  The ID of the article author
+     * @param  ArticleMetadata  $metadata  Article metadata including status, type, and flags
+     * @param  Url|null  $featured_image  Optional URL for the featured image
+     * @param  array<string>  $tags  Array of tag strings
+     * @param  array<string>  $categories  Array of category strings
+     * @param  array<string, mixed>  $meta_data  Additional metadata as key-value pairs
+     * @param  ArticleSEO|null  $seo  Optional SEO metadata
+     */
     public function __construct(
         public readonly ArticleContent $content,
         public readonly UserId $author_id,
@@ -32,7 +50,11 @@ class CreateArticleDTO
     ) {}
 
     /**
-     * @return array<string, mixed>
+     * Convert DTO to array for database persistence.
+     *
+     * Transforms Value Objects into primitive types suitable for MongoDB storage.
+     *
+     * @return array<string, mixed> Array representation of the article data
      */
     public function toArray(): array
     {
@@ -62,7 +84,15 @@ class CreateArticleDTO
     }
 
     /**
-     * @param  array<string, mixed>  $data
+     * Create DTO from array data.
+     *
+     * Factory method that validates and transforms array data into a DTO instance
+     * using Value Objects for type safety.
+     *
+     * @param  array<string, mixed>  $data  Raw article data from request
+     * @return self The created DTO instance
+     *
+     * @throws InvalidArgumentException If data validation fails
      */
     public static function fromArray(array $data): self
     {
@@ -97,7 +127,12 @@ class CreateArticleDTO
     }
 
     /**
-     * @param  array<string, mixed>  $data
+     * Validate and extract data from input array.
+     *
+     * Performs comprehensive validation of all fields and returns a structured array
+     * with validated and normalized data.
+     *
+     * @param  array<string, mixed>  $data  Raw input data
      * @return array{
      *     title: string,
      *     content: string,
@@ -115,7 +150,9 @@ class CreateArticleDTO
      *     tags: array<string>,
      *     categories: array<string>,
      *     metaData: array<string, mixed>
-     * }
+     * } Validated and structured data
+     *
+     * @throws InvalidArgumentException If validation fails
      */
     private static function validateAndExtractData(array $data): array
     {
@@ -193,7 +230,13 @@ class CreateArticleDTO
     }
 
     /**
-     * @param  array<string, mixed>  $data
+     * Validate required string fields.
+     *
+     * Ensures title, content, and author_id are present and are strings.
+     *
+     * @param  array<string, mixed>  $data  Input data to validate
+     *
+     * @throws InvalidArgumentException If required fields are missing or invalid
      */
     private static function validateRequiredStringFields(array $data): void
     {
@@ -207,7 +250,13 @@ class CreateArticleDTO
     }
 
     /**
-     * @param  array<string, mixed>  $data
+     * Validate optional string fields.
+     *
+     * Ensures optional fields are either null or strings.
+     *
+     * @param  array<string, mixed>  $data  Input data to validate
+     *
+     * @throws InvalidArgumentException If optional fields have invalid types
      */
     private static function validateOptionalStringFields(array $data): void
     {
@@ -222,7 +271,13 @@ class CreateArticleDTO
     }
 
     /**
-     * @param  array<string, mixed>  $data
+     * Validate boolean fields.
+     *
+     * Ensures is_featured and is_pinned are boolean values.
+     *
+     * @param  array<string, mixed>  $data  Input data to validate
+     *
+     * @throws InvalidArgumentException If boolean fields are not booleans
      */
     private static function validateBooleanFields(array $data): void
     {
@@ -235,7 +290,13 @@ class CreateArticleDTO
     }
 
     /**
-     * @param  array<string, mixed>  $data
+     * Validate enum fields.
+     *
+     * Ensures status and type are valid enum values (string or int).
+     *
+     * @param  array<string, mixed>  $data  Input data to validate
+     *
+     * @throws InvalidArgumentException If enum fields have invalid types
      */
     private static function validateEnumFields(array $data): void
     {
@@ -248,7 +309,12 @@ class CreateArticleDTO
     }
 
     /**
-     * @return array<string>
+     * Validate and filter string array.
+     *
+     * Ensures the input is an array and filters out non-string values.
+     *
+     * @param  mixed  $array  Input to validate and filter
+     * @return array<string> Filtered array containing only strings
      */
     private static function validateStringArray(mixed $array): array
     {

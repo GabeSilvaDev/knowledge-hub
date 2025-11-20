@@ -13,8 +13,21 @@ use App\ValueObjects\Username;
 use App\ValueObjects\UserProfile;
 use InvalidArgumentException;
 
+/**
+ * Data Transfer Object for User Creation.
+ *
+ * Encapsulates all data required to create a new user using Value Objects
+ * for validation and type safety.
+ */
 class CreateUserDTO
 {
+    /**
+     * Create a new User DTO instance.
+     *
+     * @param  UserProfile  $profile  User profile information (name, username, bio)
+     * @param  UserCredentials  $credentials  User authentication credentials (email, password, roles)
+     * @param  Url|null  $avatar_url  Optional URL for the user's avatar image
+     */
     public function __construct(
         public readonly UserProfile $profile,
         public readonly UserCredentials $credentials,
@@ -22,7 +35,12 @@ class CreateUserDTO
     ) {}
 
     /**
-     * @return array<string, mixed>
+     * Convert DTO to array for database persistence.
+     *
+     * Transforms Value Objects into primitive types suitable for MongoDB storage.
+     * Password is automatically hashed.
+     *
+     * @return array<string, mixed> Array representation of the user data
      */
     public function toArray(): array
     {
@@ -38,7 +56,15 @@ class CreateUserDTO
     }
 
     /**
-     * @param  array<string, mixed>  $data
+     * Create DTO from array data.
+     *
+     * Factory method that validates and transforms array data into a DTO instance
+     * using Value Objects for type safety. Defaults to READER role if none provided.
+     *
+     * @param  array<string, mixed>  $data  Raw user data from request
+     * @return self The created DTO instance
+     *
+     * @throws InvalidArgumentException If data validation fails
      */
     public static function fromArray(array $data): self
     {
