@@ -6,6 +6,12 @@ use App\Models\ArticleVersion;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Auth;
 
+/**
+ * Versionable Trait.
+ *
+ * Provides automatic versioning functionality for Eloquent models.
+ * Creates version snapshots on model updates, with methods for version management and restoration.
+ */
 trait Versionable
 {
     /**
@@ -22,6 +28,8 @@ trait Versionable
 
     /**
      * Boot the versionable trait for a model.
+     *
+     * Registers the updating event listener to automatically create versions.
      */
     public static function bootVersionable(): void
     {
@@ -43,7 +51,10 @@ trait Versionable
     }
 
     /**
-     * Create a new version snapshot of the current article.
+     * Create a new version snapshot of the current model.
+     *
+     * @param  string|null  $reason  Optional reason for creating the version
+     * @return ArticleVersion The newly created version
      */
     public function createVersion(?string $reason = null): ArticleVersion
     {
@@ -61,7 +72,9 @@ trait Versionable
     }
 
     /**
-     * Get the next version number for this article.
+     * Get the next version number for this model.
+     *
+     * @return int The next sequential version number
      */
     protected function getNextVersionNumber(): int
     {
@@ -136,6 +149,8 @@ trait Versionable
 
     /**
      * Determine if a version should be created.
+     *
+     * @return bool True if versioning is enabled, false otherwise
      */
     protected function shouldCreateVersion(): bool
     {
@@ -143,7 +158,10 @@ trait Versionable
     }
 
     /**
-     * Restore the article to a specific version.
+     * Restore the model to a specific version.
+     *
+     * @param  int  $versionNumber  The version number to restore
+     * @return bool True if restoration was successful, false otherwise
      */
     public function restoreToVersion(int $versionNumber): bool
     {
@@ -165,7 +183,10 @@ trait Versionable
     }
 
     /**
-     * Get a specific version of this article.
+     * Get a specific version of this model.
+     *
+     * @param  int  $versionNumber  The version number to retrieve
+     * @return ArticleVersion|null The version or null if not found
      */
     public function getVersion(int $versionNumber): ?ArticleVersion
     {
@@ -175,7 +196,9 @@ trait Versionable
     }
 
     /**
-     * Get the latest version of this article.
+     * Get the latest version of this model.
+     *
+     * @return ArticleVersion|null The latest version or null if no versions exist
      */
     public function getLatestVersion(): ?ArticleVersion
     {
@@ -185,7 +208,9 @@ trait Versionable
     /**
      * Compare two versions and return the differences.
      *
-     * @return array<string, array<string, mixed>>
+     * @param  int  $versionA  The first version number to compare
+     * @param  int  $versionB  The second version number to compare
+     * @return array<string, array<string, mixed>> Array of field differences between versions
      */
     public function compareVersions(int $versionA, int $versionB): array
     {
@@ -236,7 +261,9 @@ trait Versionable
     }
 
     /**
-     * Get the total number of versions for this article.
+     * Get the total number of versions for this model.
+     *
+     * @return int The version count
      */
     public function getVersionCount(): int
     {
@@ -246,7 +273,10 @@ trait Versionable
     /**
      * Execute a callback without creating versions.
      *
-     * @param  callable(): mixed  $callback
+     * Temporarily disables versioning, executes the callback, then re-enables versioning.
+     *
+     * @param  callable(): mixed  $callback  The callback to execute
+     * @return mixed The callback result
      */
     public function withoutVersioning(callable $callback): mixed
     {
