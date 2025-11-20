@@ -6,10 +6,22 @@ use Exception;
 use Illuminate\Http\JsonResponse;
 use Throwable;
 
+/**
+ * Exception thrown when cache invalidation fails.
+ *
+ * Indicates that the system failed to clear cache entries for a specific key or prefix.
+ */
 class CacheInvalidationException extends Exception
 {
     /**
      * Create a new exception instance.
+     *
+     * Constructs the exception with the cache key and optional custom message.
+     *
+     * @param  string  $key  The cache key that failed to invalidate
+     * @param  string  $message  Optional custom error message
+     * @param  int  $code  Optional exception code
+     * @param  Throwable|null  $previous  Optional previous exception for chaining
      */
     public function __construct(
         protected string $key,
@@ -23,6 +35,10 @@ class CacheInvalidationException extends Exception
 
     /**
      * Render the exception as an HTTP response.
+     *
+     * Returns a JSON response with error details and 500 status code.
+     *
+     * @return JsonResponse The JSON error response
      */
     public function render(): JsonResponse
     {
@@ -34,6 +50,11 @@ class CacheInvalidationException extends Exception
 
     /**
      * Factory method for deletion failures.
+     *
+     * Creates a new exception instance for cache deletion failures.
+     *
+     * @param  string  $key  The cache key prefix that failed to delete
+     * @return self The exception instance
      */
     public static function deletionFailed(string $key): self
     {
@@ -42,6 +63,10 @@ class CacheInvalidationException extends Exception
 
     /**
      * Get the cache key.
+     *
+     * Returns the cache key that caused the invalidation failure.
+     *
+     * @return string The cache key
      */
     public function getCacheKey(): string
     {
