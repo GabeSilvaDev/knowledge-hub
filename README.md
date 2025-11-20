@@ -17,7 +17,12 @@ Knowledge Hub é uma API robusta desenvolvida com Laravel 12 e MongoDB, projetad
 
 - 🔐 **Autenticação JWT** - Sistema completo com Laravel Sanctum
 - 📝 **Gerenciamento de Artigos** - CRUD completo com suporte a múltiplos tipos
-- 🕐 **Versionamento Automático** - Histórico completo de alterações em artigos
+- � **Sistema de Comentários** - Comentários aninhados com edição e exclusão
+- ❤️ **Sistema de Likes** - Curtir/descurtir artigos com contadores automáticos
+- 👥 **Sistema de Seguidores** - Seguir usuários e feed personalizado
+- 📰 **Feed Inteligente** - Feed público e personalizado baseado em seguidos
+- 👤 **Perfis Públicos** - Perfis de usuário com limitação para visitantes
+- �🕐 **Versionamento Automático** - Histórico completo de alterações em artigos
 - 🔄 **Restauração de Versões** - Volte para qualquer versão anterior
 - 📊 **Comparação de Versões** - Visualize diferenças entre versões
 - 📈 **Ranking em Tempo Real** - Redis Sorted Sets para artigos mais acessados
@@ -112,17 +117,15 @@ A API utiliza Laravel Sanctum para autenticação via tokens Bearer.
 ### Endpoints Principais
 
 ```bash
-# Registro
+# Autenticação
 POST /api/register
-
-# Login
 POST /api/login
-
-# Logout
 POST /api/logout
+POST /api/revoke-all
 
 # Perfil
 GET /api/user
+GET /api/users/{id}  # Perfil público (limitado para visitantes)
 ```
 
 **📚 Documentação Completa:** Veja a seção [Autenticação Sanctum - Detalhes](#-autenticação-sanctum---detalhes) para mais detalhes.
@@ -191,6 +194,133 @@ POST /api/articles/{id}/versions/compare
 
 **📚 Documentação Completa:** Veja a seção [Artigos - Endpoints Detalhados](#-artigos---endpoints-detalhados) e [Sistema de Versionamento - Detalhes](#-sistema-de-versionamento---detalhes) para mais detalhes.
 
+## 💬 Sistema de Comentários
+
+Sistema completo de comentários em artigos com contadores automáticos.
+
+### Recursos de Comentários
+
+- **CRUD Completo**: Criar, editar, excluir e listar comentários
+- **Contadores Automáticos**: Atualiza `comment_count` via Observer
+- **Validação de Propriedade**: Apenas o autor pode editar/excluir
+- **Rate Limiting**: 30 comentários por minuto
+- **Soft Deletes**: Comentários excluídos podem ser restaurados
+
+### Endpoints de Comentários
+
+```bash
+# Listar comentários de um artigo
+GET /api/articles/{articleId}/comments
+
+# Criar comentário
+POST /api/articles/{articleId}/comments
+
+# Atualizar comentário (apenas autor)
+PUT /api/comments/{id}
+
+# Deletar comentário (apenas autor)
+DELETE /api/comments/{id}
+```
+
+**Rate Limiting:** 30 comentários/minuto por usuário
+
+## ❤️ Sistema de Likes
+
+Sistema de curtidas em artigos com toggle automático.
+
+### Recursos de Likes
+
+- **Toggle Inteligente**: Curtir/descurtir em um único endpoint
+- **Contadores Automáticos**: Atualiza `like_count` via Observer
+- **Verificação de Status**: Checar se usuário já curtiu
+- **Rate Limiting**: 60 likes por minuto
+- **Constraint Único**: Um like por usuário por artigo
+
+### Endpoints de Likes
+
+```bash
+# Curtir/Descurtir artigo (toggle)
+POST /api/articles/{articleId}/like
+
+# Verificar se usuário curtiu
+GET /api/articles/{articleId}/like/check
+```
+
+**Rate Limiting:** 60 likes/minuto por usuário
+
+## 👥 Sistema de Seguidores
+
+Sistema completo de relacionamentos entre usuários.
+
+### Recursos de Seguidores
+
+- **Seguir/Deixar de Seguir**: Toggle em um único endpoint
+- **Prevenção de Auto-follow**: Usuário não pode seguir a si mesmo
+- **Listagem**: Seguidores e seguindo com paginação
+- **Verificação de Status**: Checar se usuário segue outro
+- **Rate Limiting**: 30 ações por minuto
+
+### Endpoints de Seguidores
+
+```bash
+# Seguir/Deixar de seguir usuário (toggle)
+POST /api/users/{userId}/follow
+
+# Listar seguidores de um usuário
+GET /api/users/{userId}/followers
+
+# Listar quem o usuário segue
+GET /api/users/{userId}/following
+
+# Verificar se está seguindo
+GET /api/users/{userId}/follow/check
+```
+
+**Rate Limiting:** 30 ações/minuto por usuário
+
+## 📰 Sistema de Feed
+
+Feed inteligente com artigos públicos e personalizados.
+
+### Recursos de Feed
+
+- **Feed Público**: Artigos mais populares baseado em score ponderado
+- **Feed Personalizado**: Prioriza artigos de usuários seguidos
+- **Algoritmo de Score**: `(view_count * 0.4) + (like_count * 0.4) + (comment_count * 0.2)`
+- **Bônus de Prioridade**: Artigos de seguidos ganham +10000 no score
+- **Paginação**: Suporte completo para navegação
+
+### Endpoints de Feed
+
+```bash
+# Feed público (para todos)
+GET /api/feed
+
+# Feed personalizado (autenticado)
+GET /api/feed/personalized
+```
+
+## 👤 Perfis de Usuário
+
+Perfis públicos com limitações para visitantes não autenticados.
+
+### Recursos de Perfil
+
+- **Perfil Completo**: Nome, username, bio, avatar, estatísticas
+- **Limitação de Visitantes**: Não autenticados veem apenas 10 artigos
+- **Estatísticas**: Contadores de seguidores e seguindo
+- **Status de Relacionamento**: Indica se usuário autenticado está seguindo
+- **Artigos do Usuário**: Listagem paginada de artigos publicados
+
+### Endpoint de Perfil
+
+```bash
+# Visualizar perfil público
+GET /api/users/{id}
+```
+
+**Limitação:** Visitantes não autenticados veem apenas 10 artigos mais recentes.
+
 ## 🏗️ Arquitetura
 
 ### Estrutura de Pastas
@@ -258,6 +388,9 @@ docker exec -it knowledge-hub-app php test-versioning.php
 | `users` | Usuários do sistema |
 | `articles` | Artigos com versionamento |
 | `article_versions` | Histórico de versões |
+| `comments` | Comentários em artigos |
+| `likes` | Curtidas em artigos |
+| `followers` | Relacionamentos entre usuários |
 | `personal_access_tokens` | Tokens Sanctum |
 
 ### Acessar Dados
@@ -311,6 +444,58 @@ docker exec -it knowledge-hub-app ./vendor/bin/pint
 - Mantenha cobertura de testes >90%
 
 ## 📝 Changelog
+
+### [3.0.0] - 2025-11-20
+
+#### ✨ Adicionado
+
+- **Sistema de Comentários**
+  - CRUD completo de comentários em artigos
+  - Atualização automática de `comment_count` via Observer
+  - Validação de propriedade (apenas autor pode editar/excluir)
+  - Rate limiting (30/min)
+  - Soft deletes
+
+- **Sistema de Likes**
+  - Toggle curtir/descurtir em endpoint único
+  - Atualização automática de `like_count` via Observer
+  - Verificação de status de like
+  - Constraint único (um like por usuário/artigo)
+  - Rate limiting (60/min)
+
+- **Sistema de Seguidores**
+  - Seguir/deixar de seguir usuários
+  - Prevenção de auto-follow
+  - Listagem de seguidores e seguindo
+  - Verificação de relacionamento
+  - Rate limiting (30/min)
+
+- **Sistema de Feed**
+  - Feed público com score ponderado
+  - Feed personalizado priorizando seguidos
+  - Algoritmo: `(views * 0.4) + (likes * 0.4) + (comments * 0.2)`
+  - Bônus de +10000 para artigos de seguidos
+
+- **Perfis Públicos**
+  - Endpoint de perfil de usuário
+  - Limitação de 10 artigos para visitantes não autenticados
+  - Estatísticas de seguidores
+  - Status de relacionamento (is_following)
+
+- **Arquitetura**
+  - Separação de Repositories e Services em providers distintos
+  - RepositoryServiceProvider para bindings de repositórios
+  - BusinessServiceProvider para bindings de serviços
+  - Uso de JsonResponse::HTTP_* constants
+  - FeedRepository para separação de queries
+
+#### 🔧 Melhorado
+
+- AppServiceProvider simplificado (apenas cache e observers)
+- Separação de concerns entre Service e Repository layers
+- Code quality (PHPStan level 10 zerado)
+- Formatação consistente com Laravel Pint
+- Testes completos para todas as novas funcionalidades
 
 ### [2.1.0] - 2025-11-17
 
