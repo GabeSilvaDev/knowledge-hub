@@ -86,6 +86,46 @@ class User extends Authenticatable
     }
 
     /**
+     * Get the comments written by this user.
+     *
+     * @return HasMany<Comment, User>
+     */
+    public function comments(): HasMany
+    {
+        return $this->hasMany(Comment::class, 'user_id');
+    }
+
+    /**
+     * Get the likes made by this user.
+     *
+     * @return HasMany<Like, User>
+     */
+    public function likes(): HasMany
+    {
+        return $this->hasMany(Like::class, 'user_id');
+    }
+
+    /**
+     * Get the users this user is following.
+     *
+     * @return HasMany<Follower, User>
+     */
+    public function following(): HasMany
+    {
+        return $this->hasMany(Follower::class, 'follower_id');
+    }
+
+    /**
+     * Get the users following this user.
+     *
+     * @return HasMany<Follower, User>
+     */
+    public function followers(): HasMany
+    {
+        return $this->hasMany(Follower::class, 'following_id');
+    }
+
+    /**
      * Override tokens relationship to use MongoDB connection.
      *
      * Customizes Sanctum's token relationship to work with MongoDB's _id field

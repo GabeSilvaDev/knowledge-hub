@@ -7,6 +7,7 @@ use Database\Factories\ArticleFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 use MongoDB\Laravel\Eloquent\Model;
 use MongoDB\Laravel\Eloquent\SoftDeletes;
@@ -130,6 +131,26 @@ class Article extends Model
     public function author()
     {
         return $this->belongsTo(User::class, 'author_id');
+    }
+
+    /**
+     * Get the comments for this article.
+     *
+     * @return HasMany<Comment, Article>
+     */
+    public function comments()
+    {
+        return $this->hasMany(Comment::class, 'article_id');
+    }
+
+    /**
+     * Get the likes for this article.
+     *
+     * @return HasMany<Like, Article>
+     */
+    public function likes()
+    {
+        return $this->hasMany(Like::class, 'article_id');
     }
 
     /**
