@@ -10,6 +10,7 @@ use App\Http\Controllers\LikeController;
 use App\Http\Controllers\RecommendationController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\UserRankingController;
 use App\Http\Middleware\TrackArticleView;
 use Illuminate\Support\Facades\Route;
 
@@ -28,6 +29,8 @@ Route::get('/articles/ranking/statistics', [ArticleRankingController::class, 'st
 Route::get('/articles/{article}', [ArticleController::class, 'show'])->middleware(TrackArticleView::class);
 Route::get('/articles/{articleId}/related', [RecommendationController::class, 'related']);
 
+Route::get('/users/ranking', [UserRankingController::class, 'index']);
+Route::get('/users/ranking/statistics', [UserRankingController::class, 'statistics']);
 Route::get('/users/{user}', [UserController::class, 'show']);
 Route::get('/users/{user}/followers', [FollowerController::class, 'followers']);
 Route::get('/users/{user}/following', [FollowerController::class, 'following']);
@@ -62,6 +65,10 @@ Route::middleware('auth:sanctum')->group(function (): void {
 
     Route::post('/users/{user}/follow', [FollowerController::class, 'toggle'])->middleware('throttle:30,1');
     Route::get('/users/{user}/follow/check', [FollowerController::class, 'check']);
+
+    Route::post('/users/ranking/sync', [UserRankingController::class, 'sync']);
+    Route::get('/users/{user}/ranking', [UserRankingController::class, 'show']);
+    Route::post('/users/{user}/ranking/recalculate', [UserRankingController::class, 'recalculate']);
 
     Route::get('/recommendations/users', [RecommendationController::class, 'users']);
     Route::get('/recommendations/articles', [RecommendationController::class, 'articles']);
