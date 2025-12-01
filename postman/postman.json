@@ -1,0 +1,367 @@
+{
+  "info": {
+    "_postman_id": "3e4354fd-15f1-4dac-84e7-94a3f66f3c66",
+    "name": "Knowledge Hub API v3.1",
+    "description": "Complete API collection for Knowledge Hub - Auth, Users, Articles, Comments, Likes, Followers, Feed, Search, and Ranking.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "description": "Authentication endpoints",
+      "item": [
+        {
+          "name": "Register",
+          "event": [{"listen": "test", "script": {"exec": ["try { const r = pm.response.json(); if (r.token) { pm.collectionVariables.set('token', r.token); pm.collectionVariables.set('user_id', r.user.id); } pm.test('Status is 201', () => pm.response.to.have.status(201)); } catch (e) {}"], "type": "text/javascript"}}],
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Accept", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"name\": \"Gabriel Silva\",\n  \"email\": \"gabriel@example.com\",\n  \"username\": \"gabesilva\",\n  \"password\": \"Secret123\",\n  \"password_confirmation\": \"Secret123\"\n}"},
+            "url": {"raw": "{{base_url}}/api/register", "host": ["{{base_url}}"], "path": ["api", "register"]}
+          }
+        },
+        {
+          "name": "Login",
+          "event": [{"listen": "test", "script": {"exec": ["try { const r = pm.response.json(); if (r.token) { pm.collectionVariables.set('token', r.token); pm.collectionVariables.set('user_id', r.user.id); } pm.test('Status is 200', () => pm.response.to.have.status(200)); } catch (e) {}"], "type": "text/javascript"}}],
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Accept", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"email\": \"gabriel@example.com\",\n  \"password\": \"Secret123\"\n}"},
+            "url": {"raw": "{{base_url}}/api/login", "host": ["{{base_url}}"], "path": ["api", "login"]}
+          }
+        },
+        {
+          "name": "Get Current User (Me)",
+          "request": {
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}]},
+            "method": "GET",
+            "header": [{"key": "Accept", "value": "application/json"}],
+            "url": {"raw": "{{base_url}}/api/me", "host": ["{{base_url}}"], "path": ["api", "me"]}
+          }
+        },
+        {
+          "name": "Update Current User (Me)",
+          "request": {
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}]},
+            "method": "PUT",
+            "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Accept", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"name\": \"Gabriel Updated\",\n  \"bio\": \"Backend Developer\"\n}"},
+            "url": {"raw": "{{base_url}}/api/me", "host": ["{{base_url}}"], "path": ["api", "me"]}
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}]},
+            "method": "POST",
+            "header": [{"key": "Accept", "value": "application/json"}],
+            "url": {"raw": "{{base_url}}/api/logout", "host": ["{{base_url}}"], "path": ["api", "logout"]}
+          }
+        },
+        {
+          "name": "Revoke All Tokens",
+          "request": {
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}]},
+            "method": "POST",
+            "header": [{"key": "Accept", "value": "application/json"}],
+            "url": {"raw": "{{base_url}}/api/revoke-all", "host": ["{{base_url}}"], "path": ["api", "revoke-all"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "description": "Public user profile endpoints",
+      "item": [
+        {
+          "name": "Get Public Profile",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Accept", "value": "application/json"}],
+            "url": {"raw": "{{base_url}}/api/users/{{user_id}}", "host": ["{{base_url}}"], "path": ["api", "users", "{{user_id}}"]}
+          }
+        },
+        {
+          "name": "Get User Followers",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Accept", "value": "application/json"}],
+            "url": {"raw": "{{base_url}}/api/users/{{user_id}}/followers", "host": ["{{base_url}}"], "path": ["api", "users", "{{user_id}}", "followers"]}
+          }
+        },
+        {
+          "name": "Get User Following",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Accept", "value": "application/json"}],
+            "url": {"raw": "{{base_url}}/api/users/{{user_id}}/following", "host": ["{{base_url}}"], "path": ["api", "users", "{{user_id}}", "following"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Followers",
+      "description": "Follow/unfollow users",
+      "item": [
+        {
+          "name": "Toggle Follow",
+          "request": {
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}]},
+            "method": "POST",
+            "header": [{"key": "Accept", "value": "application/json"}],
+            "url": {"raw": "{{base_url}}/api/users/{{target_user_id}}/follow", "host": ["{{base_url}}"], "path": ["api", "users", "{{target_user_id}}", "follow"]}
+          }
+        },
+        {
+          "name": "Check Follow Status",
+          "request": {
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}]},
+            "method": "GET",
+            "header": [{"key": "Accept", "value": "application/json"}],
+            "url": {"raw": "{{base_url}}/api/users/{{target_user_id}}/follow/check", "host": ["{{base_url}}"], "path": ["api", "users", "{{target_user_id}}", "follow", "check"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Articles",
+      "description": "Article CRUD operations",
+      "item": [
+        {
+          "name": "List My Articles",
+          "request": {
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}]},
+            "method": "GET",
+            "header": [{"key": "Accept", "value": "application/json"}],
+            "url": {"raw": "{{base_url}}/api/articles", "host": ["{{base_url}}"], "path": ["api", "articles"]}
+          }
+        },
+        {
+          "name": "Get Popular Articles",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Accept", "value": "application/json"}],
+            "url": {"raw": "{{base_url}}/api/articles/popular?limit=10&days=30", "host": ["{{base_url}}"], "path": ["api", "articles", "popular"], "query": [{"key": "limit", "value": "10"}, {"key": "days", "value": "30"}]}
+          }
+        },
+        {
+          "name": "Get Article",
+          "event": [{"listen": "test", "script": {"exec": ["try { const r = pm.response.json(); if (r.data && r.data.id) pm.collectionVariables.set('article_id', r.data.id); } catch (e) {}"], "type": "text/javascript"}}],
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Accept", "value": "application/json"}],
+            "url": {"raw": "{{base_url}}/api/articles/{{article_id}}", "host": ["{{base_url}}"], "path": ["api", "articles", "{{article_id}}"]}
+          }
+        },
+        {
+          "name": "Create Article",
+          "event": [{"listen": "test", "script": {"exec": ["try { const r = pm.response.json(); if (r.data && r.data.id) pm.collectionVariables.set('article_id', r.data.id); pm.test('Status is 201', () => pm.response.to.have.status(201)); } catch (e) {}"], "type": "text/javascript"}}],
+          "request": {
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}]},
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Accept", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"title\": \"Laravel 12 Tutorial\",\n  \"content\": \"Laravel 12 brings amazing features...\",\n  \"status\": \"published\",\n  \"type\": \"tutorial\",\n  \"tags\": [\"laravel\", \"php\"]\n}"},
+            "url": {"raw": "{{base_url}}/api/articles", "host": ["{{base_url}}"], "path": ["api", "articles"]}
+          }
+        },
+        {
+          "name": "Update Article",
+          "request": {
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}]},
+            "method": "PUT",
+            "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Accept", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"title\": \"Laravel 12 Complete Tutorial\",\n  \"tags\": [\"laravel\", \"php\", \"backend\"]\n}"},
+            "url": {"raw": "{{base_url}}/api/articles/{{article_id}}", "host": ["{{base_url}}"], "path": ["api", "articles", "{{article_id}}"]}
+          }
+        },
+        {
+          "name": "Delete Article",
+          "request": {
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}]},
+            "method": "DELETE",
+            "header": [{"key": "Accept", "value": "application/json"}],
+            "url": {"raw": "{{base_url}}/api/articles/{{article_id}}", "host": ["{{base_url}}"], "path": ["api", "articles", "{{article_id}}"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Comments",
+      "description": "Comment operations",
+      "item": [
+        {
+          "name": "List Comments",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Accept", "value": "application/json"}],
+            "url": {"raw": "{{base_url}}/api/articles/{{article_id}}/comments", "host": ["{{base_url}}"], "path": ["api", "articles", "{{article_id}}", "comments"]}
+          }
+        },
+        {
+          "name": "Create Comment",
+          "event": [{"listen": "test", "script": {"exec": ["try { const r = pm.response.json(); if (r.data && r.data.id) pm.collectionVariables.set('comment_id', r.data.id); pm.test('Status is 201', () => pm.response.to.have.status(201)); } catch (e) {}"], "type": "text/javascript"}}],
+          "request": {
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}]},
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Accept", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"article_id\": \"{{article_id}}\",\n  \"content\": \"Great article!\"\n}"},
+            "url": {"raw": "{{base_url}}/api/comments", "host": ["{{base_url}}"], "path": ["api", "comments"]}
+          }
+        },
+        {
+          "name": "Update Comment",
+          "request": {
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}]},
+            "method": "PUT",
+            "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Accept", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"content\": \"Updated comment.\"\n}"},
+            "url": {"raw": "{{base_url}}/api/comments/{{comment_id}}", "host": ["{{base_url}}"], "path": ["api", "comments", "{{comment_id}}"]}
+          }
+        },
+        {
+          "name": "Delete Comment",
+          "request": {
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}]},
+            "method": "DELETE",
+            "header": [{"key": "Accept", "value": "application/json"}],
+            "url": {"raw": "{{base_url}}/api/comments/{{comment_id}}", "host": ["{{base_url}}"], "path": ["api", "comments", "{{comment_id}}"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Likes",
+      "description": "Like/unlike articles",
+      "item": [
+        {
+          "name": "Toggle Like",
+          "request": {
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}]},
+            "method": "POST",
+            "header": [{"key": "Accept", "value": "application/json"}],
+            "url": {"raw": "{{base_url}}/api/articles/{{article_id}}/like", "host": ["{{base_url}}"], "path": ["api", "articles", "{{article_id}}", "like"]}
+          }
+        },
+        {
+          "name": "Check Like Status",
+          "request": {
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}]},
+            "method": "GET",
+            "header": [{"key": "Accept", "value": "application/json"}],
+            "url": {"raw": "{{base_url}}/api/articles/{{article_id}}/like/check", "host": ["{{base_url}}"], "path": ["api", "articles", "{{article_id}}", "like", "check"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Feed",
+      "description": "Content feed endpoints",
+      "item": [
+        {
+          "name": "Get Feed (Auto)",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Accept", "value": "application/json"}],
+            "url": {"raw": "{{base_url}}/api/feed", "host": ["{{base_url}}"], "path": ["api", "feed"]}
+          }
+        },
+        {
+          "name": "Get Public Feed",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Accept", "value": "application/json"}],
+            "url": {"raw": "{{base_url}}/api/feed/public", "host": ["{{base_url}}"], "path": ["api", "feed", "public"]}
+          }
+        },
+        {
+          "name": "Get Personalized Feed",
+          "request": {
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}]},
+            "method": "GET",
+            "header": [{"key": "Accept", "value": "application/json"}],
+            "url": {"raw": "{{base_url}}/api/feed/personalized", "host": ["{{base_url}}"], "path": ["api", "feed", "personalized"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Search",
+      "description": "Full-text search with Meilisearch",
+      "item": [
+        {
+          "name": "Search Articles",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Accept", "value": "application/json"}],
+            "url": {"raw": "{{base_url}}/api/search?q=laravel&per_page=15", "host": ["{{base_url}}"], "path": ["api", "search"], "query": [{"key": "q", "value": "laravel"}, {"key": "per_page", "value": "15"}]}
+          }
+        },
+        {
+          "name": "Search Autocomplete",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Accept", "value": "application/json"}],
+            "url": {"raw": "{{base_url}}/api/search/autocomplete?q=lar", "host": ["{{base_url}}"], "path": ["api", "search", "autocomplete"], "query": [{"key": "q", "value": "lar"}]}
+          }
+        },
+        {
+          "name": "Sync Search Index",
+          "request": {
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}]},
+            "method": "POST",
+            "header": [{"key": "Accept", "value": "application/json"}],
+            "url": {"raw": "{{base_url}}/api/search/sync", "host": ["{{base_url}}"], "path": ["api", "search", "sync"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Ranking",
+      "description": "Article ranking and statistics",
+      "item": [
+        {
+          "name": "Get Top Articles Ranking",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Accept", "value": "application/json"}],
+            "url": {"raw": "{{base_url}}/api/articles/ranking?limit=10", "host": ["{{base_url}}"], "path": ["api", "articles", "ranking"], "query": [{"key": "limit", "value": "10"}]}
+          }
+        },
+        {
+          "name": "Get Ranking Statistics",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Accept", "value": "application/json"}],
+            "url": {"raw": "{{base_url}}/api/articles/ranking/statistics", "host": ["{{base_url}}"], "path": ["api", "articles", "ranking", "statistics"]}
+          }
+        },
+        {
+          "name": "Get Article Ranking",
+          "request": {
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}]},
+            "method": "GET",
+            "header": [{"key": "Accept", "value": "application/json"}],
+            "url": {"raw": "{{base_url}}/api/articles/{{article_id}}/ranking", "host": ["{{base_url}}"], "path": ["api", "articles", "{{article_id}}", "ranking"]}
+          }
+        },
+        {
+          "name": "Sync Ranking",
+          "request": {
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}]},
+            "method": "POST",
+            "header": [{"key": "Accept", "value": "application/json"}],
+            "url": {"raw": "{{base_url}}/api/articles/ranking/sync", "host": ["{{base_url}}"], "path": ["api", "articles", "ranking", "sync"]}
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {"key": "base_url", "value": "http://localhost:8004", "type": "string"},
+    {"key": "token", "value": "", "type": "string"},
+    {"key": "user_id", "value": "", "type": "string"},
+    {"key": "article_id", "value": "", "type": "string"},
+    {"key": "comment_id", "value": "", "type": "string"},
+    {"key": "target_user_id", "value": "", "type": "string"}
+  ]
+}
