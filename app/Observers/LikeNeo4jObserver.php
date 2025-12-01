@@ -18,6 +18,8 @@ class LikeNeo4jObserver
 
     /**
      * Handle the Like "created" event.
+     *
+     * @param  Like  $like  The created like
      */
     public function created(Like $like): void
     {
@@ -29,6 +31,8 @@ class LikeNeo4jObserver
 
     /**
      * Handle the Like "deleted" event.
+     *
+     * @param  Like  $like  The deleted like
      */
     public function deleted(Like $like): void
     {

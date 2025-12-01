@@ -14,6 +14,8 @@ final readonly class CommentObserver
 {
     /**
      * Handle the Comment "created" event.
+     *
+     * @param  Comment  $comment  The created comment
      */
     public function created(Comment $comment): void
     {
@@ -22,6 +24,8 @@ final readonly class CommentObserver
 
     /**
      * Handle the Comment "deleted" event.
+     *
+     * @param  Comment  $comment  The deleted comment
      */
     public function deleted(Comment $comment): void
     {
@@ -30,6 +34,8 @@ final readonly class CommentObserver
 
     /**
      * Handle the Comment "restored" event.
+     *
+     * @param  Comment  $comment  The restored comment
      */
     public function restored(Comment $comment): void
     {
@@ -38,6 +44,8 @@ final readonly class CommentObserver
 
     /**
      * Handle the Comment "force deleted" event.
+     *
+     * @param  Comment  $comment  The force deleted comment
      */
     public function forceDeleted(Comment $comment): void
     {
@@ -46,6 +54,8 @@ final readonly class CommentObserver
 
     /**
      * Update the comment count for an article.
+     *
+     * @param  string  $articleId  The article ID to update count for
      */
     private function updateArticleCommentCount(string $articleId): void
     {

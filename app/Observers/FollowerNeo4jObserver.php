@@ -18,6 +18,8 @@ class FollowerNeo4jObserver
 
     /**
      * Handle the Follower "created" event.
+     *
+     * @param  Follower  $follower  The created follower
      */
     public function created(Follower $follower): void
     {
@@ -29,6 +31,8 @@ class FollowerNeo4jObserver
 
     /**
      * Handle the Follower "deleted" event.
+     *
+     * @param  Follower  $follower  The deleted follower
      */
     public function deleted(Follower $follower): void
     {

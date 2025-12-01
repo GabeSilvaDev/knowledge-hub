@@ -14,6 +14,8 @@ final readonly class LikeObserver
 {
     /**
      * Handle the Like "created" event.
+     *
+     * @param  Like  $like  The created like
      */
     public function created(Like $like): void
     {
@@ -22,6 +24,8 @@ final readonly class LikeObserver
 
     /**
      * Handle the Like "deleted" event.
+     *
+     * @param  Like  $like  The deleted like
      */
     public function deleted(Like $like): void
     {
@@ -30,6 +34,8 @@ final readonly class LikeObserver
 
     /**
      * Update the like count for an article.
+     *
+     * @param  string  $articleId  The article ID to update count for
      */
     private function updateArticleLikeCount(string $articleId): void
     {

@@ -18,6 +18,8 @@ class UserNeo4jObserver
 
     /**
      * Handle the User "created" event.
+     *
+     * @param  User  $user  The created user
      */
     public function created(User $user): void
     {
@@ -26,6 +28,8 @@ class UserNeo4jObserver
 
     /**
      * Handle the User "updated" event.
+     *
+     * @param  User  $user  The updated user
      */
     public function updated(User $user): void
     {
@@ -34,6 +38,8 @@ class UserNeo4jObserver
 
     /**
      * Handle the User "deleted" event.
+     *
+     * @param  User  $user  The deleted user
      */
     public function deleted(User $user): void
     {
@@ -45,6 +51,8 @@ class UserNeo4jObserver
 
     /**
      * Sync user data to Neo4j.
+     *
+     * @param  User  $user  The user to sync
      */
     private function syncToNeo4j(User $user): void
     {

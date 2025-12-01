@@ -18,6 +18,8 @@ class ArticleNeo4jObserver
 
     /**
      * Handle the Article "created" event.
+     *
+     * @param  Article  $article  The created article
      */
     public function created(Article $article): void
     {
@@ -26,6 +28,8 @@ class ArticleNeo4jObserver
 
     /**
      * Handle the Article "updated" event.
+     *
+     * @param  Article  $article  The updated article
      */
     public function updated(Article $article): void
     {
@@ -34,6 +38,8 @@ class ArticleNeo4jObserver
 
     /**
      * Handle the Article "deleted" event.
+     *
+     * @param  Article  $article  The deleted article
      */
     public function deleted(Article $article): void
     {
@@ -45,6 +51,8 @@ class ArticleNeo4jObserver
 
     /**
      * Handle the Article "restored" event.
+     *
+     * @param  Article  $article  The restored article
      */
     public function restored(Article $article): void
     {
@@ -53,6 +61,8 @@ class ArticleNeo4jObserver
 
     /**
      * Sync article data to Neo4j.
+     *
+     * @param  Article  $article  The article to sync
      */
     private function syncToNeo4j(Article $article): void
     {
