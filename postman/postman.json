@@ -356,6 +356,55 @@
       ]
     },
     {
+      "name": "User Ranking",
+      "description": "User ranking and statistics",
+      "item": [
+        {
+          "name": "Get Top Users Ranking",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Accept", "value": "application/json"}],
+            "url": {"raw": "{{base_url}}/api/users/ranking?limit=10", "host": ["{{base_url}}"], "path": ["api", "users", "ranking"], "query": [{"key": "limit", "value": "10"}]}
+          }
+        },
+        {
+          "name": "Get User Ranking Statistics",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Accept", "value": "application/json"}],
+            "url": {"raw": "{{base_url}}/api/users/ranking/statistics", "host": ["{{base_url}}"], "path": ["api", "users", "ranking", "statistics"]}
+          }
+        },
+        {
+          "name": "Sync User Ranking",
+          "request": {
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}]},
+            "method": "POST",
+            "header": [{"key": "Accept", "value": "application/json"}],
+            "url": {"raw": "{{base_url}}/api/users/ranking/sync", "host": ["{{base_url}}"], "path": ["api", "users", "ranking", "sync"]}
+          }
+        },
+        {
+          "name": "Get Specific User Ranking",
+          "request": {
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}]},
+            "method": "GET",
+            "header": [{"key": "Accept", "value": "application/json"}],
+            "url": {"raw": "{{base_url}}/api/users/{{user_id}}/ranking", "host": ["{{base_url}}"], "path": ["api", "users", "{{user_id}}", "ranking"]}
+          }
+        },
+        {
+          "name": "Recalculate User Ranking",
+          "request": {
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}]},
+            "method": "POST",
+            "header": [{"key": "Accept", "value": "application/json"}],
+            "url": {"raw": "{{base_url}}/api/users/{{user_id}}/ranking/recalculate", "host": ["{{base_url}}"], "path": ["api", "users", "{{user_id}}", "ranking", "recalculate"]}
+          }
+        }
+      ]
+    },
+    {
       "name": "Recommendations",
       "description": "Neo4j-powered recommendations (users, articles, topics, authors)",
       "item": [
