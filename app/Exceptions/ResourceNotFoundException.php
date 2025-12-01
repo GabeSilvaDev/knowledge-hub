@@ -29,7 +29,7 @@ class ResourceNotFoundException extends Exception
         int $code = 0,
         ?Throwable $previous = null
     ) {
-        $message = $message ?: "O recurso solicitado ({$this->resourceName}) não foi encontrado.";
+        $message = $message ?: "The requested resource ({$this->resourceName}) was not found.";
         parent::__construct($message, $code, $previous);
     }
 

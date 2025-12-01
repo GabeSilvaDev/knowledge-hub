@@ -29,7 +29,7 @@ class CacheInvalidationException extends Exception
         int $code = 0,
         ?Throwable $previous = null
     ) {
-        $message = $message ?: "Falha ao invalidar cache para a chave: {$this->key}";
+        $message = $message ?: "Failed to invalidate cache for key: {$this->key}";
         parent::__construct($message, $code, $previous);
     }
 
@@ -43,7 +43,7 @@ class CacheInvalidationException extends Exception
     public function render(): JsonResponse
     {
         return response()->json([
-            'message' => 'Erro ao limpar cache.',
+            'message' => 'Failed to clear cache.',
             'error' => 'Cache invalidation failed',
         ], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
     }
@@ -58,7 +58,7 @@ class CacheInvalidationException extends Exception
      */
     public static function deletionFailed(string $key): self
     {
-        return new self($key, "Falha ao deletar cache com prefixo: {$key}");
+        return new self($key, "Failed to delete cache with prefix: {$key}");
     }
 
     /**

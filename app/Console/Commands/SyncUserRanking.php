@@ -34,20 +34,20 @@ class SyncUserRanking extends Command
      */
     public function handle(UserRankingServiceInterface $rankingService): int
     {
-        $this->info('Sincronizando ranking de usuários...');
+        $this->info('Synchronizing user ranking...');
 
         $rankingService->syncFromDatabase();
 
         $stats = $rankingService->getStatistics();
 
-        $this->info('Ranking sincronizado com sucesso!');
+        $this->info('Ranking synchronized successfully!');
         $this->table(
-            ['Métrica', 'Valor'],
+            ['Metric', 'Value'],
             [
-                ['Total de Usuários', $stats['total_users']],
-                ['Score Total', number_format($stats['total_score'], 2)],
-                ['Maior Score', number_format($stats['top_score'], 2)],
-                ['Média de Score', number_format($stats['average_score'], 2)],
+                ['Total Users', $stats['total_users']],
+                ['Total Score', number_format($stats['total_score'], 2)],
+                ['Highest Score', number_format($stats['top_score'], 2)],
+                ['Average Score', number_format($stats['average_score'], 2)],
             ]
         );
 
