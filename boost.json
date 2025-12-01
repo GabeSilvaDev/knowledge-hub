@@ -1,0 +1,39 @@
+{
+  "agents": ["copilot"],
+  "editors": ["vscode"],
+  "guidelines": [
+    "psr_12",
+    "laravel_best_practices",
+    "strict_types",
+    "typed_properties",
+    "declare_strict_types",
+    "no_unused_imports",
+    "ordered_imports",
+    "single_quote",
+    "short_array_syntax",
+    "binary_operator_single_space",
+    "arrow_functions_preferred",
+    "nullable_coalescing_preferred",
+    "void_return_when_no_return",
+    "no_dead_code",
+    "early_return_preference",
+    "privatization_preference",
+    "consistent_cast_spacing",
+    "no_unnecessary_phpdoc"
+  ],
+  "sail": false,
+  "servers": {
+    "laravel": {
+      "type": "stdio",
+      "command": "docker",
+      "args": [
+        "exec",
+        "-i",
+        "knowledge-hub-app",
+        "php",
+        "artisan",
+        "boost:mcp"
+      ]
+    }
+  }
+}
