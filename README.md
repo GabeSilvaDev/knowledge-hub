@@ -19,15 +19,16 @@ Knowledge Hub é uma API robusta desenvolvida com Laravel 12 e MongoDB, projetad
 
 - 🔐 **Autenticação JWT** - Sistema completo com Laravel Sanctum
 - 📝 **Gerenciamento de Artigos** - CRUD completo com suporte a múltiplos tipos
-- � **Sistema de Comentários** - Comentários aninhados com edição e exclusão
+- 💬 **Sistema de Comentários** - Comentários aninhados com edição e exclusão
 - ❤️ **Sistema de Likes** - Curtir/descurtir artigos com contadores automáticos
 - 👥 **Sistema de Seguidores** - Seguir usuários e feed personalizado
 - 📰 **Feed Inteligente** - Feed público e personalizado baseado em seguidos
 - 👤 **Perfis Públicos** - Perfis de usuário com limitação para visitantes
-- �🕐 **Versionamento Automático** - Histórico completo de alterações em artigos
+- 🕐 **Versionamento Automático** - Histórico completo de alterações em artigos
 - 🔄 **Restauração de Versões** - Volte para qualquer versão anterior
 - 📊 **Comparação de Versões** - Visualize diferenças entre versões
-- 📈 **Ranking em Tempo Real** - Redis Sorted Sets para artigos mais acessados
+- 📈 **Ranking em Tempo Real** - Redis Sorted Sets para artigos e usuários
+- 🏆 **Ranking de Influência** - Score ponderado de usuários influentes
 - 🔍 **Busca Avançada** - Meilisearch com autocomplete e filtros
 - 🤖 **Recomendações Neo4j** - Grafo de relacionamentos para sugestões inteligentes
 - 🎯 **Rastreamento de Visualizações** - Tracking automático de acessos
@@ -225,15 +226,30 @@ app/
 
 ## 📊 Sistema de Ranking
 
-Analytics em tempo real com ranking de conteúdo e métricas de engajamento.
+Analytics em tempo real com ranking de conteúdo, usuários e métricas de engajamento.
 
-### Recursos Principais
+### Ranking de Artigos
 
-- **Ranking de Artigos** - Top conteúdos por visualizações e engajamento
-- **Redis Sorted Sets** - Performance otimizada para rankings em tempo real
-- **Estatísticas Gerais** - Métricas agregadas e insights de performance
-- **Atualização Automática** - Sincronização em background via jobs
-- **Tracking de Visualizações** - Middleware dedicado para contagem precisa
+- **Top Artigos** - Conteúdos mais visualizados em tempo real
+- **Redis Sorted Sets** - Performance otimizada para rankings
+- **Estatísticas Gerais** - Métricas agregadas de artigos
+- **Tracking Automático** - Middleware dedicado para contagem precisa
+
+### Ranking de Usuários Influentes
+
+Sistema de ranking que calcula a influência de cada usuário baseado em múltiplos fatores.
+
+- **Fórmula de Influência** - Score ponderado por seguidores, views, likes, comentários e artigos
+- **Top Usuários** - Listagem dos usuários mais influentes da plataforma
+- **Ranking Individual** - Posição e breakdown detalhado de cada usuário
+- **Sincronização** - Command artisan e endpoint para atualização do ranking
+- **Redis Sorted Sets** - Consultas instantâneas com alta performance
+
+#### Fórmula de Cálculo
+
+```
+Score = (Seguidores × 2.0) + (Views × 0.5) + (Likes × 1.0) + (Comentários × 0.8) + (Artigos × 1.5)
+```
 
 ## 🔍 Sistema de Busca Avançada
 
