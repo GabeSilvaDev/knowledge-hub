@@ -4,12 +4,9 @@ namespace App\Services;
 
 use App\Contracts\Neo4jRepositoryInterface;
 use App\Contracts\RecommendationServiceInterface;
+use App\Contracts\SyncRepositoryInterface;
 use App\DTOs\RecommendationDTO;
 use App\Enums\RecommendationType;
-use App\Models\Article;
-use App\Models\Follower;
-use App\Models\Like;
-use App\Models\User;
 use Illuminate\Support\Facades\Cache;
 
 /**
@@ -19,12 +16,23 @@ use Illuminate\Support\Facades\Cache;
  */
 final readonly class RecommendationService implements RecommendationServiceInterface
 {
+    /**
+     * Initialize the Recommendation Service.
+     *
+     * @param  Neo4jRepositoryInterface  $neo4jRepository  Repository for Neo4j graph operations
+     * @param  SyncRepositoryInterface  $syncRepository  Repository for sync data access
+     */
     public function __construct(
         private Neo4jRepositoryInterface $neo4jRepository,
+        private SyncRepositoryInterface $syncRepository,
     ) {}
 
     /**
      * Get recommended users for a specific user.
+     *
+     * @param  string  $userId  The user ID to get recommendations for
+     * @param  int  $limit  The maximum number of recommendations
+     * @return RecommendationDTO The recommended users data transfer object
      */
     public function getRecommendedUsers(string $userId, int $limit = 10): RecommendationDTO
     {
@@ -62,6 +70,10 @@ final readonly class RecommendationService implements RecommendationServiceInter
 
     /**
      * Get recommended articles for a specific user.
+     *
+     * @param  string  $userId  The user ID to get recommendations for
+     * @param  int  $limit  The maximum number of recommendations
+     * @return RecommendationDTO The recommended articles data transfer object
      */
     public function getRecommendedArticles(string $userId, int $limit = 10): RecommendationDTO
     {
@@ -99,6 +111,10 @@ final readonly class RecommendationService implements RecommendationServiceInter
 
     /**
      * Get related articles for a specific article.
+     *
+     * @param  string  $articleId  The article ID to get related articles for
+     * @param  int  $limit  The maximum number of recommendations
+     * @return RecommendationDTO The related articles data transfer object
      */
     public function getRelatedArticles(string $articleId, int $limit = 10): RecommendationDTO
     {
@@ -136,6 +152,9 @@ final readonly class RecommendationService implements RecommendationServiceInter
 
     /**
      * Get recommended authors.
+     *
+     * @param  int  $limit  The maximum number of recommendations
+     * @return RecommendationDTO The recommended authors data transfer object
      */
     public function getRecommendedAuthors(int $limit = 10): RecommendationDTO
     {
@@ -176,6 +195,10 @@ final readonly class RecommendationService implements RecommendationServiceInter
 
     /**
      * Get topics of interest for a user.
+     *
+     * @param  string  $userId  The user ID to get topics for
+     * @param  int  $limit  The maximum number of topics
+     * @return RecommendationDTO The topics data transfer object
      */
     public function getTopicsOfInterest(string $userId, int $limit = 10): RecommendationDTO
     {
@@ -229,55 +252,39 @@ final readonly class RecommendationService implements RecommendationServiceInter
             return $stats;
         }
 
-        User::query()->cursor()->each(function (User $user) use (&$stats): void {
-            $this->neo4jRepository->syncUser([
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-                'username' => $user->username,
-            ]);
+        foreach ($this->syncRepository->getAllUsersForSync() as $userData) {
+            $this->neo4jRepository->syncUser($userData);
             $stats['users']++;
-        });
+        }
 
-        Article::query()
-            ->where('status', 'published')
-            ->cursor()
-            ->each(function (Article $article) use (&$stats): void {
-                $this->neo4jRepository->syncArticle([
-                    'id' => $article->id,
-                    'title' => $article->title,
-                    'slug' => $article->slug,
-                    'status' => $article->status,
-                    'author_id' => $article->author_id,
-                    'view_count' => $article->view_count,
-                    'like_count' => $article->like_count,
-                    'tags' => $article->tags ?? [],
-                    'categories' => $article->categories ?? [],
-                ]);
-                $stats['articles']++;
-            });
+        foreach ($this->syncRepository->getAllPublishedArticlesForSync() as $articleData) {
+            $this->neo4jRepository->syncArticle($articleData);
+            $stats['articles']++;
+        }
 
-        Follower::query()->cursor()->each(function (Follower $follower) use (&$stats): void {
+        foreach ($this->syncRepository->getAllFollowersForSync() as $followerData) {
             $this->neo4jRepository->syncFollow(
-                (string) $follower->follower_id,
-                (string) $follower->following_id
+                $followerData['follower_id'],
+                $followerData['following_id']
             );
             $stats['follows']++;
-        });
+        }
 
-        Like::query()->cursor()->each(function (Like $like) use (&$stats): void {
+        foreach ($this->syncRepository->getAllLikesForSync() as $likeData) {
             $this->neo4jRepository->syncLike(
-                (string) $like->user_id,
-                (string) $like->article_id
+                $likeData['user_id'],
+                $likeData['article_id']
             );
             $stats['likes']++;
-        });
+        }
 
         return $stats;
     }
 
     /**
      * Check if Neo4j is connected and working.
+     *
+     * @return bool True if Neo4j is available
      */
     public function isAvailable(): bool
     {
