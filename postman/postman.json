@@ -1,8 +1,8 @@
 {
   "info": {
     "_postman_id": "3e4354fd-15f1-4dac-84e7-94a3f66f3c66",
-    "name": "Knowledge Hub API v3.1",
-    "description": "Complete API collection for Knowledge Hub - Auth, Users, Articles, Comments, Likes, Followers, Feed, Search, and Ranking.",
+    "name": "Knowledge Hub API v3.2",
+    "description": "Complete API collection for Knowledge Hub - Auth, Users, Articles, Comments, Likes, Followers, Feed, Search, Ranking, and Neo4j Recommendations.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -351,6 +351,72 @@
             "method": "POST",
             "header": [{"key": "Accept", "value": "application/json"}],
             "url": {"raw": "{{base_url}}/api/articles/ranking/sync", "host": ["{{base_url}}"], "path": ["api", "articles", "ranking", "sync"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Recommendations",
+      "description": "Neo4j-powered recommendations (users, articles, topics, authors)",
+      "item": [
+        {
+          "name": "Get Statistics (Public)",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Accept", "value": "application/json"}],
+            "url": {"raw": "{{base_url}}/api/recommendations/statistics", "host": ["{{base_url}}"], "path": ["api", "recommendations", "statistics"]}
+          }
+        },
+        {
+          "name": "Get Influential Authors (Public)",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Accept", "value": "application/json"}],
+            "url": {"raw": "{{base_url}}/api/recommendations/authors?min_followers=5&limit=10", "host": ["{{base_url}}"], "path": ["api", "recommendations", "authors"], "query": [{"key": "min_followers", "value": "5"}, {"key": "limit", "value": "10"}]}
+          }
+        },
+        {
+          "name": "Get Related Articles (Public)",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Accept", "value": "application/json"}],
+            "url": {"raw": "{{base_url}}/api/articles/{{article_id}}/related?limit=10", "host": ["{{base_url}}"], "path": ["api", "articles", "{{article_id}}", "related"], "query": [{"key": "limit", "value": "10"}]}
+          }
+        },
+        {
+          "name": "Get Recommended Users",
+          "request": {
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}]},
+            "method": "GET",
+            "header": [{"key": "Accept", "value": "application/json"}],
+            "url": {"raw": "{{base_url}}/api/recommendations/users?limit=10", "host": ["{{base_url}}"], "path": ["api", "recommendations", "users"], "query": [{"key": "limit", "value": "10"}]}
+          }
+        },
+        {
+          "name": "Get Recommended Articles",
+          "request": {
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}]},
+            "method": "GET",
+            "header": [{"key": "Accept", "value": "application/json"}],
+            "url": {"raw": "{{base_url}}/api/recommendations/articles?limit=10", "host": ["{{base_url}}"], "path": ["api", "recommendations", "articles"], "query": [{"key": "limit", "value": "10"}]}
+          }
+        },
+        {
+          "name": "Get Topics of Interest",
+          "request": {
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}]},
+            "method": "GET",
+            "header": [{"key": "Accept", "value": "application/json"}],
+            "url": {"raw": "{{base_url}}/api/recommendations/topics?limit=10", "host": ["{{base_url}}"], "path": ["api", "recommendations", "topics"], "query": [{"key": "limit", "value": "10"}]}
+          }
+        },
+        {
+          "name": "Sync Neo4j Data",
+          "request": {
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}]},
+            "method": "POST",
+            "header": [{"key": "Accept", "value": "application/json"}],
+            "url": {"raw": "{{base_url}}/api/recommendations/sync", "host": ["{{base_url}}"], "path": ["api", "recommendations", "sync"]}
           }
         }
       ]
