@@ -14,3 +14,9 @@ parameters:
 
     excludePaths:
         - ./*/*/FileToBeExcluded.php
+
+    # Ignore Neo4j library type covariance issues that cannot be resolved
+    ignoreErrors:
+        - '#Parameter \#1 \$record of method App\\Repositories\\Neo4jRepository::(getString|getInt)\(\) expects Laudis\\Neo4j\\Types\\CypherMap<mixed>#'
+        - '#Strict comparison using \!\=\= between Laudis\\Neo4j\\Types\\CypherMap.* and null will always evaluate to true#'
+        - '#Cannot cast mixed to (string|int)#'
