@@ -33,59 +33,59 @@ class SyncNeo4jCommand extends Command
      */
     public function handle(RecommendationServiceInterface $recommendationService): int
     {
-        $this->info('Iniciando sincronização com Neo4j...');
+        $this->info('Starting Neo4j synchronization...');
 
         if (! $recommendationService->isAvailable()) {
-            $this->error('Neo4j não está disponível. Verifique a conexão.');
+            $this->error('Neo4j is not available. Please check the connection.');
 
             return Command::FAILURE;
         }
 
-        $this->info('✓ Neo4j conectado com sucesso!');
+        $this->info('✓ Neo4j connected successfully!');
 
         /** @var string|null $entity */
         $entity = $this->option('entity');
 
         if ($entity !== null && $entity !== '') {
-            $this->info("Sincronizando apenas: {$entity}");
+            $this->info("Synchronizing only: {$entity}");
         } else {
-            $this->info('Sincronizando todos os dados...');
+            $this->info('Synchronizing all data...');
         }
 
         $this->newLine();
-        $this->output->write('  <comment>→ Sincronizando...</comment>');
+        $this->output->write('  <comment>→ Synchronizing...</comment>');
 
         $stats = $recommendationService->syncFromDatabase();
 
         $this->output->writeln(' <info>✓</info>');
         $this->newLine();
 
-        $this->info('✓ Sincronização concluída com sucesso!');
+        $this->info('✓ Synchronization completed successfully!');
         $this->newLine();
 
         $this->table(
-            ['Entidade', 'Sincronizados'],
+            ['Entity', 'Synchronized'],
             [
-                ['Usuários', number_format($stats['users'], 0, ',', '.')],
-                ['Artigos', number_format($stats['articles'], 0, ',', '.')],
-                ['Seguidores', number_format($stats['follows'], 0, ',', '.')],
-                ['Curtidas', number_format($stats['likes'], 0, ',', '.')],
+                ['Users', number_format($stats['users'], 0, '.', ',')],
+                ['Articles', number_format($stats['articles'], 0, '.', ',')],
+                ['Followers', number_format($stats['follows'], 0, '.', ',')],
+                ['Likes', number_format($stats['likes'], 0, '.', ',')],
             ]
         );
 
         $this->newLine();
 
         $graphStats = $recommendationService->getStatistics();
-        $this->info('Estatísticas do grafo Neo4j:');
+        $this->info('Neo4j graph statistics:');
         $this->table(
-            ['Tipo de Nó/Relacionamento', 'Quantidade'],
+            ['Node/Relationship Type', 'Count'],
             [
-                ['Usuários (User)', number_format($graphStats['users'], 0, ',', '.')],
-                ['Artigos (Article)', number_format($graphStats['articles'], 0, ',', '.')],
-                ['Relacionamentos FOLLOWS', number_format($graphStats['follows'], 0, ',', '.')],
-                ['Relacionamentos LIKES', number_format($graphStats['likes'], 0, ',', '.')],
-                ['Tags', number_format($graphStats['tags'], 0, ',', '.')],
-                ['Categorias', number_format($graphStats['categories'], 0, ',', '.')],
+                ['Users (User)', number_format($graphStats['users'], 0, '.', ',')],
+                ['Articles (Article)', number_format($graphStats['articles'], 0, '.', ',')],
+                ['FOLLOWS Relationships', number_format($graphStats['follows'], 0, '.', ',')],
+                ['LIKES Relationships', number_format($graphStats['likes'], 0, '.', ',')],
+                ['Tags', number_format($graphStats['tags'], 0, '.', ',')],
+                ['Categories', number_format($graphStats['categories'], 0, '.', ',')],
             ]
         );
 

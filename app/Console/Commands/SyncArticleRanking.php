@@ -36,19 +36,19 @@ class SyncArticleRanking extends Command
      */
     public function handle(ArticleRankingServiceInterface $rankingService): int
     {
-        $this->info('Sincronizando ranking de artigos...');
+        $this->info('Synchronizing article ranking...');
 
         $rankingService->syncFromDatabase();
 
         $stats = $rankingService->getStatistics();
 
-        $this->info('✓ Ranking sincronizado com sucesso!');
+        $this->info('✓ Ranking synchronized successfully!');
         $this->table(
-            ['Métrica', 'Valor'],
+            ['Metric', 'Value'],
             [
-                ['Total de artigos', $stats['total_articles']],
-                ['Total de visualizações', number_format($stats['total_views'], 0, ',', '.')],
-                ['Maior pontuação', number_format($stats['top_score'], 0, ',', '.')],
+                ['Total articles', $stats['total_articles']],
+                ['Total views', number_format($stats['total_views'], 0, '.', ',')],
+                ['Highest score', number_format($stats['top_score'], 0, '.', ',')],
             ]
         );
 
