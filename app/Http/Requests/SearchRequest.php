@@ -11,7 +11,7 @@ use Illuminate\Validation\Rule;
 /**
  * SearchRequest
  *
- * Valida requisições de busca de artigos.
+ * Validates article search requests.
  */
 class SearchRequest extends FormRequest
 {
@@ -53,22 +53,22 @@ class SearchRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'q.required' => 'O termo de busca é obrigatório.',
-            'q.min' => 'O termo de busca deve ter pelo menos 2 caracteres.',
-            'q.max' => 'O termo de busca não pode exceder 255 caracteres.',
-            'per_page.integer' => 'O número de itens por página deve ser um número inteiro.',
-            'per_page.min' => 'O número mínimo de itens por página é 1.',
-            'per_page.max' => 'O número máximo de itens por página é 100.',
-            'status.in' => 'O status informado é inválido.',
-            'tags.array' => 'As tags devem ser enviadas como um array.',
-            'tags.*.string' => 'Cada tag deve ser uma string.',
-            'tags.*.max' => 'Cada tag não pode exceder 50 caracteres.',
-            'categories.array' => 'As categorias devem ser enviadas como um array.',
-            'categories.*.string' => 'Cada categoria deve ser uma string.',
-            'categories.*.max' => 'Cada categoria não pode exceder 50 caracteres.',
-            'date_from.date' => 'A data inicial deve ser uma data válida.',
-            'date_to.date' => 'A data final deve ser uma data válida.',
-            'date_to.after_or_equal' => 'A data final deve ser igual ou posterior à data inicial.',
+            'q.required' => 'The search term is required.',
+            'q.min' => 'The search term must be at least 2 characters.',
+            'q.max' => 'The search term cannot exceed 255 characters.',
+            'per_page.integer' => 'The number of items per page must be an integer.',
+            'per_page.min' => 'The minimum number of items per page is 1.',
+            'per_page.max' => 'The maximum number of items per page is 100.',
+            'status.in' => 'The provided status is invalid.',
+            'tags.array' => 'Tags must be sent as an array.',
+            'tags.*.string' => 'Each tag must be a string.',
+            'tags.*.max' => 'Each tag cannot exceed 50 characters.',
+            'categories.array' => 'Categories must be sent as an array.',
+            'categories.*.string' => 'Each category must be a string.',
+            'categories.*.max' => 'Each category cannot exceed 50 characters.',
+            'date_from.date' => 'The start date must be a valid date.',
+            'date_to.date' => 'The end date must be a valid date.',
+            'date_to.after_or_equal' => 'The end date must be equal to or after the start date.',
         ];
     }
 

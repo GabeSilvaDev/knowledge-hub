@@ -42,11 +42,11 @@ class StoreCommentRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'article_id.required' => 'O ID do artigo é obrigatório.',
-            'article_id.exists' => 'O artigo especificado não existe.',
-            'content.required' => 'O conteúdo do comentário é obrigatório.',
-            'content.min' => 'O comentário deve ter pelo menos 1 caractere.',
-            'content.max' => 'O comentário não pode ter mais de 5000 caracteres.',
+            'article_id.required' => 'The article ID is required.',
+            'article_id.exists' => 'The specified article does not exist.',
+            'content.required' => 'The comment content is required.',
+            'content.min' => 'The comment must have at least 1 character.',
+            'content.max' => 'The comment cannot exceed 5000 characters.',
         ];
     }
 }

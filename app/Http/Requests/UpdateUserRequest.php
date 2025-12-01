@@ -53,15 +53,15 @@ class UpdateUserRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'name.min' => 'O nome deve ter pelo menos 3 caracteres.',
-            'name.max' => 'O nome não pode ter mais de 255 caracteres.',
-            'username.min' => 'O username deve ter pelo menos 3 caracteres.',
-            'username.max' => 'O username não pode ter mais de 50 caracteres.',
-            'username.regex' => 'O username pode conter apenas letras, números e underscores.',
-            'username.unique' => 'Este username já está em uso.',
-            'bio.max' => 'A bio não pode ter mais de 500 caracteres.',
-            'avatar_url.url' => 'A URL do avatar deve ser válida.',
-            'avatar_url.max' => 'A URL do avatar não pode ter mais de 500 caracteres.',
+            'name.min' => 'The name must be at least 3 characters.',
+            'name.max' => 'The name cannot exceed 255 characters.',
+            'username.min' => 'The username must be at least 3 characters.',
+            'username.max' => 'The username cannot exceed 50 characters.',
+            'username.regex' => 'The username may only contain letters, numbers, and underscores.',
+            'username.unique' => 'This username is already in use.',
+            'bio.max' => 'The bio cannot exceed 500 characters.',
+            'avatar_url.url' => 'The avatar URL must be valid.',
+            'avatar_url.max' => 'The avatar URL cannot exceed 500 characters.',
         ];
     }
 }

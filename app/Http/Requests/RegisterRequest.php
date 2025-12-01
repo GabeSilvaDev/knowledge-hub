@@ -46,21 +46,21 @@ class RegisterRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'name.required' => 'O nome é obrigatório.',
-            'name.min' => 'O nome deve ter no mínimo 3 caracteres.',
-            'name.max' => 'O nome não pode ter mais de 255 caracteres.',
-            'email.required' => 'O email é obrigatório.',
-            'email.email' => 'O email deve ser um endereço válido.',
-            'email.unique' => 'Este email já está em uso.',
-            'username.required' => 'O nome de usuário é obrigatório.',
-            'username.min' => 'O nome de usuário deve ter no mínimo 3 caracteres.',
-            'username.unique' => 'Este nome de usuário já está em uso.',
-            'username.alpha_dash' => 'O nome de usuário pode conter apenas letras, números, hífens e underscores.',
-            'password.required' => 'A senha é obrigatória.',
-            'password.confirmed' => 'A confirmação de senha não confere.',
-            'password.regex' => 'A senha deve conter pelo menos uma letra maiúscula.',
-            'bio.max' => 'A biografia não pode ter mais de 500 caracteres.',
-            'avatar_url.url' => 'A URL do avatar deve ser válida.',
+            'name.required' => 'The name is required.',
+            'name.min' => 'The name must be at least 3 characters.',
+            'name.max' => 'The name cannot exceed 255 characters.',
+            'email.required' => 'The email is required.',
+            'email.email' => 'The email must be a valid address.',
+            'email.unique' => 'This email is already in use.',
+            'username.required' => 'The username is required.',
+            'username.min' => 'The username must be at least 3 characters.',
+            'username.unique' => 'This username is already in use.',
+            'username.alpha_dash' => 'The username may only contain letters, numbers, dashes, and underscores.',
+            'password.required' => 'The password is required.',
+            'password.confirmed' => 'The password confirmation does not match.',
+            'password.regex' => 'The password must contain at least one uppercase letter.',
+            'bio.max' => 'The bio cannot exceed 500 characters.',
+            'avatar_url.url' => 'The avatar URL must be valid.',
         ];
     }
 
@@ -73,12 +73,12 @@ class RegisterRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'name' => 'nome',
+            'name' => 'name',
             'email' => 'email',
-            'username' => 'nome de usuário',
-            'password' => 'senha',
-            'bio' => 'biografia',
-            'avatar_url' => 'URL do avatar',
+            'username' => 'username',
+            'password' => 'password',
+            'bio' => 'bio',
+            'avatar_url' => 'avatar URL',
         ];
     }
 }

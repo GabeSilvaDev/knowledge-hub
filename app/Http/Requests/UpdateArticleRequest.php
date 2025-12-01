@@ -65,15 +65,15 @@ class UpdateArticleRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'title.string' => 'O título do artigo deve ser um texto.',
-            'title.max' => 'O título não pode ter mais de 255 caracteres.',
-            'content.string' => 'O conteúdo do artigo deve ser um texto.',
-            'status.in' => 'O status do artigo é inválido.',
-            'type.in' => 'O tipo do artigo é inválido.',
-            'featured_image.url' => 'A imagem destacada deve ser uma URL válida.',
-            'tags.array' => 'As tags devem ser um array.',
-            'categories.array' => 'As categorias devem ser um array.',
-            'published_at.date' => 'A data de publicação deve ser uma data válida.',
+            'title.string' => 'The article title must be text.',
+            'title.max' => 'The title cannot exceed 255 characters.',
+            'content.string' => 'The article content must be text.',
+            'status.in' => 'The article status is invalid.',
+            'type.in' => 'The article type is invalid.',
+            'featured_image.url' => 'The featured image must be a valid URL.',
+            'tags.array' => 'Tags must be an array.',
+            'categories.array' => 'Categories must be an array.',
+            'published_at.date' => 'The publication date must be a valid date.',
         ];
     }
 }

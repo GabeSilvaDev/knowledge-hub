@@ -9,7 +9,7 @@ use Illuminate\Foundation\Http\FormRequest;
 /**
  * AutocompleteRequest
  *
- * Valida requisições de autocomplete de busca.
+ * Validates autocomplete search requests.
  */
 class AutocompleteRequest extends FormRequest
 {
@@ -43,13 +43,13 @@ class AutocompleteRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'q.required' => 'O termo de busca é obrigatório.',
-            'q.string' => 'O termo de busca deve ser uma string.',
-            'q.min' => 'O termo de busca deve ter pelo menos 2 caracteres.',
-            'q.max' => 'O termo de busca não pode exceder 255 caracteres.',
-            'limit.integer' => 'O limite deve ser um número inteiro.',
-            'limit.min' => 'O limite mínimo é 1.',
-            'limit.max' => 'O limite máximo é 20.',
+            'q.required' => 'The search term is required.',
+            'q.string' => 'The search term must be a string.',
+            'q.min' => 'The search term must be at least 2 characters.',
+            'q.max' => 'The search term cannot exceed 255 characters.',
+            'limit.integer' => 'The limit must be an integer.',
+            'limit.min' => 'The minimum limit is 1.',
+            'limit.max' => 'The maximum limit is 20.',
         ];
     }
 

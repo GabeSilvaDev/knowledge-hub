@@ -60,17 +60,17 @@ class StoreArticleRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'title.required' => 'O título do artigo é obrigatório.',
-            'title.max' => 'O título não pode ter mais de 255 caracteres.',
-            'content.required' => 'O conteúdo do artigo é obrigatório.',
-            'status.required' => 'O status do artigo é obrigatório.',
-            'status.in' => 'O status do artigo é inválido.',
-            'type.required' => 'O tipo do artigo é obrigatório.',
-            'type.in' => 'O tipo do artigo é inválido.',
-            'featured_image.url' => 'A imagem destacada deve ser uma URL válida.',
-            'tags.array' => 'As tags devem ser um array.',
-            'categories.array' => 'As categorias devem ser um array.',
-            'published_at.date' => 'A data de publicação deve ser uma data válida.',
+            'title.required' => 'The article title is required.',
+            'title.max' => 'The title cannot exceed 255 characters.',
+            'content.required' => 'The article content is required.',
+            'status.required' => 'The article status is required.',
+            'status.in' => 'The article status is invalid.',
+            'type.required' => 'The article type is required.',
+            'type.in' => 'The article type is invalid.',
+            'featured_image.url' => 'The featured image must be a valid URL.',
+            'tags.array' => 'Tags must be an array.',
+            'categories.array' => 'Categories must be an array.',
+            'published_at.date' => 'The publication date must be a valid date.',
         ];
     }
 }
