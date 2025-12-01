@@ -97,10 +97,7 @@ class ArticleVersion extends Model
     protected function casts(): array
     {
         return [
-            'tags' => 'array',
-            'categories' => 'array',
             'meta_data' => 'array',
-            'changed_fields' => 'array',
             'view_count' => 'integer',
             'like_count' => 'integer',
             'comment_count' => 'integer',

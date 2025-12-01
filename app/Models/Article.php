@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
+use Laravel\Scout\Searchable;
 use MongoDB\Laravel\Eloquent\Model;
 use MongoDB\Laravel\Eloquent\SoftDeletes;
 
@@ -51,6 +52,7 @@ class Article extends Model
     /** @use HasFactory<ArticleFactory> */
     use HasFactory;
 
+    use Searchable;
     use SoftDeletes;
     use Versionable;
 
@@ -105,8 +107,6 @@ class Article extends Model
     protected function casts(): array
     {
         return [
-            'tags' => 'array',
-            'categories' => 'array',
             'meta_data' => 'array',
             'view_count' => 'integer',
             'like_count' => 'integer',
@@ -166,10 +166,11 @@ class Article extends Model
     public function scopeTags(Builder $query, string|array $tags): Builder
     {
         $tagsArray = is_array($tags) ? $tags : explode(',', $tags);
+        $tagsArray = array_map('trim', $tagsArray);
 
         return $query->where(function (Builder $q) use ($tagsArray): void {
             foreach ($tagsArray as $tag) {
-                $q->orWhere('tags', 'like', '%' . trim($tag) . '%');
+                $q->orWhere('tags', $tag);
             }
         });
     }
@@ -187,11 +188,65 @@ class Article extends Model
     public function scopeCategories(Builder $query, string|array $categories): Builder
     {
         $categoriesArray = is_array($categories) ? $categories : explode(',', $categories);
+        $categoriesArray = array_map('trim', $categoriesArray);
 
         return $query->where(function (Builder $q) use ($categoriesArray): void {
             foreach ($categoriesArray as $category) {
-                $q->orWhere('categories', 'like', '%' . trim($category) . '%');
+                $q->orWhere('categories', $category);
             }
         });
+    }
+
+    /**
+     * Get the indexable data array for the model.
+     *
+     * @return array<string, mixed>
+     */
+    public function toSearchableArray(): array
+    {
+        return [
+            'id' => $this->id,
+            'title' => $this->title,
+            'slug' => $this->slug,
+            'content' => $this->content,
+            'excerpt' => $this->excerpt,
+            'author_id' => $this->author_id,
+            'status' => $this->status,
+            'type' => $this->type,
+            'tags' => $this->tags,
+            'categories' => $this->categories,
+            'published_at' => $this->published_at?->timestamp,
+            'created_at' => $this->created_at?->timestamp,
+        ];
+    }
+
+    /**
+     * Get the value used to index the model.
+     */
+    public function getScoutKey(): string
+    {
+        $id = $this->id;
+
+        if (is_string($id)) {
+            return $id;
+        }
+
+        return '';
+    }
+
+    /**
+     * Get the key name used to index the model.
+     */
+    public function getScoutKeyName(): string
+    {
+        return 'id';
+    }
+
+    /**
+     * Determine if the model should be searchable.
+     */
+    public function shouldBeSearchable(): bool
+    {
+        return ! $this->trashed();
     }
 }
