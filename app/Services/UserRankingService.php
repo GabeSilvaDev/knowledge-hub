@@ -2,11 +2,11 @@
 
 namespace App\Services;
 
+use App\Contracts\ArticleRepositoryInterface;
 use App\Contracts\FollowerRepositoryInterface;
 use App\Contracts\UserRankingServiceInterface;
 use App\Contracts\UserRepositoryInterface;
 use App\DTOs\UserRankingDTO;
-use App\Models\Article;
 use App\Models\User;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Redis;
@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Redis;
  * User Ranking Service.
  *
  * Manages user influence ranking using Redis Sorted Sets.
- * Implements RF-051: Ranking de Usuários Baseado em Influência.
+ * Implements RF-051: Influence-Based User Ranking.
  */
 class UserRankingService implements UserRankingServiceInterface
 {
@@ -39,10 +39,12 @@ class UserRankingService implements UserRankingServiceInterface
      *
      * @param  UserRepositoryInterface  $userRepository  Repository for user data access
      * @param  FollowerRepositoryInterface  $followerRepository  Repository for follower data
+     * @param  ArticleRepositoryInterface  $articleRepository  Repository for article data
      */
     public function __construct(
         private readonly UserRepositoryInterface $userRepository,
         private readonly FollowerRepositoryInterface $followerRepository,
+        private readonly ArticleRepositoryInterface $articleRepository,
     ) {}
 
     /**
@@ -323,21 +325,10 @@ class UserRankingService implements UserRankingServiceInterface
      */
     private function getUserArticleStats(User $user): array
     {
-        $articles = Article::where('author_id', $user->id)
-            ->where('status', 'published')
-            ->get(['view_count', 'like_count', 'comment_count']);
+        /** @var string $userId */
+        $userId = $user->id;
 
-        $articlesCount = $articles->count();
-        $totalViews = (int) $articles->sum('view_count');
-        $totalLikes = (int) $articles->sum('like_count');
-        $totalComments = (int) $articles->sum('comment_count');
-
-        return [
-            'articles_count' => $articlesCount,
-            'total_views' => $totalViews,
-            'total_likes' => $totalLikes,
-            'total_comments' => $totalComments,
-        ];
+        return $this->articleRepository->getPublishedArticleStatsByAuthor($userId);
     }
 
     /**

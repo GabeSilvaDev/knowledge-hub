@@ -4,41 +4,51 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Contracts\ArticleRepositoryInterface;
 use App\Contracts\SearchServiceInterface;
 use App\Enums\ArticleStatus;
 use App\Models\Article;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 /**
- * SearchService
+ * Search Service.
  *
- * Implementa a lógica de busca de artigos usando Laravel Scout e Meilisearch.
+ * Implements article search logic using Laravel Scout and Meilisearch.
  */
 class SearchService implements SearchServiceInterface
 {
     /**
-     * Busca artigos por termo de pesquisa.
+     * Initialize the Search Service.
      *
-     * @param  string  $query  Termo de busca
-     * @param  array<string, mixed>  $filters  Filtros adicionais (author, tags, status, date_from, date_to)
-     * @param  int  $perPage  Número de resultados por página
-     * @return LengthAwarePaginator<int, Article>
+     * @param  ArticleRepositoryInterface  $articleRepository  Repository for article data access
+     */
+    public function __construct(
+        private readonly ArticleRepositoryInterface $articleRepository
+    ) {}
+
+    /**
+     * Search articles by query term.
+     *
+     * @param  string  $query  The search term
+     * @param  array<string, mixed>  $filters  Additional filters (author, tags, status, date_from, date_to)
+     * @param  int  $perPage  Number of results per page
+     * @return LengthAwarePaginator<int, Article> The paginated search results
      */
     public function search(string $query, array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
         $searchQuery = Article::search($query);
 
-        $searchQuery->query(fn ($builder) => $this->applyFilters($builder, $filters));
+        $searchQuery->query(fn($builder) => $this->applyFilters($builder, $filters));
 
         return $searchQuery->paginate($perPage);
     }
 
     /**
-     * Aplica filtros na query de busca.
+     * Apply filters to the search query.
      *
-     * @param  mixed  $builder
-     * @param  array<string, mixed>  $filters
-     * @return mixed
+     * @param  mixed  $builder  The query builder instance
+     * @param  array<string, mixed>  $filters  The filters to apply
+     * @return mixed The query builder with filters applied
      */
     private function applyFilters($builder, array $filters)
     {
@@ -84,11 +94,11 @@ class SearchService implements SearchServiceInterface
     }
 
     /**
-     * Retorna sugestões de autocomplete baseadas no termo.
+     * Get autocomplete suggestions based on the search term.
      *
-     * @param  string  $query  Termo parcial de busca
-     * @param  int  $limit  Limite de sugestões
-     * @return array<int, array{id: string, title: string, slug: string, excerpt: string|null}>
+     * @param  string  $query  The partial search term
+     * @param  int  $limit  The maximum number of suggestions
+     * @return array<int, array{id: string, title: string, slug: string, excerpt: string|null}> The autocomplete suggestions
      */
     public function autocomplete(string $query, int $limit = 10): array
     {
@@ -98,7 +108,7 @@ class SearchService implements SearchServiceInterface
 
         $results = Article::search($query)
             /* @phpstan-ignore method.nonObject */
-            ->query(fn ($builder) => $builder->where('status', ArticleStatus::PUBLISHED->value))
+            ->query(fn($builder) => $builder->where('status', ArticleStatus::PUBLISHED->value))
             ->take($limit)
             ->get();
 
@@ -106,10 +116,10 @@ class SearchService implements SearchServiceInterface
     }
 
     /**
-     * Mapeia uma coleção de artigos para o formato de autocomplete.
+     * Map a collection of articles to the autocomplete format.
      *
-     * @param  \Illuminate\Support\Collection<int, Article>  $articles
-     * @return array<int, array{id: string, title: string, slug: string, excerpt: string|null}>
+     * @param  \Illuminate\Support\Collection<int, Article>  $articles  The articles to map
+     * @return array<int, array{id: string, title: string, slug: string, excerpt: string|null}> The mapped autocomplete data
      */
     public function mapArticlesToAutocomplete($articles): array
     {
@@ -130,9 +140,9 @@ class SearchService implements SearchServiceInterface
     }
 
     /**
-     * Sincroniza todos os artigos com o índice de busca.
+     * Synchronize all articles with the search index.
      *
-     * @return int Número de artigos indexados
+     * @return int The number of indexed articles
      */
     public function syncAll(): int
     {
@@ -144,15 +154,16 @@ class SearchService implements SearchServiceInterface
     }
 
     /**
-     * Remove um artigo do índice de busca.
+     * Remove an article from the search index.
      *
-     * @param  string  $articleId  ID do artigo
+     * @param  string  $articleId  The article ID to remove
+     * @return bool True if removed successfully, false otherwise
      */
     public function removeFromIndex(string $articleId): bool
     {
-        $article = Article::find($articleId);
+        $article = $this->articleRepository->findById($articleId);
 
-        if (! $article) {
+        if (! $article instanceof \App\Models\Article) {
             return false;
         }
 

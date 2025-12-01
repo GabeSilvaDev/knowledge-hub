@@ -207,4 +207,27 @@ class ArticleRepository implements ArticleRepositoryInterface
 
         return $article;
     }
+
+    /**
+     * Get published articles stats by author ID.
+     *
+     * Retrieves aggregated statistics for all published articles by a specific author.
+     *
+     * @param  string  $authorId  The author's user ID
+     * @return array{articles_count: int, total_views: int, total_likes: int, total_comments: int} The article statistics
+     */
+    public function getPublishedArticleStatsByAuthor(string $authorId): array
+    {
+        $articles = Article::query()
+            ->where('author_id', $authorId)
+            ->where('status', 'published')
+            ->get(['view_count', 'like_count', 'comment_count']);
+
+        return [
+            'articles_count' => $articles->count(),
+            'total_views' => (int) $articles->sum('view_count'),
+            'total_likes' => (int) $articles->sum('like_count'),
+            'total_comments' => (int) $articles->sum('comment_count'),
+        ];
+    }
 }

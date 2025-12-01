@@ -116,4 +116,14 @@ interface ArticleRepositoryInterface
      * @return Article The article with loaded relationships
      */
     public function loadRelationships(Article $article, array $relationships): Article;
+
+    /**
+     * Get published articles stats by author ID.
+     *
+     * Retrieves aggregated statistics for all published articles by a specific author.
+     *
+     * @param  string  $authorId  The author's user ID
+     * @return array{articles_count: int, total_views: int, total_likes: int, total_comments: int} The article statistics
+     */
+    public function getPublishedArticleStatsByAuthor(string $authorId): array;
 }
