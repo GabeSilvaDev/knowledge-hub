@@ -7,6 +7,7 @@ use App\Http\Controllers\CommentController;
 use App\Http\Controllers\FeedController;
 use App\Http\Controllers\FollowerController;
 use App\Http\Controllers\LikeController;
+use App\Http\Controllers\RecommendationController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\UserController;
 use App\Http\Middleware\TrackArticleView;
@@ -25,12 +26,16 @@ Route::get('/articles/popular', [ArticleController::class, 'popular']);
 Route::get('/articles/ranking', [ArticleRankingController::class, 'index']);
 Route::get('/articles/ranking/statistics', [ArticleRankingController::class, 'statistics']);
 Route::get('/articles/{article}', [ArticleController::class, 'show'])->middleware(TrackArticleView::class);
+Route::get('/articles/{articleId}/related', [RecommendationController::class, 'related']);
 
 Route::get('/users/{user}', [UserController::class, 'show']);
 Route::get('/users/{user}/followers', [FollowerController::class, 'followers']);
 Route::get('/users/{user}/following', [FollowerController::class, 'following']);
 
 Route::get('/articles/{articleId}/comments', [CommentController::class, 'index']);
+
+Route::get('/recommendations/authors', [RecommendationController::class, 'authors']);
+Route::get('/recommendations/statistics', [RecommendationController::class, 'statistics']);
 
 Route::middleware('auth:sanctum')->group(function (): void {
     Route::post('/logout', [AuthController::class, 'logout']);
@@ -57,4 +62,9 @@ Route::middleware('auth:sanctum')->group(function (): void {
 
     Route::post('/users/{user}/follow', [FollowerController::class, 'toggle'])->middleware('throttle:30,1');
     Route::get('/users/{user}/follow/check', [FollowerController::class, 'check']);
+
+    Route::get('/recommendations/users', [RecommendationController::class, 'users']);
+    Route::get('/recommendations/articles', [RecommendationController::class, 'articles']);
+    Route::get('/recommendations/topics', [RecommendationController::class, 'topics']);
+    Route::post('/recommendations/sync', [RecommendationController::class, 'sync']);
 });
