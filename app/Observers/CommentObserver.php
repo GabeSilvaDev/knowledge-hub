@@ -49,11 +49,8 @@ final readonly class CommentObserver
      */
     private function updateArticleCommentCount(string $articleId): void
     {
+        /** @var Article $article */
         $article = Article::find($articleId);
-
-        if ($article === null) {
-            return;
-        }
 
         $count = Comment::where('article_id', $articleId)->count();
 

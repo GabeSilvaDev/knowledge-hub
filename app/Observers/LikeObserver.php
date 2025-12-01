@@ -33,11 +33,8 @@ final readonly class LikeObserver
      */
     private function updateArticleLikeCount(string $articleId): void
     {
+        /** @var Article $article */
         $article = Article::find($articleId);
-
-        if ($article === null) {
-            return;
-        }
 
         $count = Like::where('article_id', $articleId)->count();
 
