@@ -7,6 +7,7 @@ use App\Http\Controllers\CommentController;
 use App\Http\Controllers\FeedController;
 use App\Http\Controllers\FollowerController;
 use App\Http\Controllers\LikeController;
+use App\Http\Controllers\SearchController;
 use App\Http\Controllers\UserController;
 use App\Http\Middleware\TrackArticleView;
 use Illuminate\Support\Facades\Route;
@@ -16,6 +17,9 @@ Route::post('/login', [AuthController::class, 'login']);
 
 Route::get('/feed', [FeedController::class, 'index']);
 Route::get('/feed/public', [FeedController::class, 'public']);
+
+Route::get('/search', [SearchController::class, 'search']);
+Route::get('/search/autocomplete', [SearchController::class, 'autocomplete']);
 
 Route::get('/articles/popular', [ArticleController::class, 'popular']);
 Route::get('/articles/ranking', [ArticleRankingController::class, 'index']);
@@ -34,7 +38,10 @@ Route::middleware('auth:sanctum')->group(function (): void {
     Route::get('/me', [UserController::class, 'me']);
     Route::put('/me', [UserController::class, 'update']);
 
+    Route::get('/feed/personalized', [FeedController::class, 'personalized']);
+
     Route::post('/articles/ranking/sync', [ArticleRankingController::class, 'sync']);
+    Route::post('/search/sync', [SearchController::class, 'sync']);
     Route::post('/articles', [ArticleController::class, 'store'])->middleware('throttle:10,1');
     Route::put('/articles/{article}', [ArticleController::class, 'update']);
     Route::delete('/articles/{article}', [ArticleController::class, 'destroy']);
