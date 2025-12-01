@@ -5,6 +5,7 @@
 [![MongoDB](https://img.shields.io/badge/MongoDB-6.0-47A248?style=flat-square&logo=mongodb&logoColor=white)](https://mongodb.com)
 [![Redis](https://img.shields.io/badge/Redis-7.0-DC382D?style=flat-square&logo=redis&logoColor=white)](https://redis.io)
 [![Meilisearch](https://img.shields.io/badge/Meilisearch-1.12-FF5CAA?style=flat-square&logo=meilisearch&logoColor=white)](https://meilisearch.com)
+[![Neo4j](https://img.shields.io/badge/Neo4j-5.13-008CC1?style=flat-square&logo=neo4j&logoColor=white)](https://neo4j.com)
 [![Pest](https://img.shields.io/badge/Pest-4.1-8BC34A?style=flat-square&logo=pest&logoColor=white)](https://pestphp.com)
 [![Docker](https://img.shields.io/badge/Docker-Enabled-2496ED?style=flat-square&logo=docker&logoColor=white)](https://docker.com)
 
@@ -28,6 +29,7 @@ Knowledge Hub é uma API robusta desenvolvida com Laravel 12 e MongoDB, projetad
 - 📊 **Comparação de Versões** - Visualize diferenças entre versões
 - 📈 **Ranking em Tempo Real** - Redis Sorted Sets para artigos mais acessados
 - 🔍 **Busca Avançada** - Meilisearch com autocomplete e filtros
+- 🤖 **Recomendações Neo4j** - Grafo de relacionamentos para sugestões inteligentes
 - 🎯 **Rastreamento de Visualizações** - Tracking automático de acessos
 - 🏷️ **Tags e Categorias** - Organização flexível de conteúdo
 - 🎯 **SEO Otimizado** - Metadados completos para otimização
@@ -43,6 +45,7 @@ Knowledge Hub é uma API robusta desenvolvida com Laravel 12 e MongoDB, projetad
 - **PHP 8.4** - Última versão com recursos avançados
 - **MongoDB 6.0** - Banco de dados NoSQL flexível
 - **Redis 7.0** - Cache e ranking em tempo real
+- **Neo4j 5.13** - Banco de dados de grafos para recomendações
 - **Meilisearch 1.12** - Motor de busca full-text
 - **Laravel Sanctum 4.2** - Autenticação API
 - **Laravel Scout 10.x** - Integração de busca
@@ -244,6 +247,19 @@ Motor de busca full-text com Meilisearch para descoberta rápida e precisa de co
 - **Tolerância a Erros** - Typo-tolerance nativo do Meilisearch
 - **Performance Ultra-Rápida** - Respostas em milissegundos
 - **Highlighting** - Destaque de termos encontrados
+
+## 🤖 Sistema de Recomendações
+
+Engine de recomendações inteligente com Neo4j para descoberta de conteúdo e conexões relevantes.
+
+### Recursos Principais
+
+- **Usuários Similares** - Sugestões baseadas em seguidores em comum
+- **Artigos Relacionados** - Recomendações por tags e categorias compartilhadas
+- **Autores Influentes** - Descoberta de criadores de conteúdo populares
+- **Tópicos de Interesse** - Identificação de áreas baseadas em interações
+- **Sincronização Automática** - Observers mantêm Neo4j atualizado em tempo real
+- **Graceful Degradation** - Sistema funciona mesmo se Neo4j estiver indisponível
 
 ## 🗄️ Banco de Dados
 
