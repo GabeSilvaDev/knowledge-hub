@@ -157,7 +157,6 @@ it('syncs from database correctly', function (): void {
         'view_count' => 0,
     ]);
 
-    // Mock repository para retornar apenas published com views > 0
     $this->repository
         ->shouldReceive('getPublishedWithViews')
         ->once()

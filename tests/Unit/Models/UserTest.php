@@ -82,7 +82,6 @@ describe('User Model Configuration', function (): void {
         expect($casts)->toHaveKeys([
             'email_verified_at',
             'password',
-            'roles',
             'created_at',
             'updated_at',
             'last_login_at',

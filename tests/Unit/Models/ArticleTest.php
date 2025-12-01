@@ -217,8 +217,6 @@ describe('Article Model Configuration', function (): void {
     it('has correct cast configuration', function (): void {
         $article = new Article;
         $expectedCasts = [
-            'tags' => 'array',
-            'categories' => 'array',
             'meta_data' => 'array',
             'view_count' => 'integer',
             'like_count' => 'integer',
@@ -629,6 +627,33 @@ describe('Article Model Scopes', function (): void {
             $diffs = $article->compareVersions(1, 99);
 
             expect($diffs)->toBeArray()->toBeEmpty();
+        });
+    });
+
+    describe('Scout Search Methods', function (): void {
+        it('getScoutKey returns string id when id is string', function (): void {
+            $article = Article::factory()->create();
+
+            $scoutKey = $article->getScoutKey();
+
+            expect($scoutKey)->toBeString()
+                ->and($scoutKey)->toBe($article->id);
+        });
+
+        it('getScoutKey returns empty string when id is not string', function (): void {
+            $article = new Article;
+
+            $scoutKey = $article->getScoutKey();
+
+            expect($scoutKey)->toBe('');
+        });
+
+        it('getScoutKeyName returns id', function (): void {
+            $article = new Article;
+
+            $keyName = $article->getScoutKeyName();
+
+            expect($keyName)->toBe('id');
         });
     });
 });
