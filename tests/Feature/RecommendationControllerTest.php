@@ -83,7 +83,7 @@ describe('RecommendationController Feature Tests', function (): void {
 
         it('respects limit parameter', function (): void {
             $this->mockNeo4j->shouldReceive('getUsersWithCommonFollowers')
-                ->withArgs(fn ($userId, $limit): bool => $limit === 5)
+                ->withArgs(fn($userId, $limit): bool => $limit === 5)
                 ->andReturn(collect());
 
             actingAs($this->user);
@@ -140,7 +140,7 @@ describe('RecommendationController Feature Tests', function (): void {
             $response->assertStatus(JsonResponse::HTTP_OK)
                 ->assertJson([
                     'success' => true,
-                    'message' => 'Nenhuma recomendação de artigo disponível no momento.',
+                    'message' => 'No article recommendations available at the moment.',
                     'data' => [
                         'type' => 'articles',
                         'total_count' => 0,
@@ -282,7 +282,7 @@ describe('RecommendationController Feature Tests', function (): void {
             $response->assertStatus(JsonResponse::HTTP_OK)
                 ->assertJson([
                     'success' => true,
-                    'message' => 'Nenhum tópico de interesse identificado ainda.',
+                    'message' => 'No topics of interest identified yet.',
                     'data' => [
                         'type' => 'topics',
                         'total_count' => 0,

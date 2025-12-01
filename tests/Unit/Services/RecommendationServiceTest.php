@@ -1,6 +1,7 @@
 <?php
 
 use App\Contracts\Neo4jRepositoryInterface;
+use App\Contracts\SyncRepositoryInterface;
 use App\DTOs\RecommendationDTO;
 use App\Enums\RecommendationType;
 use App\Models\Article;
@@ -10,7 +11,8 @@ use Illuminate\Support\Facades\Cache;
 
 beforeEach(function (): void {
     $this->mockNeo4j = Mockery::mock(Neo4jRepositoryInterface::class);
-    $this->service = new RecommendationService($this->mockNeo4j);
+    $this->mockSyncRepository = Mockery::mock(SyncRepositoryInterface::class);
+    $this->service = new RecommendationService($this->mockNeo4j, $this->mockSyncRepository);
 });
 
 afterEach(function (): void {
@@ -240,11 +242,88 @@ describe('RecommendationService', function (): void {
                 'status' => 'published',
             ]);
 
+            $this->mockSyncRepository->shouldReceive('getAllUsersForSync')
+                ->andReturn(collect([[
+                    'id' => (string) $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'username' => $user->username,
+                ]])->lazy());
+            $this->mockSyncRepository->shouldReceive('getAllPublishedArticlesForSync')
+                ->andReturn(collect([[
+                    'id' => (string) $article->id,
+                    'author_id' => (string) $user->id,
+                    'title' => $article->title,
+                    'slug' => $article->slug,
+                    'status' => $article->status,
+                    'view_count' => $article->view_count,
+                    'like_count' => $article->like_count,
+                    'tags' => [],
+                    'categories' => [],
+                ]])->lazy());
+            $this->mockSyncRepository->shouldReceive('getAllFollowersForSync')
+                ->andReturn(collect([])->lazy());
+            $this->mockSyncRepository->shouldReceive('getAllLikesForSync')
+                ->andReturn(collect([])->lazy());
+
             $result = $this->service->syncFromDatabase();
 
             expect($result)->toHaveKeys(['users', 'articles', 'follows', 'likes'])
-                ->and($result['users'])->toBeGreaterThanOrEqual(1)
-                ->and($result['articles'])->toBeGreaterThanOrEqual(1);
+                ->and($result['users'])->toBe(1)
+                ->and($result['articles'])->toBe(1);
+        });
+
+        it('syncs all entities including follows and likes', function (): void {
+            $this->mockNeo4j->shouldReceive('isConnected')->andReturn(true);
+            $this->mockNeo4j->shouldReceive('syncUser')->andReturn();
+            $this->mockNeo4j->shouldReceive('syncArticle')->andReturn();
+            $this->mockNeo4j->shouldReceive('syncFollow')->andReturn();
+            $this->mockNeo4j->shouldReceive('syncLike')->andReturn();
+
+            $user = User::factory()->create();
+            $article = Article::factory()->create([
+                'author_id' => $user->id,
+                'status' => 'published',
+            ]);
+
+            $this->mockSyncRepository->shouldReceive('getAllUsersForSync')
+                ->andReturn(collect([[
+                    'id' => (string) $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'username' => $user->username,
+                ]])->lazy());
+            $this->mockSyncRepository->shouldReceive('getAllPublishedArticlesForSync')
+                ->andReturn(collect([[
+                    'id' => (string) $article->id,
+                    'author_id' => (string) $user->id,
+                    'title' => $article->title,
+                    'slug' => $article->slug,
+                    'status' => $article->status,
+                    'view_count' => $article->view_count,
+                    'like_count' => $article->like_count,
+                    'tags' => [],
+                    'categories' => [],
+                ]])->lazy());
+            $this->mockSyncRepository->shouldReceive('getAllFollowersForSync')
+                ->andReturn(collect([
+                    ['follower_id' => 'user1', 'following_id' => 'user2'],
+                    ['follower_id' => 'user3', 'following_id' => 'user4'],
+                ])->lazy());
+            $this->mockSyncRepository->shouldReceive('getAllLikesForSync')
+                ->andReturn(collect([
+                    ['user_id' => 'user1', 'article_id' => 'article1'],
+                    ['user_id' => 'user2', 'article_id' => 'article2'],
+                    ['user_id' => 'user3', 'article_id' => 'article3'],
+                ])->lazy());
+
+            $result = $this->service->syncFromDatabase();
+
+            expect($result)->toHaveKeys(['users', 'articles', 'follows', 'likes'])
+                ->and($result['users'])->toBe(1)
+                ->and($result['articles'])->toBe(1)
+                ->and($result['follows'])->toBe(2)
+                ->and($result['likes'])->toBe(3);
         });
 
         it('returns zeros when Neo4j is unavailable', function (): void {

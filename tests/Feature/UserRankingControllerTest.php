@@ -145,7 +145,7 @@ describe('POST /api/users/ranking/sync', function (): void {
 
         $response->assertStatus(200)
             ->assertJson([
-                'message' => 'Ranking de usuários sincronizado com sucesso.',
+                'message' => 'User ranking synchronized successfully.',
             ]);
 
         /** @var UserRankingServiceInterface $service */
@@ -275,7 +275,7 @@ describe('POST /api/users/{user}/ranking/recalculate', function (): void {
 
         $response->assertStatus(200)
             ->assertJson([
-                'message' => 'Ranking do usuário recalculado com sucesso.',
+                'message' => 'User ranking recalculated successfully.',
             ])
             ->assertJsonStructure([
                 'data' => [

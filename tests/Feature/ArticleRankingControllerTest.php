@@ -157,7 +157,7 @@ describe('POST /api/articles/ranking/sync', function (): void {
 
         $response->assertStatus(200)
             ->assertJson([
-                'message' => 'Ranking sincronizado com sucesso.',
+                'message' => 'Ranking synchronized successfully.',
             ]);
 
         /** @var ArticleRankingServiceInterface $service */

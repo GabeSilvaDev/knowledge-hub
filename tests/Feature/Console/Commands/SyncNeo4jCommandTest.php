@@ -15,8 +15,8 @@ describe('SyncNeo4jCommand', function (): void {
             $this->app->instance(RecommendationServiceInterface::class, $mockService);
 
             artisan('neo4j:sync')
-                ->expectsOutput('Iniciando sincronização com Neo4j...')
-                ->expectsOutput('Neo4j não está disponível. Verifique a conexão.')
+                ->expectsOutput('Starting Neo4j synchronization...')
+                ->expectsOutput('Neo4j is not available. Please check the connection.')
                 ->assertExitCode(1);
         });
 
@@ -47,10 +47,10 @@ describe('SyncNeo4jCommand', function (): void {
             $this->app->instance(RecommendationServiceInterface::class, $mockService);
 
             artisan('neo4j:sync')
-                ->expectsOutput('Iniciando sincronização com Neo4j...')
-                ->expectsOutput('✓ Neo4j conectado com sucesso!')
-                ->expectsOutput('Sincronizando todos os dados...')
-                ->expectsOutput('✓ Sincronização concluída com sucesso!')
+                ->expectsOutput('Starting Neo4j synchronization...')
+                ->expectsOutput('✓ Neo4j connected successfully!')
+                ->expectsOutput('Synchronizing all data...')
+                ->expectsOutput('✓ Synchronization completed successfully!')
                 ->assertExitCode(0);
         });
 
@@ -81,7 +81,7 @@ describe('SyncNeo4jCommand', function (): void {
             $this->app->instance(RecommendationServiceInterface::class, $mockService);
 
             artisan('neo4j:sync', ['--entity' => 'users'])
-                ->expectsOutput('Sincronizando apenas: users')
+                ->expectsOutput('Synchronizing only: users')
                 ->assertExitCode(0);
         });
 
@@ -112,7 +112,7 @@ describe('SyncNeo4jCommand', function (): void {
             $this->app->instance(RecommendationServiceInterface::class, $mockService);
 
             artisan('neo4j:sync')
-                ->expectsOutput('Estatísticas do grafo Neo4j:')
+                ->expectsOutput('Neo4j graph statistics:')
                 ->assertExitCode(0);
         });
 
@@ -143,7 +143,7 @@ describe('SyncNeo4jCommand', function (): void {
             $this->app->instance(RecommendationServiceInterface::class, $mockService);
 
             artisan('neo4j:sync', ['--entity' => ''])
-                ->expectsOutput('Sincronizando todos os dados...')
+                ->expectsOutput('Synchronizing all data...')
                 ->assertExitCode(0);
         });
     });

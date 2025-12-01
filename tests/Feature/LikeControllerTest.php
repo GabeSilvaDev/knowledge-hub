@@ -27,7 +27,7 @@ describe('LikeController Feature Tests', function (): void {
         $response->assertStatus(JsonResponse::HTTP_OK)
             ->assertJson([
                 'success' => true,
-                'message' => 'Artigo curtido com sucesso.',
+                'message' => 'Article liked successfully.',
             ]);
 
         expect(Like::count())->toBe(1);
@@ -46,7 +46,7 @@ describe('LikeController Feature Tests', function (): void {
         $response->assertStatus(JsonResponse::HTTP_OK)
             ->assertJson([
                 'success' => true,
-                'message' => 'Curtida removida com sucesso.',
+                'message' => 'Like removed successfully.',
             ]);
 
         expect(Like::count())->toBe(0);

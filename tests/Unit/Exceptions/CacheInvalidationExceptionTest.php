@@ -14,7 +14,7 @@ describe('CacheInvalidationException', function (): void {
     it('creates exception with default message', function (): void {
         $exception = new CacheInvalidationException('test_key');
 
-        expect($exception->getMessage())->toBe('Falha ao invalidar cache para a chave: test_key')
+        expect($exception->getMessage())->toBe('Failed to invalidate cache for key: test_key')
             ->and($exception->getCacheKey())->toBe('test_key');
     });
 
@@ -33,7 +33,7 @@ describe('CacheInvalidationException', function (): void {
         expect($response)->toBeInstanceOf(JsonResponse::class)
             ->and($response->getStatusCode())->toBe(JsonResponse::HTTP_INTERNAL_SERVER_ERROR)
             ->and($response->getData(true))->toBe([
-                'message' => 'Erro ao limpar cache.',
+                'message' => 'Failed to clear cache.',
                 'error' => 'Cache invalidation failed',
             ]);
     });
@@ -42,7 +42,7 @@ describe('CacheInvalidationException', function (): void {
         $exception = CacheInvalidationException::deletionFailed('popular_articles');
 
         expect($exception)->toBeInstanceOf(CacheInvalidationException::class)
-            ->and($exception->getMessage())->toBe('Falha ao deletar cache com prefixo: popular_articles')
+            ->and($exception->getMessage())->toBe('Failed to delete cache with prefix: popular_articles')
             ->and($exception->getCacheKey())->toBe('popular_articles');
     });
 

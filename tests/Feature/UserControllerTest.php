@@ -90,7 +90,7 @@ describe('UserController Feature Tests', function (): void {
         $response->assertStatus(JsonResponse::HTTP_OK)
             ->assertJson([
                 'success' => true,
-                'message' => 'Perfil atualizado com sucesso.',
+                'message' => 'Profile updated successfully.',
             ]);
     });
 
@@ -102,7 +102,7 @@ describe('UserController Feature Tests', function (): void {
         $response->assertStatus(JsonResponse::HTTP_BAD_REQUEST)
             ->assertJson([
                 'success' => false,
-                'message' => 'Nenhum dado para atualizar.',
+                'message' => 'No data to update.',
             ]);
     });
 

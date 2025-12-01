@@ -70,7 +70,7 @@ describe('CommentController Feature Tests', function (): void {
         $response->assertStatus(JsonResponse::HTTP_OK)
             ->assertJson([
                 'success' => true,
-                'message' => 'Comentário atualizado com sucesso.',
+                'message' => 'Comment updated successfully.',
             ]);
     });
 
@@ -90,7 +90,7 @@ describe('CommentController Feature Tests', function (): void {
         $response->assertStatus(JsonResponse::HTTP_FORBIDDEN)
             ->assertJson([
                 'success' => false,
-                'message' => 'Você não tem permissão para editar este comentário.',
+                'message' => 'You do not have permission to edit this comment.',
             ]);
     });
 
@@ -107,7 +107,7 @@ describe('CommentController Feature Tests', function (): void {
         $response->assertStatus(JsonResponse::HTTP_OK)
             ->assertJson([
                 'success' => true,
-                'message' => 'Comentário excluído com sucesso.',
+                'message' => 'Comment deleted successfully.',
             ]);
     });
 
@@ -125,7 +125,7 @@ describe('CommentController Feature Tests', function (): void {
         $response->assertStatus(JsonResponse::HTTP_FORBIDDEN)
             ->assertJson([
                 'success' => false,
-                'message' => 'Você não tem permissão para excluir este comentário.',
+                'message' => 'You do not have permission to delete this comment.',
             ]);
     });
 });

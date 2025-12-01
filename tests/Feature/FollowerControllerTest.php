@@ -25,7 +25,7 @@ describe('FollowerController Feature Tests', function (): void {
         $response->assertStatus(JsonResponse::HTTP_OK)
             ->assertJson([
                 'success' => true,
-                'message' => 'Usuário seguido com sucesso.',
+                'message' => 'User followed successfully.',
             ]);
 
         expect(Follower::count())->toBe(1);
@@ -44,7 +44,7 @@ describe('FollowerController Feature Tests', function (): void {
         $response->assertStatus(JsonResponse::HTTP_OK)
             ->assertJson([
                 'success' => true,
-                'message' => 'Você deixou de seguir este usuário.',
+                'message' => 'You have unfollowed this user.',
             ]);
 
         expect(Follower::count())->toBe(0);

@@ -22,8 +22,8 @@ describe('users:sync-ranking command', function (): void {
         ]);
 
         artisan('users:sync-ranking')
-            ->expectsOutput('Sincronizando ranking de usuários...')
-            ->expectsOutput('Ranking sincronizado com sucesso!')
+            ->expectsOutput('Synchronizing user ranking...')
+            ->expectsOutput('Ranking synchronized successfully!')
             ->assertSuccessful();
     });
 
@@ -36,8 +36,8 @@ describe('users:sync-ranking command', function (): void {
 
     it('handles empty database', function (): void {
         artisan('users:sync-ranking')
-            ->expectsOutput('Sincronizando ranking de usuários...')
-            ->expectsOutput('Ranking sincronizado com sucesso!')
+            ->expectsOutput('Synchronizing user ranking...')
+            ->expectsOutput('Ranking synchronized successfully!')
             ->assertSuccessful();
     });
 

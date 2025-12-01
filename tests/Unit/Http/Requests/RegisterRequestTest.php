@@ -363,10 +363,10 @@ describe('RegisterRequest Custom Messages', function (): void {
             ->and($messages)->toHaveKey('email.required')
             ->and($messages)->toHaveKey('username.required')
             ->and($messages)->toHaveKey('password.required')
-            ->and($messages['name.required'])->toBe('O nome é obrigatório.')
-            ->and($messages['email.required'])->toBe('O email é obrigatório.')
-            ->and($messages['username.required'])->toBe('O nome de usuário é obrigatório.')
-            ->and($messages['password.required'])->toBe('A senha é obrigatória.');
+            ->and($messages['name.required'])->toBe('The name is required.')
+            ->and($messages['email.required'])->toBe('The email is required.')
+            ->and($messages['username.required'])->toBe('The username is required.')
+            ->and($messages['password.required'])->toBe('The password is required.');
     });
 
     it('custom message is used for name required error', function (): void {
@@ -377,7 +377,7 @@ describe('RegisterRequest Custom Messages', function (): void {
             $request->messages()
         );
 
-        expect($validator->errors()->first('name'))->toBe('O nome é obrigatório.');
+        expect($validator->errors()->first('name'))->toBe('The name is required.');
     });
 
     it('custom message is used for email unique error', function (): void {
@@ -396,7 +396,7 @@ describe('RegisterRequest Custom Messages', function (): void {
             $request->messages()
         );
 
-        expect($validator->errors()->first('email'))->toBe('Este email já está em uso.');
+        expect($validator->errors()->first('email'))->toBe('This email is already in use.');
     });
 
     it('custom message is used for username alpha_dash error', function (): void {
@@ -407,7 +407,7 @@ describe('RegisterRequest Custom Messages', function (): void {
             $request->messages()
         );
 
-        expect($validator->errors()->first('username'))->toBe('O nome de usuário pode conter apenas letras, números, hífens e underscores.');
+        expect($validator->errors()->first('username'))->toBe('The username may only contain letters, numbers, dashes, and underscores.');
     });
 
     it('custom message is used for password confirmed error', function (): void {
@@ -418,7 +418,7 @@ describe('RegisterRequest Custom Messages', function (): void {
             $request->messages()
         );
 
-        expect($validator->errors()->first('password'))->toBe('A confirmação de senha não confere.');
+        expect($validator->errors()->first('password'))->toBe('The password confirmation does not match.');
     });
 });
 
@@ -434,11 +434,11 @@ describe('RegisterRequest Custom Attributes', function (): void {
             ->and($attributes)->toHaveKey('password')
             ->and($attributes)->toHaveKey('bio')
             ->and($attributes)->toHaveKey('avatar_url')
-            ->and($attributes['name'])->toBe('nome')
+            ->and($attributes['name'])->toBe('name')
             ->and($attributes['email'])->toBe('email')
-            ->and($attributes['username'])->toBe('nome de usuário')
-            ->and($attributes['password'])->toBe('senha')
-            ->and($attributes['bio'])->toBe('biografia')
-            ->and($attributes['avatar_url'])->toBe('URL do avatar');
+            ->and($attributes['username'])->toBe('username')
+            ->and($attributes['password'])->toBe('password')
+            ->and($attributes['bio'])->toBe('bio')
+            ->and($attributes['avatar_url'])->toBe('avatar URL');
     });
 });

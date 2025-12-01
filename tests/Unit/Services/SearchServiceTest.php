@@ -1,12 +1,14 @@
 <?php
 
+use App\Contracts\ArticleRepositoryInterface;
 use App\Enums\ArticleStatus;
 use App\Enums\ArticleType;
 use App\Models\Article;
 use App\Services\SearchService;
 
 beforeEach(function (): void {
-    $this->searchService = new SearchService;
+    $this->mockArticleRepository = Mockery::mock(ArticleRepositoryInterface::class);
+    $this->searchService = new SearchService($this->mockArticleRepository);
 });
 
 describe('SearchService', function (): void {
@@ -269,12 +271,20 @@ describe('SearchService', function (): void {
             $article = Article::factory()->create();
             $article->searchable();
 
-            $result = $this->searchService->removeFromIndex($article->id);
+            $this->mockArticleRepository->shouldReceive('findById')
+                ->with((string) $article->id)
+                ->andReturn($article);
+
+            $result = $this->searchService->removeFromIndex((string) $article->id);
 
             expect($result)->toBeTrue();
         });
 
         it('returns false when article not found', function (): void {
+            $this->mockArticleRepository->shouldReceive('findById')
+                ->with('non-existent-id')
+                ->andReturn(null);
+
             $result = $this->searchService->removeFromIndex('non-existent-id');
 
             expect($result)->toBeFalse();

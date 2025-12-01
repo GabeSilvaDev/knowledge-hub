@@ -37,50 +37,50 @@ describe('RecommendationType Enum', function (): void {
 
     describe('label method', function (): void {
         it('returns correct label for users', function (): void {
-            expect(RecommendationType::Users->label())->toBe('Usuários Recomendados');
+            expect(RecommendationType::Users->label())->toBe('Recommended Users');
         });
 
         it('returns correct label for articles', function (): void {
-            expect(RecommendationType::Articles->label())->toBe('Artigos Recomendados');
+            expect(RecommendationType::Articles->label())->toBe('Recommended Articles');
         });
 
         it('returns correct label for authors', function (): void {
-            expect(RecommendationType::Authors->label())->toBe('Autores Sugeridos');
+            expect(RecommendationType::Authors->label())->toBe('Suggested Authors');
         });
 
         it('returns correct label for topics', function (): void {
-            expect(RecommendationType::Topics->label())->toBe('Tópicos de Interesse');
+            expect(RecommendationType::Topics->label())->toBe('Topics of Interest');
         });
 
         it('returns correct label for related articles', function (): void {
-            expect(RecommendationType::RelatedArticles->label())->toBe('Artigos Relacionados');
+            expect(RecommendationType::RelatedArticles->label())->toBe('Related Articles');
         });
     });
 
     describe('description method', function (): void {
         it('returns correct description for users', function (): void {
             expect(RecommendationType::Users->description())
-                ->toBe('Usuários com seguidores em comum');
+                ->toBe('Users with common followers');
         });
 
         it('returns correct description for articles', function (): void {
             expect(RecommendationType::Articles->description())
-                ->toBe('Artigos baseados em seus interesses');
+                ->toBe('Articles based on your interests');
         });
 
         it('returns correct description for authors', function (): void {
             expect(RecommendationType::Authors->description())
-                ->toBe('Autores influentes na plataforma');
+                ->toBe('Influential authors on the platform');
         });
 
         it('returns correct description for topics', function (): void {
             expect(RecommendationType::Topics->description())
-                ->toBe('Tópicos baseados em suas interações');
+                ->toBe('Topics based on your interactions');
         });
 
         it('returns correct description for related articles', function (): void {
             expect(RecommendationType::RelatedArticles->description())
-                ->toBe('Artigos similares por tags e categorias');
+                ->toBe('Similar articles by tags and categories');
         });
     });
 

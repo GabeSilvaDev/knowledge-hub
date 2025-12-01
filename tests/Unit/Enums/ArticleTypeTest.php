@@ -38,16 +38,16 @@ describe('ArticleType Enum', function (): void {
     });
 
     it('throws exception for invalid value', function (): void {
-        expect(fn () => ArticleType::from('invalid'))
+        expect(fn() => ArticleType::from('invalid'))
             ->toThrow(ValueError::class);
     });
 
     it('returns correct labels', function (): void {
-        expect(ArticleType::ARTICLE->label())->toBe('Artigo')
+        expect(ArticleType::ARTICLE->label())->toBe('Article')
             ->and(ArticleType::POST->label())->toBe('Post')
             ->and(ArticleType::WIKI->label())->toBe('Wiki')
             ->and(ArticleType::TUTORIAL->label())->toBe('Tutorial')
-            ->and(ArticleType::NEWS->label())->toBe('Notícia');
+            ->and(ArticleType::NEWS->label())->toBe('News');
     });
 
     it('returns correct icons', function (): void {
@@ -59,7 +59,7 @@ describe('ArticleType Enum', function (): void {
     });
 
     it('can be used in match expressions', function (): void {
-        $getDescription = (fn (ArticleType $type): string => match ($type) {
+        $getDescription = (fn(ArticleType $type): string => match ($type) {
             ArticleType::ARTICLE => 'Long-form content',
             ArticleType::POST => 'Short-form content',
             ArticleType::WIKI => 'Documentation content',
@@ -106,8 +106,8 @@ describe('ArticleType Enum', function (): void {
 
     it('supports filtering by specific types', function (): void {
         $allTypes = ArticleType::cases();
-        $contentTypes = array_filter($allTypes, fn (ArticleType $type): bool => in_array($type, [ArticleType::ARTICLE, ArticleType::POST]));
-        $educationalTypes = array_filter($allTypes, fn (ArticleType $type): bool => in_array($type, [ArticleType::TUTORIAL, ArticleType::WIKI]));
+        $contentTypes = array_filter($allTypes, fn(ArticleType $type): bool => in_array($type, [ArticleType::ARTICLE, ArticleType::POST]));
+        $educationalTypes = array_filter($allTypes, fn(ArticleType $type): bool => in_array($type, [ArticleType::TUTORIAL, ArticleType::WIKI]));
 
         expect($contentTypes)->toHaveCount(2)
             ->and($educationalTypes)->toHaveCount(2)

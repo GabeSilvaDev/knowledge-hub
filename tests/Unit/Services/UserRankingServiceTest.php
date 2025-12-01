@@ -1,5 +1,6 @@
 <?php
 
+use App\Contracts\ArticleRepositoryInterface;
 use App\Contracts\FollowerRepositoryInterface;
 use App\Contracts\UserRepositoryInterface;
 use App\DTOs\UserRankingDTO;
@@ -13,7 +14,8 @@ beforeEach(function (): void {
 
     $this->userRepository = Mockery::mock(UserRepositoryInterface::class);
     $this->followerRepository = Mockery::mock(FollowerRepositoryInterface::class);
-    $this->service = new UserRankingService($this->userRepository, $this->followerRepository);
+    $this->articleRepository = Mockery::mock(ArticleRepositoryInterface::class);
+    $this->service = new UserRankingService($this->userRepository, $this->followerRepository, $this->articleRepository);
 });
 
 it('updates score for user', function (): void {
@@ -149,14 +151,6 @@ it('returns zero statistics for empty ranking', function (): void {
 it('calculates influence score correctly', function (): void {
     $user = User::factory()->create();
 
-    Article::factory()->create([
-        'author_id' => $user->id,
-        'status' => 'published',
-        'view_count' => 100,
-        'like_count' => 10,
-        'comment_count' => 5,
-    ]);
-
     $this->userRepository->shouldReceive('findById')
         ->with((string) $user->id)
         ->andReturn($user);
@@ -164,6 +158,15 @@ it('calculates influence score correctly', function (): void {
     $this->followerRepository->shouldReceive('getFollowerCount')
         ->with((string) $user->id)
         ->andReturn(5);
+
+    $this->articleRepository->shouldReceive('getPublishedArticleStatsByAuthor')
+        ->with((string) $user->id)
+        ->andReturn([
+            'articles_count' => 1,
+            'total_views' => 100,
+            'total_likes' => 10,
+            'total_comments' => 5,
+        ]);
 
     $score = $this->service->calculateInfluenceScore((string) $user->id);
 
@@ -174,6 +177,9 @@ it('returns zero for non-existing user influence', function (): void {
     $this->userRepository->shouldReceive('findById')
         ->with('non-existing')
         ->andReturn(null);
+
+    $this->articleRepository->shouldReceive('getPublishedArticleStatsByAuthor')
+        ->never();
 
     $score = $this->service->calculateInfluenceScore('non-existing');
 
@@ -252,6 +258,15 @@ it('returns empty ranking for non-existing user', function (): void {
     $this->userRepository->shouldReceive('findById')
         ->with('non-existing')
         ->andReturn(null);
+
+    $this->articleRepository->shouldReceive('getPublishedArticleStatsByAuthor')
+        ->with('non-existing')
+        ->andReturn([
+            'articles_count' => 0,
+            'total_views' => 0,
+            'total_likes' => 0,
+            'total_comments' => 0,
+        ]);
 
     $ranking = $this->service->getEnrichedUserRanking('non-existing');
 

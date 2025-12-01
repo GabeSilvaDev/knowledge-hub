@@ -168,9 +168,9 @@ describe('LoginRequest Custom Messages', function (): void {
             ->and($messages)->toHaveKey('email.required')
             ->and($messages)->toHaveKey('email.email')
             ->and($messages)->toHaveKey('password.required')
-            ->and($messages['email.required'])->toBe('O email é obrigatório.')
-            ->and($messages['email.email'])->toBe('O email deve ser um endereço válido.')
-            ->and($messages['password.required'])->toBe('A senha é obrigatória.');
+            ->and($messages['email.required'])->toBe('The email is required.')
+            ->and($messages['email.email'])->toBe('The email must be a valid address.')
+            ->and($messages['password.required'])->toBe('The password is required.');
     });
 
     it('custom message is used for email required error', function (): void {
@@ -181,7 +181,7 @@ describe('LoginRequest Custom Messages', function (): void {
             $request->messages()
         );
 
-        expect($validator->errors()->first('email'))->toBe('O email é obrigatório.');
+        expect($validator->errors()->first('email'))->toBe('The email is required.');
     });
 
     it('custom message is used for email format error', function (): void {
@@ -192,7 +192,7 @@ describe('LoginRequest Custom Messages', function (): void {
             $request->messages()
         );
 
-        expect($validator->errors()->first('email'))->toBe('O email deve ser um endereço válido.');
+        expect($validator->errors()->first('email'))->toBe('The email must be a valid address.');
     });
 
     it('custom message is used for password required error', function (): void {
@@ -203,7 +203,7 @@ describe('LoginRequest Custom Messages', function (): void {
             $request->messages()
         );
 
-        expect($validator->errors()->first('password'))->toBe('A senha é obrigatória.');
+        expect($validator->errors()->first('password'))->toBe('The password is required.');
     });
 });
 
@@ -216,7 +216,7 @@ describe('LoginRequest Custom Attributes', function (): void {
             ->and($attributes)->toHaveKey('email')
             ->and($attributes)->toHaveKey('password')
             ->and($attributes['email'])->toBe('email')
-            ->and($attributes['password'])->toBe('senha');
+            ->and($attributes['password'])->toBe('password');
     });
 });
 

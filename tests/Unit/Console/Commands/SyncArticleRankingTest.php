@@ -24,8 +24,8 @@ describe('SyncArticleRanking Command', function (): void {
 
         artisan('articles:sync-ranking')
             ->assertExitCode(Command::SUCCESS)
-            ->expectsOutput('Sincronizando ranking de artigos...')
-            ->expectsOutput('✓ Ranking sincronizado com sucesso!');
+            ->expectsOutput('Synchronizing article ranking...')
+            ->expectsOutput('✓ Ranking synchronized successfully!');
     });
 
     it('displays statistics table after sync', function (): void {
@@ -45,10 +45,10 @@ describe('SyncArticleRanking Command', function (): void {
 
         artisan('articles:sync-ranking')
             ->assertExitCode(Command::SUCCESS)
-            ->expectsTable(['Métrica', 'Valor'], [
-                ['Total de artigos', 5],
-                ['Total de visualizações', '250'],
-                ['Maior pontuação', '100'],
+            ->expectsTable(['Metric', 'Value'], [
+                ['Total articles', 5],
+                ['Total views', '250'],
+                ['Highest score', '100'],
             ]);
     });
 

@@ -63,7 +63,7 @@ describe('POST /api/articles', function (): void {
 
         $response->assertStatus(Response::HTTP_CREATED)
             ->assertJson([
-                'message' => 'Artigo criado com sucesso.',
+                'message' => 'Article created successfully.',
             ])
             ->assertJsonStructure([
                 'message',
@@ -127,7 +127,7 @@ describe('GET /api/articles/{article}', function (): void {
         getJson(ARTICLES_ENDPOINT . "/{$invalidId}")
             ->assertStatus(JsonResponse::HTTP_NOT_FOUND)
             ->assertJson([
-                'message' => 'O recurso solicitado (Article) não foi encontrado.',
+                'message' => 'The requested resource (Article) was not found.',
                 'error' => 'Resource not found',
             ]);
     });
@@ -152,7 +152,7 @@ describe('PUT /api/articles/{article}', function (): void {
 
         $response->assertStatus(JsonResponse::HTTP_OK)
             ->assertJson([
-                'message' => 'Artigo atualizado com sucesso.',
+                'message' => 'Article updated successfully.',
             ])
             ->assertJsonStructure([
                 'message',
@@ -178,7 +178,7 @@ describe('DELETE /api/articles/{article}', function (): void {
 
         $response->assertStatus(JsonResponse::HTTP_OK)
             ->assertJson([
-                'message' => 'Artigo excluído com sucesso.',
+                'message' => 'Article deleted successfully.',
             ]);
     });
 
@@ -188,7 +188,7 @@ describe('DELETE /api/articles/{article}', function (): void {
         deleteJson(ARTICLES_ENDPOINT . "/{$invalidId}")
             ->assertStatus(JsonResponse::HTTP_NOT_FOUND)
             ->assertJson([
-                'message' => 'O recurso solicitado (Article) não foi encontrado.',
+                'message' => 'The requested resource (Article) was not found.',
                 'error' => 'Resource not found',
             ]);
     });

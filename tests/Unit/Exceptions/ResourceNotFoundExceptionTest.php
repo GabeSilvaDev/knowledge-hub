@@ -3,8 +3,8 @@
 use App\Exceptions\ResourceNotFoundException;
 use Illuminate\Http\JsonResponse;
 
-const ARTICLE_DEFAULT_MESSAGE = 'O recurso solicitado (Article) não foi encontrado.';
-const USER_DEFAULT_MESSAGE = 'O recurso solicitado (User) não foi encontrado.';
+const ARTICLE_DEFAULT_MESSAGE = 'The requested resource (Article) was not found.';
+const USER_DEFAULT_MESSAGE = 'The requested resource (User) was not found.';
 const ERROR_TYPE = 'Resource not found';
 
 describe('ResourceNotFoundException', function (): void {
