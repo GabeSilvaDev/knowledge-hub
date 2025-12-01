@@ -39,18 +39,18 @@ enum ArticleType: string
     /**
      * Get type display name.
      *
-     * Returns a localized, human-readable label for the type.
+     * Returns a human-readable label for the type.
      *
-     * @return string The display label in Portuguese
+     * @return string The display label
      */
     public function label(): string
     {
         return match ($this) {
-            self::ARTICLE => 'Artigo',
+            self::ARTICLE => 'Article',
             self::POST => 'Post',
             self::WIKI => 'Wiki',
             self::TUTORIAL => 'Tutorial',
-            self::NEWS => 'Notícia',
+            self::NEWS => 'News',
         };
     }
 

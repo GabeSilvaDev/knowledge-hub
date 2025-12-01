@@ -37,32 +37,32 @@ enum RecommendationType: string
     /**
      * Get type display name.
      *
-     * @return string The display label in Portuguese
+     * @return string The display label
      */
     public function label(): string
     {
         return match ($this) {
-            self::Users => 'Usuários Recomendados',
-            self::Articles => 'Artigos Recomendados',
-            self::Authors => 'Autores Sugeridos',
-            self::Topics => 'Tópicos de Interesse',
-            self::RelatedArticles => 'Artigos Relacionados',
+            self::Users => 'Recommended Users',
+            self::Articles => 'Recommended Articles',
+            self::Authors => 'Suggested Authors',
+            self::Topics => 'Topics of Interest',
+            self::RelatedArticles => 'Related Articles',
         };
     }
 
     /**
      * Get description for the recommendation type.
      *
-     * @return string The description in Portuguese
+     * @return string The description
      */
     public function description(): string
     {
         return match ($this) {
-            self::Users => 'Usuários com seguidores em comum',
-            self::Articles => 'Artigos baseados em seus interesses',
-            self::Authors => 'Autores influentes na plataforma',
-            self::Topics => 'Tópicos baseados em suas interações',
-            self::RelatedArticles => 'Artigos similares por tags e categorias',
+            self::Users => 'Users with common followers',
+            self::Articles => 'Articles based on your interests',
+            self::Authors => 'Influential authors on the platform',
+            self::Topics => 'Topics based on your interactions',
+            self::RelatedArticles => 'Similar articles by tags and categories',
         };
     }
 }
