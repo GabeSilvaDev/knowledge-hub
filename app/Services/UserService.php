@@ -51,9 +51,7 @@ class UserService
     /**
      * Update user profile.
      *
-     * @param User $user
-     * @param array<string, mixed> $data
-     * @return User
+     * @param  array<string, mixed>  $data
      */
     public function updateUser(User $user, array $data): User
     {
