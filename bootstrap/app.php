@@ -2,6 +2,7 @@
 
 use App\Exceptions\ResourceNotFoundException;
 use App\Http\Middleware\CheckRevokedToken;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -43,6 +44,15 @@ return Application::configure(basePath: dirname(__DIR__))
                     'message' => 'A rota solicitada não foi encontrada.',
                     'error' => 'Route not found',
                 ], JsonResponse::HTTP_NOT_FOUND);
+            }
+        });
+
+        $exceptions->render(function (AuthenticationException $e, $request) {
+            if ($request->expectsJson() || $request->is('api/*')) {
+                return response()->json([
+                    'message' => 'Não autenticado.',
+                    'error' => 'Unauthenticated',
+                ], JsonResponse::HTTP_UNAUTHORIZED);
             }
         });
 
