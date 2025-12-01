@@ -76,21 +76,13 @@ class UserRepository implements UserRepositoryInterface
     /**
      * Update an existing user.
      *
-     * @param User $user
-     * @param array<string, mixed> $data
-     * @return User
+     * @param  array<string, mixed>  $data
      */
     public function update(User $user, array $data): User
     {
         $user->update($data);
 
-        $fresh = $user->fresh();
-
-        if ($fresh === null) {
-            throw new \RuntimeException('Failed to refresh user after update');
-        }
-
-        return $fresh;
+        return $user->fresh() ?? $user;
     }
 
     /**

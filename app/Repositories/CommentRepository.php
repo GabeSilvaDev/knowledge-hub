@@ -5,7 +5,6 @@ namespace App\Repositories;
 use App\Contracts\CommentRepositoryInterface;
 use App\Models\Comment;
 use Illuminate\Database\Eloquent\Collection;
-use RuntimeException;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
@@ -43,13 +42,7 @@ final readonly class CommentRepository implements CommentRepositoryInterface
     {
         $comment->update($data);
 
-        $fresh = $comment->fresh();
-
-        if ($fresh === null) {
-            throw new RuntimeException('Failed to refresh comment after update');
-        }
-
-        return $fresh;
+        return $comment->fresh() ?? $comment;
     }
 
     /**

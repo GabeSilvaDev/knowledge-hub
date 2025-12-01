@@ -22,7 +22,8 @@ final readonly class FeedRepository implements FeedRepositoryInterface
     {
         return Article::where('status', 'published')
             ->with('author:_id,name,username,avatar_url')
-            ->orderByRaw('(view_count * 0.4 + like_count * 0.4 + comment_count * 0.2) DESC')
+            ->orderBy('view_count', 'desc')
+            ->orderBy('like_count', 'desc')
             ->orderBy('published_at', 'desc')
             ->paginate($perPage);
     }
@@ -39,14 +40,13 @@ final readonly class FeedRepository implements FeedRepositoryInterface
             ->with('author:_id,name,username,avatar_url');
 
         if (count($followingIds) > 0) {
-            $query->orderByRaw(
-                'CASE WHEN author_id IN (?) THEN 1000 ELSE 0 END + (view_count * 0.4 + like_count * 0.4 + comment_count * 0.2) DESC',
-                [$followingIds]
-            );
-        } else {
-            $query->orderByRaw('(view_count * 0.4 + like_count * 0.4 + comment_count * 0.2) DESC');
+            $query->whereIn('author_id', $followingIds);
         }
 
-        return $query->orderBy('published_at', 'desc')->paginate($perPage);
+        $query->orderBy('view_count', 'desc')
+            ->orderBy('like_count', 'desc')
+            ->orderBy('published_at', 'desc');
+
+        return $query->paginate($perPage);
     }
 }
