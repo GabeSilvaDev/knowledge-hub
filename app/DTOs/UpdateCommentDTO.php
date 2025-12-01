@@ -18,7 +18,8 @@ final readonly class UpdateCommentDTO
     /**
      * Create a DTO from an array.
      *
-     * @param  array<string, mixed>  $data
+     * @param  array<string, mixed>  $data  The input data array
+     * @return self The created DTO instance
      */
     public static function fromArray(array $data): self
     {

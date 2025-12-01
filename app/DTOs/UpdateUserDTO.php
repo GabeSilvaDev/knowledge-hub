@@ -21,7 +21,8 @@ final readonly class UpdateUserDTO
     /**
      * Create a DTO from an array.
      *
-     * @param  array<string, mixed>  $data
+     * @param  array<string, mixed>  $data  The input data array
+     * @return self The created DTO instance
      */
     public static function fromArray(array $data): self
     {
@@ -50,6 +51,6 @@ final readonly class UpdateUserDTO
             'username' => $this->username,
             'bio' => $this->bio,
             'avatar_url' => $this->avatarUrl,
-        ], fn (?string $value): bool => $value !== null);
+        ], fn(?string $value): bool => $value !== null);
     }
 }
