@@ -10,9 +10,9 @@ use App\Http\Requests\SearchRequest;
 use Illuminate\Http\JsonResponse;
 
 /**
- * SearchController
+ * Search Controller.
  *
- * Gerencia as requisições de busca de artigos.
+ * Handles HTTP requests for article search operations.
  */
 class SearchController extends Controller
 {
@@ -21,7 +21,10 @@ class SearchController extends Controller
     ) {}
 
     /**
-     * Busca artigos por termo de pesquisa com filtros opcionais.
+     * Search articles by query term with optional filters.
+     *
+     * @param  SearchRequest  $request  The validated search request
+     * @return JsonResponse The paginated search results
      */
     public function search(SearchRequest $request): JsonResponse
     {
@@ -51,7 +54,10 @@ class SearchController extends Controller
     }
 
     /**
-     * Retorna sugestões de autocomplete.
+     * Get autocomplete suggestions for a search query.
+     *
+     * @param  AutocompleteRequest  $request  The validated autocomplete request
+     * @return JsonResponse The autocomplete suggestions
      */
     public function autocomplete(AutocompleteRequest $request): JsonResponse
     {
@@ -66,8 +72,11 @@ class SearchController extends Controller
     }
 
     /**
-     * Sincroniza todos os artigos com o índice de busca.
-     * Apenas administradores podem executar.
+     * Synchronize all articles with the search index.
+     *
+     * Only administrators can execute this action.
+     *
+     * @return JsonResponse The synchronization result with count
      */
     public function sync(): JsonResponse
     {

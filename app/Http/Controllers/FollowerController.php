@@ -6,7 +6,6 @@ use App\Contracts\FollowerServiceInterface;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
-use InvalidArgumentException;
 
 /**
  * Follower Controller.
@@ -21,6 +20,9 @@ final class FollowerController extends Controller
 
     /**
      * Toggle follow for a user.
+     *
+     * @param  User  $user  The user to follow/unfollow
+     * @return JsonResponse The follow status and updated counts
      */
     public function toggle(User $user): JsonResponse
     {
@@ -29,27 +31,23 @@ final class FollowerController extends Controller
         /** @var string $targetUserId */
         $targetUserId = $user->id;
 
-        try {
-            $result = $this->followerService->toggleFollow($currentUserId, $targetUserId);
+        $result = $this->followerService->toggleFollow($currentUserId, $targetUserId);
 
-            return response()->json([
-                'success' => true,
-                'message' => $result['following'] ? 'Usuário seguido com sucesso.' : 'Você deixou de seguir este usuário.',
-                'data' => [
-                    'following' => $result['following'],
-                    'counts' => $this->followerService->getCounts($targetUserId),
-                ],
-            ]);
-        } catch (InvalidArgumentException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage(),
-            ], JsonResponse::HTTP_BAD_REQUEST);
-        }
+        return response()->json([
+            'success' => true,
+            'message' => $result['following'] ? 'User followed successfully.' : 'You have unfollowed this user.',
+            'data' => [
+                'following' => $result['following'],
+                'counts' => $this->followerService->getCounts($targetUserId),
+            ],
+        ]);
     }
 
     /**
      * Get followers for a user.
+     *
+     * @param  User  $user  The user to get followers for
+     * @return JsonResponse The list of followers
      */
     public function followers(User $user): JsonResponse
     {
@@ -65,6 +63,9 @@ final class FollowerController extends Controller
 
     /**
      * Get users being followed by a user.
+     *
+     * @param  User  $user  The user to get following list for
+     * @return JsonResponse The list of users being followed
      */
     public function following(User $user): JsonResponse
     {
@@ -80,6 +81,9 @@ final class FollowerController extends Controller
 
     /**
      * Check if current user is following a user.
+     *
+     * @param  User  $user  The user to check follow status for
+     * @return JsonResponse The follow status
      */
     public function check(User $user): JsonResponse
     {

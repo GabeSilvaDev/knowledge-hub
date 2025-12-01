@@ -24,6 +24,9 @@ final class CommentController extends Controller
 
     /**
      * Get all comments for an article.
+     *
+     * @param  string  $articleId  The article ID to get comments for
+     * @return JsonResponse The list of comments
      */
     public function index(string $articleId): JsonResponse
     {
@@ -37,6 +40,9 @@ final class CommentController extends Controller
 
     /**
      * Store a new comment.
+     *
+     * @param  StoreCommentRequest  $request  The validated comment request
+     * @return JsonResponse The created comment with user data
      */
     public function store(StoreCommentRequest $request): JsonResponse
     {
@@ -49,20 +55,24 @@ final class CommentController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Comentário criado com sucesso.',
+            'message' => 'Comment created successfully.',
             'data' => $comment->load('user:_id,name,username,avatar_url'),
         ], JsonResponse::HTTP_CREATED);
     }
 
     /**
      * Update an existing comment.
+     *
+     * @param  UpdateCommentRequest  $request  The validated update request
+     * @param  Comment  $comment  The comment to update
+     * @return JsonResponse The updated comment or forbidden error
      */
     public function update(UpdateCommentRequest $request, Comment $comment): JsonResponse
     {
         if ($comment->user_id !== Auth::id()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Você não tem permissão para editar este comentário.',
+                'message' => 'You do not have permission to edit this comment.',
             ], JsonResponse::HTTP_FORBIDDEN);
         }
 
@@ -71,20 +81,23 @@ final class CommentController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Comentário atualizado com sucesso.',
+            'message' => 'Comment updated successfully.',
             'data' => $updatedComment->load('user:_id,name,username,avatar_url'),
         ], JsonResponse::HTTP_OK);
     }
 
     /**
      * Delete a comment.
+     *
+     * @param  Comment  $comment  The comment to delete
+     * @return JsonResponse The deletion result or forbidden error
      */
     public function destroy(Comment $comment): JsonResponse
     {
         if ($comment->user_id !== Auth::id()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Você não tem permissão para excluir este comentário.',
+                'message' => 'You do not have permission to delete this comment.',
             ], JsonResponse::HTTP_FORBIDDEN);
         }
 
@@ -92,7 +105,7 @@ final class CommentController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Comentário excluído com sucesso.',
+            'message' => 'Comment deleted successfully.',
         ], JsonResponse::HTTP_OK);
     }
 }

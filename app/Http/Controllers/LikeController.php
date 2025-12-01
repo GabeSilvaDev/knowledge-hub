@@ -20,6 +20,9 @@ final class LikeController extends Controller
 
     /**
      * Toggle like on an article.
+     *
+     * @param  Article  $article  The article to like/unlike
+     * @return JsonResponse The like status and updated count
      */
     public function toggle(Article $article): JsonResponse
     {
@@ -35,7 +38,7 @@ final class LikeController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => $result['liked'] ? 'Artigo curtido com sucesso.' : 'Curtida removida com sucesso.',
+            'message' => $result['liked'] ? 'Article liked successfully.' : 'Like removed successfully.',
             'data' => [
                 'liked' => $result['liked'],
                 'like_count' => $likeCount,
@@ -45,6 +48,9 @@ final class LikeController extends Controller
 
     /**
      * Check if user has liked an article.
+     *
+     * @param  Article  $article  The article to check like status for
+     * @return JsonResponse The like status
      */
     public function check(Article $article): JsonResponse
     {

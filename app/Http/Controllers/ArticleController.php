@@ -56,7 +56,7 @@ class ArticleController extends Controller
         $article = $this->articleService->createArticle($dto);
 
         return response()->json([
-            'message' => 'Artigo criado com sucesso.',
+            'message' => 'Article created successfully.',
             'data' => $article,
         ], Response::HTTP_CREATED);
     }
@@ -93,7 +93,7 @@ class ArticleController extends Controller
         $updatedArticle = $this->articleService->updateArticle($article, $data);
 
         return response()->json([
-            'message' => 'Artigo atualizado com sucesso.',
+            'message' => 'Article updated successfully.',
             'data' => $updatedArticle,
         ], JsonResponse::HTTP_OK);
     }
@@ -111,7 +111,7 @@ class ArticleController extends Controller
         $this->articleService->deleteArticle($article);
 
         return response()->json([
-            'message' => 'Artigo excluído com sucesso.',
+            'message' => 'Article deleted successfully.',
         ], JsonResponse::HTTP_OK);
     }
 

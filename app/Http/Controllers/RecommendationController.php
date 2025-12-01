@@ -23,6 +23,9 @@ final class RecommendationController extends Controller
      * Get recommended users for the authenticated user.
      *
      * Returns users with common followers (similar social circles).
+     *
+     * @param  Request  $request  The HTTP request with optional limit parameter
+     * @return JsonResponse The list of recommended users
      */
     public function users(Request $request): JsonResponse
     {
@@ -40,8 +43,8 @@ final class RecommendationController extends Controller
         return response()->json([
             'success' => true,
             'message' => $recommendations->isEmpty()
-                ? 'Nenhuma recomendação de usuário disponível no momento.'
-                : 'Usuários recomendados com base em seguidores em comum.',
+                ? 'No user recommendations available at the moment.'
+                : 'Recommended users based on common followers.',
             'data' => $recommendations->toArray(),
         ]);
     }
@@ -50,6 +53,9 @@ final class RecommendationController extends Controller
      * Get recommended articles for the authenticated user.
      *
      * Returns articles based on tags and categories the user interacts with.
+     *
+     * @param  Request  $request  The HTTP request with optional limit parameter
+     * @return JsonResponse The list of recommended articles
      */
     public function articles(Request $request): JsonResponse
     {
@@ -67,8 +73,8 @@ final class RecommendationController extends Controller
         return response()->json([
             'success' => true,
             'message' => $recommendations->isEmpty()
-                ? 'Nenhuma recomendação de artigo disponível no momento.'
-                : 'Artigos recomendados com base em seus interesses.',
+                ? 'No article recommendations available at the moment.'
+                : 'Recommended articles based on your interests.',
             'data' => $recommendations->toArray(),
         ]);
     }
@@ -77,6 +83,10 @@ final class RecommendationController extends Controller
      * Get related articles for a specific article.
      *
      * Returns articles with similar tags and categories.
+     *
+     * @param  Request  $request  The HTTP request with optional limit parameter
+     * @param  string  $articleId  The article ID to find related articles for
+     * @return JsonResponse The list of related articles
      */
     public function related(Request $request, string $articleId): JsonResponse
     {
@@ -88,8 +98,8 @@ final class RecommendationController extends Controller
         return response()->json([
             'success' => true,
             'message' => $recommendations->isEmpty()
-                ? 'Nenhum artigo relacionado encontrado.'
-                : 'Artigos relacionados por tags e categorias.',
+                ? 'No related articles found.'
+                : 'Related articles by tags and categories.',
             'data' => $recommendations->toArray(),
         ]);
     }
@@ -98,6 +108,9 @@ final class RecommendationController extends Controller
      * Get recommended authors.
      *
      * Returns influential authors based on follower network.
+     *
+     * @param  Request  $request  The HTTP request with optional limit parameter
+     * @return JsonResponse The list of influential authors
      */
     public function authors(Request $request): JsonResponse
     {
@@ -109,8 +122,8 @@ final class RecommendationController extends Controller
         return response()->json([
             'success' => true,
             'message' => $recommendations->isEmpty()
-                ? 'Nenhum autor influente encontrado no momento.'
-                : 'Autores influentes na plataforma.',
+                ? 'No influential authors found at the moment.'
+                : 'Influential authors on the platform.',
             'data' => $recommendations->toArray(),
         ]);
     }
@@ -119,6 +132,9 @@ final class RecommendationController extends Controller
      * Get topics of interest for the authenticated user.
      *
      * Returns topics/tags based on user's likes and interactions.
+     *
+     * @param  Request  $request  The HTTP request with optional limit parameter
+     * @return JsonResponse The list of topics of interest
      */
     public function topics(Request $request): JsonResponse
     {
@@ -136,8 +152,8 @@ final class RecommendationController extends Controller
         return response()->json([
             'success' => true,
             'message' => $recommendations->isEmpty()
-                ? 'Nenhum tópico de interesse identificado ainda.'
-                : 'Tópicos baseados em suas interações.',
+                ? 'No topics of interest identified yet.'
+                : 'Topics based on your interactions.',
             'data' => $recommendations->toArray(),
         ]);
     }
@@ -146,6 +162,8 @@ final class RecommendationController extends Controller
      * Sync data from MongoDB to Neo4j.
      *
      * Admin-only endpoint to synchronize graph data.
+     *
+     * @return JsonResponse The synchronization statistics
      */
     public function sync(): JsonResponse
     {
@@ -153,7 +171,7 @@ final class RecommendationController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Sincronização com Neo4j concluída com sucesso.',
+            'message' => 'Neo4j synchronization completed successfully.',
             'data' => [
                 'synced' => $stats,
                 'neo4j_available' => $this->recommendationService->isAvailable(),
@@ -163,6 +181,8 @@ final class RecommendationController extends Controller
 
     /**
      * Get Neo4j graph statistics.
+     *
+     * @return JsonResponse The graph statistics and availability status
      */
     public function statistics(): JsonResponse
     {
@@ -172,8 +192,8 @@ final class RecommendationController extends Controller
         return response()->json([
             'success' => true,
             'message' => $isAvailable
-                ? 'Estatísticas do grafo de recomendações.'
-                : 'Neo4j não está disponível no momento.',
+                ? 'Recommendation graph statistics.'
+                : 'Neo4j is not available at the moment.',
             'data' => [
                 'neo4j_available' => $isAvailable,
                 'statistics' => $stats,

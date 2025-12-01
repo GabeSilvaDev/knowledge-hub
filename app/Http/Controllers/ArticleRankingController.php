@@ -69,7 +69,7 @@ class ArticleRankingController extends Controller
         $this->rankingService->syncFromDatabase();
 
         return response()->json([
-            'message' => 'Ranking sincronizado com sucesso.',
+            'message' => 'Ranking synchronized successfully.',
         ], JsonResponse::HTTP_OK);
     }
 

@@ -20,7 +20,10 @@ final class FeedController extends Controller
 
     /**
      * Get feed based on authentication status.
+     *
      * Returns public feed for visitors, personalized feed for authenticated users.
+     *
+     * @return JsonResponse The feed articles
      */
     public function index(): JsonResponse
     {
@@ -31,7 +34,7 @@ final class FeedController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Feed público - mostrando artigos mais populares.',
+                'message' => 'Public feed - showing most popular articles.',
                 'data' => $feed,
             ]);
         }
@@ -43,13 +46,15 @@ final class FeedController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Feed personalizado baseado em suas conexões.',
+            'message' => 'Personalized feed based on your connections.',
             'data' => $feed,
         ]);
     }
 
     /**
      * Get public feed explicitly.
+     *
+     * @return JsonResponse The public feed with popular articles
      */
     public function public(): JsonResponse
     {
@@ -63,6 +68,8 @@ final class FeedController extends Controller
 
     /**
      * Get personalized feed for authenticated user.
+     *
+     * @return JsonResponse The personalized feed based on user connections
      */
     public function personalized(): JsonResponse
     {
@@ -76,7 +83,7 @@ final class FeedController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Feed personalizado baseado em suas conexões.',
+            'message' => 'Personalized feed based on your connections.',
             'data' => $feed,
         ]);
     }

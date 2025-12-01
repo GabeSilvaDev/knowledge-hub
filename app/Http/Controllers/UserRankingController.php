@@ -10,7 +10,7 @@ use Illuminate\Http\JsonResponse;
  * User Ranking Controller.
  *
  * Handles HTTP requests for user influence ranking operations.
- * Implements RF-051: Ranking de Usuários Baseado em Influência.
+ * Implements RF-051: Influence-Based User Ranking.
  */
 class UserRankingController extends Controller
 {
@@ -73,7 +73,7 @@ class UserRankingController extends Controller
         $this->rankingService->syncFromDatabase();
 
         return response()->json([
-            'message' => 'Ranking de usuários sincronizado com sucesso.',
+            'message' => 'User ranking synchronized successfully.',
         ], JsonResponse::HTTP_OK);
     }
 
@@ -116,7 +116,7 @@ class UserRankingController extends Controller
         $rankingData = $this->rankingService->getEnrichedUserRanking($userId);
 
         return response()->json([
-            'message' => 'Ranking do usuário recalculado com sucesso.',
+            'message' => 'User ranking recalculated successfully.',
             'data' => $rankingData->toArray(),
         ], JsonResponse::HTTP_OK);
     }

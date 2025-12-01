@@ -26,6 +26,9 @@ final class UserController extends Controller
 
     /**
      * Get user public profile.
+     *
+     * @param  User  $user  The user to get profile for
+     * @return JsonResponse The user profile with articles and follow data
      */
     public function show(User $user): JsonResponse
     {
@@ -75,6 +78,8 @@ final class UserController extends Controller
 
     /**
      * Get current authenticated user profile.
+     *
+     * @return JsonResponse The authenticated user profile with stats
      */
     public function me(): JsonResponse
     {
@@ -98,6 +103,9 @@ final class UserController extends Controller
 
     /**
      * Update current authenticated user profile.
+     *
+     * @param  UpdateUserRequest  $request  The validated update request
+     * @return JsonResponse The updated user data or error
      */
     public function update(UpdateUserRequest $request): JsonResponse
     {
@@ -110,7 +118,7 @@ final class UserController extends Controller
         if ($data === []) {
             return response()->json([
                 'success' => false,
-                'message' => 'Nenhum dado para atualizar.',
+                'message' => 'No data to update.',
             ], JsonResponse::HTTP_BAD_REQUEST);
         }
 
@@ -118,7 +126,7 @@ final class UserController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Perfil atualizado com sucesso.',
+            'message' => 'Profile updated successfully.',
             'data' => $updatedUser,
         ], JsonResponse::HTTP_OK);
     }
