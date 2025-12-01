@@ -55,6 +55,17 @@ interface UserRepositoryInterface
     public function create(CreateUserDTO $dto): User;
 
     /**
+     * Update user data.
+     *
+     * Updates a user with the provided data.
+     *
+     * @param  User  $user  The user to update
+     * @param  array<string, mixed>  $data  The data to update
+     * @return User The updated user instance
+     */
+    public function update(User $user, array $data): User;
+
+    /**
      * Get paginated users.
      *
      * Retrieves a paginated list of all users.
