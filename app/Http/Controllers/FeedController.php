@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Contracts\FeedServiceInterface;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
-use RuntimeException;
 
 /**
  * Feed Controller.
@@ -36,11 +36,8 @@ final class FeedController extends Controller
             ]);
         }
 
+        /** @var string $userId */
         $userId = $user->id;
-
-        if (! is_string($userId)) {
-            throw new RuntimeException('User ID must be a string');
-        }
 
         $feed = $this->feedService->getPersonalizedFeed($userId);
 
@@ -60,6 +57,26 @@ final class FeedController extends Controller
 
         return response()->json([
             'success' => true,
+            'data' => $feed,
+        ]);
+    }
+
+    /**
+     * Get personalized feed for authenticated user.
+     */
+    public function personalized(): JsonResponse
+    {
+        /** @var User $user */
+        $user = Auth::user();
+
+        /** @var string $userId */
+        $userId = $user->id;
+
+        $feed = $this->feedService->getPersonalizedFeed($userId);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Feed personalizado baseado em suas conexões.',
             'data' => $feed,
         ]);
     }

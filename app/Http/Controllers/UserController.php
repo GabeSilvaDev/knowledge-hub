@@ -10,7 +10,6 @@ use App\Http\Requests\UpdateUserRequest;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
-use RuntimeException;
 
 /**
  * User Controller.
@@ -32,10 +31,6 @@ final class UserController extends Controller
     {
         $isAuthenticated = Auth::check();
 
-        if (! is_string($user->id)) {
-            throw new RuntimeException('User ID must be a string');
-        }
-
         $articlesQuery = $this->articleRepository->query()
             ->where('author_id', $user->id)
             ->where('status', 'published');
@@ -46,13 +41,15 @@ final class UserController extends Controller
 
         $articles = $articlesQuery->get();
 
-        $counts = $this->followerService->getCounts($user->id);
+        /** @var string $userId */
+        $userId = $user->id;
+        $counts = $this->followerService->getCounts($userId);
 
         $isFollowing = false;
         $currentUserId = Auth::id();
 
         if ($isAuthenticated && $currentUserId !== null && is_string($currentUserId) && $currentUserId !== $user->id) {
-            $isFollowing = $this->followerService->isFollowing($currentUserId, $user->id);
+            $isFollowing = $this->followerService->isFollowing($currentUserId, $userId);
         }
 
         return response()->json([
@@ -81,20 +78,12 @@ final class UserController extends Controller
      */
     public function me(): JsonResponse
     {
+        /** @var User $user */
         $user = Auth::user();
 
-        if ($user === null) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Usuário não autenticado.',
-            ], JsonResponse::HTTP_UNAUTHORIZED);
-        }
-
-        if (! is_string($user->id)) {
-            throw new RuntimeException('User ID must be a string');
-        }
-
-        $counts = $this->followerService->getCounts($user->id);
+        /** @var string $userId */
+        $userId = $user->id;
+        $counts = $this->followerService->getCounts($userId);
 
         return response()->json([
             'success' => true,
@@ -112,19 +101,13 @@ final class UserController extends Controller
      */
     public function update(UpdateUserRequest $request): JsonResponse
     {
+        /** @var User $user */
         $user = Auth::user();
-
-        if ($user === null) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Usuário não autenticado.',
-            ], JsonResponse::HTTP_UNAUTHORIZED);
-        }
 
         $dto = UpdateUserDTO::fromArray($request->validated());
         $data = $dto->toArray();
 
-        if (empty($data)) {
+        if ($data === []) {
             return response()->json([
                 'success' => false,
                 'message' => 'Nenhum dado para atualizar.',

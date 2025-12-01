@@ -6,7 +6,6 @@ use App\Contracts\LikeServiceInterface;
 use App\Models\Article;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
-use RuntimeException;
 
 /**
  * Like Controller.
@@ -24,37 +23,22 @@ final class LikeController extends Controller
      */
     public function toggle(Article $article): JsonResponse
     {
+        /** @var string $userId */
         $userId = Auth::id();
+        /** @var string $articleId */
+        $articleId = $article->id;
 
-        if ($userId === null) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Usuário não autenticado.',
-            ], JsonResponse::HTTP_UNAUTHORIZED);
-        }
-
-        if (! is_string($userId)) {
-            throw new RuntimeException('User ID must be a string');
-        }
-
-        if (! is_string($article->id)) {
-            throw new RuntimeException('Article ID must be a string');
-        }
-
-        $result = $this->likeService->toggleLike($article->id, $userId);
+        $result = $this->likeService->toggleLike($articleId, $userId);
 
         $freshArticle = $article->fresh();
-
-        if ($freshArticle === null) {
-            throw new RuntimeException('Failed to refresh article');
-        }
+        $likeCount = $freshArticle !== null ? $freshArticle->like_count : 0;
 
         return response()->json([
             'success' => true,
             'message' => $result['liked'] ? 'Artigo curtido com sucesso.' : 'Curtida removida com sucesso.',
             'data' => [
                 'liked' => $result['liked'],
-                'like_count' => $freshArticle->like_count,
+                'like_count' => $likeCount,
             ],
         ], JsonResponse::HTTP_OK);
     }
@@ -64,24 +48,12 @@ final class LikeController extends Controller
      */
     public function check(Article $article): JsonResponse
     {
+        /** @var string $userId */
         $userId = Auth::id();
+        /** @var string $articleId */
+        $articleId = $article->id;
 
-        if ($userId === null) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Usuário não autenticado.',
-            ], JsonResponse::HTTP_UNAUTHORIZED);
-        }
-
-        if (! is_string($userId)) {
-            throw new RuntimeException('User ID must be a string');
-        }
-
-        if (! is_string($article->id)) {
-            throw new RuntimeException('Article ID must be a string');
-        }
-
-        $hasLiked = $this->likeService->hasUserLiked($article->id, $userId);
+        $hasLiked = $this->likeService->hasUserLiked($articleId, $userId);
 
         return response()->json([
             'success' => true,
