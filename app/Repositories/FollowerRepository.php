@@ -16,7 +16,9 @@ final readonly class FollowerRepository implements FollowerRepositoryInterface
     /**
      * Toggle a follow relationship.
      *
-     * @return array{following: bool, follower: Follower|null}
+     * @param  string  $followerId  The ID of the user who is following
+     * @param  string  $followingId  The ID of the user being followed
+     * @return array{following: bool, follower: Follower|null} The follow status and follower model
      */
     public function toggle(string $followerId, string $followingId): array
     {
@@ -40,6 +42,10 @@ final readonly class FollowerRepository implements FollowerRepositoryInterface
 
     /**
      * Check if a user is following another user.
+     *
+     * @param  string  $followerId  The ID of the user who is following
+     * @param  string  $followingId  The ID of the user being followed
+     * @return bool True if following, false otherwise
      */
     public function isFollowing(string $followerId, string $followingId): bool
     {
@@ -51,7 +57,8 @@ final readonly class FollowerRepository implements FollowerRepositoryInterface
     /**
      * Get all followers for a user.
      *
-     * @return Collection<int, Follower>
+     * @param  string  $userId  The user ID to get followers for
+     * @return Collection<int, Follower> The collection of followers
      */
     public function getFollowers(string $userId): Collection
     {
@@ -64,7 +71,8 @@ final readonly class FollowerRepository implements FollowerRepositoryInterface
     /**
      * Get all users a user is following.
      *
-     * @return Collection<int, Follower>
+     * @param  string  $userId  The user ID to get following list for
+     * @return Collection<int, Follower> The collection of users being followed
      */
     public function getFollowing(string $userId): Collection
     {
@@ -76,6 +84,9 @@ final readonly class FollowerRepository implements FollowerRepositoryInterface
 
     /**
      * Get follower count for a user.
+     *
+     * @param  string  $userId  The user ID to get follower count for
+     * @return int The number of followers
      */
     public function getFollowerCount(string $userId): int
     {
@@ -84,6 +95,9 @@ final readonly class FollowerRepository implements FollowerRepositoryInterface
 
     /**
      * Get following count for a user.
+     *
+     * @param  string  $userId  The user ID to get following count for
+     * @return int The number of users being followed
      */
     public function getFollowingCount(string $userId): int
     {

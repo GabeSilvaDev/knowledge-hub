@@ -20,7 +20,9 @@ final readonly class LikeService implements LikeServiceInterface
     /**
      * Toggle a like for a user on an article.
      *
-     * @return array{liked: bool, like: Like|null}
+     * @param  string  $articleId  The article ID to toggle like on
+     * @param  string  $userId  The user ID who is liking/unliking
+     * @return array{liked: bool, like: Like|null} The like status and like model
      */
     public function toggleLike(string $articleId, string $userId): array
     {
@@ -29,6 +31,10 @@ final readonly class LikeService implements LikeServiceInterface
 
     /**
      * Check if a user has liked an article.
+     *
+     * @param  string  $articleId  The article ID to check
+     * @param  string  $userId  The user ID to check
+     * @return bool True if the user has liked the article
      */
     public function hasUserLiked(string $articleId, string $userId): bool
     {

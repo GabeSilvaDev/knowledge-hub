@@ -9,7 +9,7 @@ use Illuminate\Support\Collection;
  * User ranking service contract.
  *
  * Defines the interface for user influence tracking and ranking operations using Redis.
- * Implements RF-051: Ranking de Usuários Baseado em Influência.
+ * Implements RF-051: Influence-Based User Ranking.
  */
 interface UserRankingServiceInterface
 {

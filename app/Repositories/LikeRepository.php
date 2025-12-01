@@ -15,7 +15,9 @@ final readonly class LikeRepository implements LikeRepositoryInterface
     /**
      * Toggle a like for a user on an article.
      *
-     * @return array{liked: bool, like: Like|null}
+     * @param  string  $articleId  The article ID to toggle like on
+     * @param  string  $userId  The user ID who is liking/unliking
+     * @return array{liked: bool, like: Like|null} The like status and like model
      */
     public function toggle(string $articleId, string $userId): array
     {
@@ -37,6 +39,10 @@ final readonly class LikeRepository implements LikeRepositoryInterface
 
     /**
      * Check if a user has liked an article.
+     *
+     * @param  string  $articleId  The article ID to check
+     * @param  string  $userId  The user ID to check
+     * @return bool True if the user has liked the article
      */
     public function hasLiked(string $articleId, string $userId): bool
     {
@@ -47,6 +53,9 @@ final readonly class LikeRepository implements LikeRepositoryInterface
 
     /**
      * Get like count for an article.
+     *
+     * @param  string  $articleId  The article ID to get like count for
+     * @return int The number of likes
      */
     public function getCountByArticle(string $articleId): int
     {
@@ -55,6 +64,10 @@ final readonly class LikeRepository implements LikeRepositoryInterface
 
     /**
      * Find a like by article and user.
+     *
+     * @param  string  $articleId  The article ID
+     * @param  string  $userId  The user ID
+     * @return Like|null The found like or null
      */
     public function findByArticleAndUser(string $articleId, string $userId): ?Like
     {

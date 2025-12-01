@@ -18,7 +18,8 @@ final readonly class CommentRepository implements CommentRepositoryInterface
     /**
      * Create a new comment.
      *
-     * @param  array<string, mixed>  $data
+     * @param  array<string, mixed>  $data  The comment data
+     * @return Comment The created comment
      */
     public function create(array $data): Comment
     {
@@ -27,6 +28,9 @@ final readonly class CommentRepository implements CommentRepositoryInterface
 
     /**
      * Find a comment by ID.
+     *
+     * @param  string  $id  The comment ID
+     * @return Comment|null The found comment or null
      */
     public function findById(string $id): ?Comment
     {
@@ -36,7 +40,9 @@ final readonly class CommentRepository implements CommentRepositoryInterface
     /**
      * Update a comment.
      *
-     * @param  array<string, mixed>  $data
+     * @param  Comment  $comment  The comment to update
+     * @param  array<string, mixed>  $data  The update data
+     * @return Comment The updated comment
      */
     public function update(Comment $comment, array $data): Comment
     {
@@ -47,6 +53,9 @@ final readonly class CommentRepository implements CommentRepositoryInterface
 
     /**
      * Delete a comment.
+     *
+     * @param  Comment  $comment  The comment to delete
+     * @return bool True if deleted successfully
      */
     public function delete(Comment $comment): bool
     {
@@ -58,7 +67,8 @@ final readonly class CommentRepository implements CommentRepositoryInterface
     /**
      * Get all comments for an article.
      *
-     * @return Collection<int, Comment>
+     * @param  string  $articleId  The article ID to get comments for
+     * @return Collection<int, Comment> The collection of comments
      */
     public function getByArticleId(string $articleId): Collection
     {

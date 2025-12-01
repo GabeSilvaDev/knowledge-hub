@@ -16,7 +16,8 @@ final readonly class FeedRepository implements FeedRepositoryInterface
     /**
      * Get popular articles for public feed.
      *
-     * @return LengthAwarePaginator<int, Article>
+     * @param  int  $perPage  The number of articles per page
+     * @return LengthAwarePaginator<int, Article> The paginated articles
      */
     public function getPopularArticles(int $perPage = 15): LengthAwarePaginator
     {
@@ -31,8 +32,9 @@ final readonly class FeedRepository implements FeedRepositoryInterface
     /**
      * Get personalized articles based on following and popularity.
      *
-     * @param  array<int, string>  $followingIds
-     * @return LengthAwarePaginator<int, Article>
+     * @param  array<int, string>  $followingIds  The IDs of users being followed
+     * @param  int  $perPage  The number of articles per page
+     * @return LengthAwarePaginator<int, Article> The paginated articles
      */
     public function getPersonalizedArticles(array $followingIds, int $perPage = 15): LengthAwarePaginator
     {

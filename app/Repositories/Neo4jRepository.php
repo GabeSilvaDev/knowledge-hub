@@ -26,7 +26,9 @@ class Neo4jRepository implements Neo4jRepositoryInterface
     /**
      * Extract a string value from a Neo4j CypherMap.
      *
-     * @param  CypherMap<mixed>  $record
+     * @param  CypherMap<mixed>  $record  The Neo4j record
+     * @param  string  $key  The key to extract
+     * @return string The extracted string value
      */
     private function getString(CypherMap $record, string $key): string
     {
@@ -39,7 +41,9 @@ class Neo4jRepository implements Neo4jRepositoryInterface
     /**
      * Extract an integer value from a Neo4j CypherMap.
      *
-     * @param  CypherMap<mixed>  $record
+     * @param  CypherMap<mixed>  $record  The Neo4j record
+     * @param  string  $key  The key to extract
+     * @return int The extracted integer value
      */
     private function getInt(CypherMap $record, string $key): int
     {
@@ -51,6 +55,8 @@ class Neo4jRepository implements Neo4jRepositoryInterface
 
     /**
      * Get the Neo4j client instance.
+     *
+     * @return ClientInterface The Neo4j client
      */
     protected function getClient(): ClientInterface
     {
@@ -77,6 +83,8 @@ class Neo4jRepository implements Neo4jRepositoryInterface
 
     /**
      * Check if Neo4j is connected.
+     *
+     * @return bool True if connected, false otherwise
      */
     public function isConnected(): bool
     {
@@ -95,7 +103,7 @@ class Neo4jRepository implements Neo4jRepositoryInterface
     /**
      * Sync a user node to Neo4j.
      *
-     * @param  array<string, mixed>  $userData
+     * @param  array<string, mixed>  $userData  The user data to sync
      */
     public function syncUser(array $userData): void
     {
@@ -129,6 +137,8 @@ class Neo4jRepository implements Neo4jRepositoryInterface
 
     /**
      * Delete a user node from Neo4j.
+     *
+     * @param  string  $userId  The user ID to delete
      */
     public function deleteUser(string $userId): void
     {
@@ -145,7 +155,7 @@ class Neo4jRepository implements Neo4jRepositoryInterface
     /**
      * Sync an article node to Neo4j.
      *
-     * @param  array<string, mixed>  $articleData
+     * @param  array<string, mixed>  $articleData  The article data to sync
      */
     public function syncArticle(array $articleData): void
     {
@@ -216,7 +226,8 @@ class Neo4jRepository implements Neo4jRepositoryInterface
     /**
      * Sync article tags.
      *
-     * @param  array<string>  $tags
+     * @param  string  $articleId  The article ID
+     * @param  array<string>  $tags  The tags to sync
      */
     private function syncArticleTags(string $articleId, array $tags): void
     {
@@ -241,7 +252,8 @@ class Neo4jRepository implements Neo4jRepositoryInterface
     /**
      * Sync article categories.
      *
-     * @param  array<string>  $categories
+     * @param  string  $articleId  The article ID
+     * @param  array<string>  $categories  The categories to sync
      */
     private function syncArticleCategories(string $articleId, array $categories): void
     {
@@ -265,6 +277,8 @@ class Neo4jRepository implements Neo4jRepositoryInterface
 
     /**
      * Delete an article node from Neo4j.
+     *
+     * @param  string  $articleId  The article ID to delete
      */
     public function deleteArticle(string $articleId): void
     {
@@ -280,6 +294,9 @@ class Neo4jRepository implements Neo4jRepositoryInterface
 
     /**
      * Sync a follow relationship.
+     *
+     * @param  string  $followerId  The ID of the user who is following
+     * @param  string  $followingId  The ID of the user being followed
      */
     public function syncFollow(string $followerId, string $followingId): void
     {
@@ -300,6 +317,9 @@ class Neo4jRepository implements Neo4jRepositoryInterface
 
     /**
      * Delete a follow relationship.
+     *
+     * @param  string  $followerId  The ID of the user who is following
+     * @param  string  $followingId  The ID of the user being followed
      */
     public function deleteFollow(string $followerId, string $followingId): void
     {
@@ -319,6 +339,9 @@ class Neo4jRepository implements Neo4jRepositoryInterface
 
     /**
      * Sync a like relationship.
+     *
+     * @param  string  $userId  The user ID
+     * @param  string  $articleId  The article ID
      */
     public function syncLike(string $userId, string $articleId): void
     {
@@ -339,6 +362,9 @@ class Neo4jRepository implements Neo4jRepositoryInterface
 
     /**
      * Delete a like relationship.
+     *
+     * @param  string  $userId  The user ID
+     * @param  string  $articleId  The article ID
      */
     public function deleteLike(string $userId, string $articleId): void
     {
@@ -359,7 +385,9 @@ class Neo4jRepository implements Neo4jRepositoryInterface
     /**
      * Get users with common followers.
      *
-     * @return Collection<int, array<string, mixed>>
+     * @param  string  $userId  The user ID to find recommendations for
+     * @param  int  $limit  The maximum number of results
+     * @return Collection<int, array<string, mixed>> The collection of recommended users
      */
     public function getUsersWithCommonFollowers(string $userId, int $limit): Collection
     {
@@ -409,7 +437,9 @@ class Neo4jRepository implements Neo4jRepositoryInterface
     /**
      * Get articles related by tags.
      *
-     * @return Collection<int, array<string, mixed>>
+     * @param  string  $articleId  The article ID to find related articles for
+     * @param  int  $limit  The maximum number of results
+     * @return Collection<int, array<string, mixed>> The collection of related articles
      */
     public function getRelatedArticlesByTags(string $articleId, int $limit): Collection
     {
@@ -460,7 +490,9 @@ class Neo4jRepository implements Neo4jRepositoryInterface
     /**
      * Get influential authors.
      *
-     * @return Collection<int, array<string, mixed>>
+     * @param  int  $minFollowers  The minimum number of followers required
+     * @param  int  $limit  The maximum number of results
+     * @return Collection<int, array<string, mixed>> The collection of influential authors
      */
     public function getInfluentialAuthors(int $minFollowers, int $limit): Collection
     {
@@ -508,7 +540,9 @@ class Neo4jRepository implements Neo4jRepositoryInterface
     /**
      * Get topics of interest for a user.
      *
-     * @return Collection<int, array<string, mixed>>
+     * @param  string  $userId  The user ID to get topics for
+     * @param  int  $limit  The maximum number of results
+     * @return Collection<int, array<string, mixed>> The collection of topics
      */
     public function getTopicsOfInterest(string $userId, int $limit): Collection
     {
@@ -563,7 +597,9 @@ class Neo4jRepository implements Neo4jRepositoryInterface
     /**
      * Get recommended articles for a user.
      *
-     * @return Collection<int, array<string, mixed>>
+     * @param  string  $userId  The user ID to get recommendations for
+     * @param  int  $limit  The maximum number of results
+     * @return Collection<int, array<string, mixed>> The collection of recommended articles
      */
     public function getRecommendedArticlesForUser(string $userId, int $limit): Collection
     {

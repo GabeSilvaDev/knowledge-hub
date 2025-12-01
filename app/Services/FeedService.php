@@ -21,9 +21,11 @@ final readonly class FeedService implements FeedServiceInterface
 
     /**
      * Get public feed (for visitors).
+     *
      * Returns most popular articles based on views, likes, and comments.
      *
-     * @return LengthAwarePaginator<int, \App\Models\Article>
+     * @param  int  $perPage  The number of articles per page
+     * @return LengthAwarePaginator<int, \App\Models\Article> The paginated articles
      */
     public function getPublicFeed(int $perPage = 15): LengthAwarePaginator
     {
@@ -32,12 +34,15 @@ final readonly class FeedService implements FeedServiceInterface
 
     /**
      * Get personalized feed for authenticated users.
+     *
      * Prioritizes:
      * 1. Articles from followed users
      * 2. Popular articles from tags the user interacts with
      * 3. General popular articles
      *
-     * @return LengthAwarePaginator<int, \App\Models\Article>
+     * @param  string  $userId  The authenticated user ID
+     * @param  int  $perPage  The number of articles per page
+     * @return LengthAwarePaginator<int, \App\Models\Article> The paginated articles
      */
     public function getPersonalizedFeed(string $userId, int $perPage = 15): LengthAwarePaginator
     {

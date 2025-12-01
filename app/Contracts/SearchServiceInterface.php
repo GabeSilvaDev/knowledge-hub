@@ -8,50 +8,51 @@ use App\Models\Article;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 /**
- * Interface SearchServiceInterface
+ * Interface SearchServiceInterface.
  *
- * Define o contrato para serviços de busca de artigos.
+ * Defines the contract for article search services.
  */
 interface SearchServiceInterface
 {
     /**
-     * Busca artigos por termo de pesquisa.
+     * Search articles by query term.
      *
-     * @param  string  $query  Termo de busca
-     * @param  array<string, mixed>  $filters  Filtros adicionais (autor, tags, status, datas)
-     * @param  int  $perPage  Número de resultados por página
-     * @return LengthAwarePaginator<int, Article>
+     * @param  string  $query  The search term
+     * @param  array<string, mixed>  $filters  Additional filters (author, tags, status, dates)
+     * @param  int  $perPage  Number of results per page
+     * @return LengthAwarePaginator<int, Article> The paginated search results
      */
     public function search(string $query, array $filters = [], int $perPage = 15): LengthAwarePaginator;
 
     /**
-     * Retorna sugestões de autocomplete baseadas no termo.
+     * Get autocomplete suggestions based on the search term.
      *
-     * @param  string  $query  Termo parcial de busca
-     * @param  int  $limit  Limite de sugestões
-     * @return array<int, array{id: string, title: string, slug: string, excerpt: string|null}>
+     * @param  string  $query  The partial search term
+     * @param  int  $limit  The maximum number of suggestions
+     * @return array<int, array{id: string, title: string, slug: string, excerpt: string|null}> The autocomplete suggestions
      */
     public function autocomplete(string $query, int $limit = 10): array;
 
     /**
-     * Mapeia uma coleção de artigos para o formato de autocomplete.
+     * Map a collection of articles to the autocomplete format.
      *
-     * @param  \Illuminate\Support\Collection<int, \App\Models\Article>  $articles
-     * @return array<int, array{id: string, title: string, slug: string, excerpt: string|null}>
+     * @param  \Illuminate\Support\Collection<int, \App\Models\Article>  $articles  The articles to map
+     * @return array<int, array{id: string, title: string, slug: string, excerpt: string|null}> The mapped autocomplete data
      */
     public function mapArticlesToAutocomplete($articles): array;
 
     /**
-     * Sincroniza todos os artigos com o índice de busca.
+     * Synchronize all articles with the search index.
      *
-     * @return int Número de artigos indexados
+     * @return int The number of indexed articles
      */
     public function syncAll(): int;
 
     /**
-     * Remove um artigo do índice de busca.
+     * Remove an article from the search index.
      *
-     * @param  string  $articleId  ID do artigo
+     * @param  string  $articleId  The article ID to remove
+     * @return bool True if removed successfully
      */
     public function removeFromIndex(string $articleId): bool;
 }
