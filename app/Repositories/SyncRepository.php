@@ -25,7 +25,7 @@ final readonly class SyncRepository implements SyncRepositoryInterface
      */
     public function getAllUsersForSync(): LazyCollection
     {
-        return User::query()->cursor()->map(fn(User $user): array => [
+        return User::query()->cursor()->map(fn (User $user): array => [
             'id' => (string) $user->id,
             'name' => $user->name,
             'email' => $user->email,
@@ -43,7 +43,7 @@ final readonly class SyncRepository implements SyncRepositoryInterface
         return Article::query()
             ->where('status', 'published')
             ->cursor()
-            ->map(fn(Article $article): array => [
+            ->map(fn (Article $article): array => [
                 'id' => (string) $article->id,
                 'title' => $article->title,
                 'slug' => $article->slug,
@@ -63,7 +63,7 @@ final readonly class SyncRepository implements SyncRepositoryInterface
      */
     public function getAllFollowersForSync(): LazyCollection
     {
-        return Follower::query()->cursor()->map(fn(Follower $follower): array => [
+        return Follower::query()->cursor()->map(fn (Follower $follower): array => [
             'follower_id' => (string) $follower->follower_id,
             'following_id' => (string) $follower->following_id,
         ]);
@@ -76,7 +76,7 @@ final readonly class SyncRepository implements SyncRepositoryInterface
      */
     public function getAllLikesForSync(): LazyCollection
     {
-        return Like::query()->cursor()->map(fn(Like $like): array => [
+        return Like::query()->cursor()->map(fn (Like $like): array => [
             'user_id' => (string) $like->user_id,
             'article_id' => (string) $like->article_id,
         ]);

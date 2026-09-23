@@ -38,7 +38,7 @@ class SearchService implements SearchServiceInterface
     {
         $searchQuery = Article::search($query);
 
-        $searchQuery->query(fn($builder) => $this->applyFilters($builder, $filters));
+        $searchQuery->query(fn ($builder) => $this->applyFilters($builder, $filters));
 
         return $searchQuery->paginate($perPage);
     }
@@ -108,7 +108,7 @@ class SearchService implements SearchServiceInterface
 
         $results = Article::search($query)
             /* @phpstan-ignore method.nonObject */
-            ->query(fn($builder) => $builder->where('status', ArticleStatus::PUBLISHED->value))
+            ->query(fn ($builder) => $builder->where('status', ArticleStatus::PUBLISHED->value))
             ->take($limit)
             ->get();
 
