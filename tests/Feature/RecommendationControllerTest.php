@@ -83,7 +83,7 @@ describe('RecommendationController Feature Tests', function (): void {
 
         it('respects limit parameter', function (): void {
             $this->mockNeo4j->shouldReceive('getUsersWithCommonFollowers')
-                ->withArgs(fn($userId, $limit): bool => $limit === 5)
+                ->withArgs(fn ($userId, $limit): bool => $limit === 5)
                 ->andReturn(collect());
 
             actingAs($this->user);

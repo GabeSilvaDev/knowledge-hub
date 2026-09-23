@@ -51,6 +51,6 @@ final readonly class UpdateUserDTO
             'username' => $this->username,
             'bio' => $this->bio,
             'avatar_url' => $this->avatarUrl,
-        ], fn(?string $value): bool => $value !== null);
+        ], fn (?string $value): bool => $value !== null);
     }
 }
