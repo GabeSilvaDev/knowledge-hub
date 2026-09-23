@@ -12,7 +12,8 @@
 [![Redis](https://img.shields.io/badge/Redis-7-DC382D?logo=redis&logoColor=white)](https://redis.io)
 [![Meilisearch](https://img.shields.io/badge/Meilisearch-1.12-FF5CAA?logo=meilisearch&logoColor=white)](https://meilisearch.com)
 [![Neo4j](https://img.shields.io/badge/Neo4j-5.26-008CC1?logo=neo4j&logoColor=white)](https://neo4j.com)
-[![Pest](https://img.shields.io/badge/tests-1184%20Pest-8BC34A?logo=pestphp&logoColor=white)](#development)
+[![CI](https://github.com/GabeSilvaDev/knowledge-hub/actions/workflows/ci.yml/badge.svg)](https://github.com/GabeSilvaDev/knowledge-hub/actions/workflows/ci.yml)
+[![Pest](https://img.shields.io/badge/tests-1192%20Pest-8BC34A?logo=pestphp&logoColor=white)](#development)
 [![PHPStan](https://img.shields.io/badge/PHPStan-level%2010-4F5B93)](#development)
 [![License](https://img.shields.io/badge/license-MIT-555)](LICENSE)
 
@@ -58,7 +59,7 @@ Observers on the Mongo models keep the other stores in sync: saving an article r
 - **Recommendations** — similar users (shared follows), related articles (shared tags/categories), most-followed authors and topics of interest, all as Cypher queries on Neo4j.
 - **Rankings** — most-viewed articles tracked by a middleware into a Redis sorted set; an influence score per user with a documented formula.
 - **Token auth** — Laravel Sanctum bearer tokens with logout, revoke-all and a revoked-token check on every request.
-- **Quality gates** — 1,184 Pest tests, PHPStan level 10, Pint (PSR-12) and Rector.
+- **Quality gates** — 1,192 Pest tests, PHPStan level 10, Pint (PSR-12) and Rector.
 
 ## API reference
 
@@ -208,13 +209,13 @@ php artisan scout:import "App\Models\Article"
 ## Development
 
 ```bash
-docker exec -it knowledge-hub-app ./vendor/bin/pest           # 1,184 tests
+docker exec -it knowledge-hub-app ./vendor/bin/pest           # 1,192 tests
 docker exec -it knowledge-hub-app ./vendor/bin/phpstan analyse  # level 10
 docker exec -it knowledge-hub-app ./vendor/bin/pint             # PSR-12
 docker exec -it knowledge-hub-app ./vendor/bin/rector process --dry-run
 ```
 
-Tests run against a `knowledge_hub_test` MongoDB database with the array cache driver and Scout disabled (`phpunit.xml`), so the suite needs only the `mongo` container. Feature tests cover every controller; unit tests cover services, repositories, DTOs, value objects, observers, cache, helpers and console commands.
+Tests run against a `knowledge_hub_test` MongoDB database with the array cache driver and Scout disabled (`phpunit.xml`), and the suite talks to real MongoDB, Redis (rankings) and Neo4j (graph) instances, so start the `mongo`, `redis` and `neo4j` containers first. [CI](.github/workflows/ci.yml) runs the same suite on every push and pull request with 100% line coverage enforced, alongside Pint, PHPStan and Rector. Feature tests cover every controller; unit tests cover services, repositories, DTOs, value objects, observers, cache, helpers and console commands.
 
 ## Project structure
 

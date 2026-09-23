@@ -12,7 +12,8 @@
 [![Redis](https://img.shields.io/badge/Redis-7-DC382D?logo=redis&logoColor=white)](https://redis.io)
 [![Meilisearch](https://img.shields.io/badge/Meilisearch-1.12-FF5CAA?logo=meilisearch&logoColor=white)](https://meilisearch.com)
 [![Neo4j](https://img.shields.io/badge/Neo4j-5.26-008CC1?logo=neo4j&logoColor=white)](https://neo4j.com)
-[![Pest](https://img.shields.io/badge/testes-1184%20Pest-8BC34A?logo=pestphp&logoColor=white)](#desenvolvimento)
+[![CI](https://github.com/GabeSilvaDev/knowledge-hub/actions/workflows/ci.yml/badge.svg)](https://github.com/GabeSilvaDev/knowledge-hub/actions/workflows/ci.yml)
+[![Pest](https://img.shields.io/badge/testes-1192%20Pest-8BC34A?logo=pestphp&logoColor=white)](#desenvolvimento)
 [![PHPStan](https://img.shields.io/badge/PHPStan-n%C3%ADvel%2010-4F5B93)](#desenvolvimento)
 [![Licença](https://img.shields.io/badge/licen%C3%A7a-MIT-555)](LICENSE)
 
@@ -58,7 +59,7 @@ Observers nos models do Mongo mantêm os outros bancos sincronizados: salvar um 
 - **Recomendações** — usuários similares (follows em comum), artigos relacionados (tags/categorias em comum), autores mais seguidos e tópicos de interesse, tudo em consultas Cypher no Neo4j.
 - **Rankings** — artigos mais vistos rastreados por um middleware num sorted set do Redis; score de influência por usuário com fórmula documentada.
 - **Autenticação por token** — bearer tokens do Laravel Sanctum com logout, revogação total e checagem de token revogado em toda requisição.
-- **Portões de qualidade** — 1.184 testes Pest, PHPStan nível 10, Pint (PSR-12) e Rector.
+- **Portões de qualidade** — 1.192 testes Pest, PHPStan nível 10, Pint (PSR-12) e Rector.
 
 ## Referência da API
 
@@ -208,13 +209,13 @@ php artisan scout:import "App\Models\Article"
 ## Desenvolvimento
 
 ```bash
-docker exec -it knowledge-hub-app ./vendor/bin/pest           # 1.184 testes
+docker exec -it knowledge-hub-app ./vendor/bin/pest           # 1.192 testes
 docker exec -it knowledge-hub-app ./vendor/bin/phpstan analyse  # nível 10
 docker exec -it knowledge-hub-app ./vendor/bin/pint             # PSR-12
 docker exec -it knowledge-hub-app ./vendor/bin/rector process --dry-run
 ```
 
-Os testes rodam contra o banco MongoDB `knowledge_hub_test`, com cache em array e Scout desligado (`phpunit.xml`), então a suíte precisa só do container `mongo`. Testes de feature cobrem todos os controllers; testes unitários cobrem services, repositories, DTOs, value objects, observers, cache, helpers e comandos de console.
+Os testes rodam contra o banco MongoDB `knowledge_hub_test`, com cache em array e Scout desligado (`phpunit.xml`), e a suíte usa instâncias reais de MongoDB, Redis (rankings) e Neo4j (grafo), então suba antes os containers `mongo`, `redis` e `neo4j`. O [CI](.github/workflows/ci.yml) roda a mesma suíte a cada push e pull request, exigindo 100% de cobertura de linhas, junto com Pint, PHPStan e Rector. Testes de feature cobrem todos os controllers; testes unitários cobrem services, repositories, DTOs, value objects, observers, cache, helpers e comandos de console.
 
 ## Estrutura do projeto
 
